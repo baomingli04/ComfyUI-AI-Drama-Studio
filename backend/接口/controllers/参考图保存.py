@@ -125,12 +125,14 @@ def 参考图保存(请求):
 
         if 动作 == '删资产':
             # 删除整个美术资产：该资产全部参考图 + 定装行 + 资产行（不需要图 id）
-            参考图.objects.filter(资产行id=定装id).delete()
-            定装.delete()
-            资产id = 资产行.资产id if 资产行 else ''
-            if 资产行:
-                资产行.delete()
-            return Response({'ok': True, '删除资产': 资产id})
+            # 2026-11-04：三步删除包进事务，中途异常不再留下半删状态
+            from django.db import transaction as _事务
+            with _事务.atomic():
+                参考图.objects.filter(资产行id=定装id).delete()
+                定装.delete()
+                if 资产行:
+                    资产行.delete()
+            return Response({'ok': True, '删除资产': 资产行.资产id if 资产行 else ''})
 
         if 动作 == '添加':
             url = str(数据.get('url') or '').strip()

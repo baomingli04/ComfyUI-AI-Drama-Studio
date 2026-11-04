@@ -113,16 +113,16 @@
       </div>
       <div style="flex:1"></div>
       <template v-if="视图 === '角色卡'">
-        <el-button size="mini" icon="el-icon-edit" :disabled="!选中角色" @click="打开编辑(选中角色)">
+        <el-button size="mini" icon="el-icon-edit" :disabled="!选中角色" @click="$refs.角色编辑弹窗.打开编辑(选中角色)">
           编辑选中
         </el-button>
-        <el-button size="mini" icon="el-icon-plus" @click="打开新增()">手动新增</el-button>
-        <el-button size="mini" type="primary" plain icon="el-icon-magic-stick" @click="打开AI新增()">
+        <el-button size="mini" icon="el-icon-plus" @click="$refs.角色编辑弹窗.打开新增()">手动新增</el-button>
+        <el-button size="mini" type="primary" plain icon="el-icon-magic-stick" @click="$refs.AI新增人物弹窗.打开AI新增()">
           AI 新增人物
         </el-button>
       </template>
       <template v-else>
-        <el-button size="mini" icon="el-icon-plus" @click="打开新增关系()">新增关系</el-button>
+        <el-button size="mini" icon="el-icon-plus" @click="$refs.关系编辑弹窗.打开新增关系()">新增关系</el-button>
         <el-button size="mini" type="primary" plain icon="el-icon-magic-stick" :loading="关系中" @click="生成关系网()">
           AI 补关系网
         </el-button>
@@ -158,7 +158,7 @@
               <span v-if="角色变化数(人)" class="小标签 变化标">随集变 {{ 角色变化数(人) }}</span>
               <span v-if="人.来源 === 'AI新增' || 人.来源 === '手动新增'" class="小标签 新增标">{{ 人.来源 }}</span>
               <div style="flex:1"></div>
-              <el-button size="mini" icon="el-icon-edit" @click.stop="打开编辑(人)">编辑</el-button>
+              <el-button size="mini" icon="el-icon-edit" @click.stop="$refs.角色编辑弹窗.打开编辑(人)">编辑</el-button>
             </div>
           </div>
         </div>
@@ -212,7 +212,7 @@
               随集变 {{ 关系阶段(边).length }} 段
             </span>
             <div style="flex:1"></div>
-            <el-button size="mini" icon="el-icon-edit" @click="打开编辑关系(边)">编辑</el-button>
+            <el-button size="mini" icon="el-icon-edit" @click="$refs.关系编辑弹窗.打开编辑关系(边)">编辑</el-button>
           </div>
           <div v-if="边.关键词 && 边.关键词.length" class="关系词">
             <span v-for="(词, 序) in 边.关键词" :key="'词' + 序" class="词">{{ 词 }}</span>
@@ -251,7 +251,7 @@
         <span class="小标签">{{ 选中角色.关系 }}</span>
         <span class="小标签 灰">{{ 选中角色.资产ID }}</span>
         <div style="flex:1"></div>
-        <el-button size="mini" icon="el-icon-edit" @click="打开编辑(选中角色)">编辑</el-button>
+        <el-button size="mini" icon="el-icon-edit" @click="$refs.角色编辑弹窗.打开编辑(选中角色)">编辑</el-button>
         <i class="el-icon-close 关闭钮" title="收起" @click="选中角色 = null"></i>
       </div>
 
@@ -300,262 +300,43 @@
     </div>
     </template>
 
-    <!-- 角色表单弹窗：新增和编辑共用一套字段。
-         新增时标题写「新增角色」，底部是「加入人物设定」；编辑时是「保存」+ 左侧「删除」。 -->
-    <el-dialog
-      :visible.sync="编辑显示"
-      width="680px"
-      top="6vh"
-      custom-class="角色编辑弹窗"
-      :show-close="false"
-      :close-on-click-modal="false">
-      <div class="弹窗头">
-        <div>
-          <div class="弹窗标题">{{ 新增模式 ? '新增角色' : '编辑角色 · ' + 草稿.名 }}</div>
-          <div class="弹窗副题">{{ 新增模式 ? '填完点「加入人物设定」，这张卡会出现在「本剧角色」里' : '改完点保存，直接写回这张角色卡。会随剧情变的字段点「按集拆分」，写成第1-5集 / 第6-8集' }}</div>
-        </div>
-        <i class="el-icon-close 弹窗关闭" title="关闭" @click="编辑显示 = false"></i>
-      </div>
-      <div class="弹窗体">
-        <div v-if="新增原文" class="AI原文">
-          <div class="行间" style="margin-bottom:6px">
-            <span class="AI原文标">AI 原文</span>
-            <span class="AI原文注">下面各字段是从这段原文里拆出来的，拆错了直接改字段</span>
-            <div style="flex:1"></div>
-            <el-button type="text" size="mini" @click="新增原文 = ''">收起</el-button>
-          </div>
-          <pre class="原文">{{ 新增原文 }}</pre>
-        </div>
-        <el-form label-width="76px" size="small">
-          <el-form-item label="名">
-            <el-input v-model="草稿.名" maxlength="20" placeholder="角色名，别和已有角色重名"></el-input>
-          </el-form-item>
-          <el-form-item label="本剧关系">
-            <el-input v-model="草稿.关系" maxlength="20" placeholder="主角 / 核心成员 / 功能性角色 / 反派"></el-input>
-          </el-form-item>
-          <el-form-item label="性别">
-            <el-input v-model="草稿.性别" maxlength="4"></el-input>
-          </el-form-item>
-          <el-form-item label="年龄">
-            <el-input v-model="草稿.年龄" maxlength="6"></el-input>
-          </el-form-item>
-          <el-form-item label="简介">
-            <el-input v-model="草稿.简介" type="textarea" :autosize="{ minRows: 1, maxRows: 3 }"></el-input>
-          </el-form-item>
-        </el-form>
+    <!-- 角色表单弹窗（已拆分为独立组件） -->
+    <juese-edit-dialog
+      ref="角色编辑弹窗"
+      :显示.sync="编辑显示"
+      :总集="总集"
+      :角色表="角色表"
+      :关系表="关系表"
+      :选中角色.sync="选中角色"
+      :关系筛选.sync="关系筛选"
+      @已保存="存本地()"
+      @删除="删除角色($event)"></juese-edit-dialog>
 
-        <!-- 详情字段按 字段分组 铺：基本信息 / 外形 / 当前状态 / 能力与目标 / 关系 / 背景与台词 -->
-        <div v-for="组 in 编辑分组" :key="'编' + 组.名" class="编辑组">
-          <div class="编辑组名">{{ 组.名 }}</div>
-          <el-form label-width="76px" size="small">
-            <el-form-item v-for="键 in 组.字段" :key="键" :label="String(键)">
-              <!-- 分阶段：一条字段拆成「第1-5集 / 第6-8集」几段，各自一个值 -->
-              <div v-if="是分段值(键)" class="段编辑列">
-                <div v-for="(段, 序) in 草稿.详[键]" :key="序" class="段编辑行">
-                  <span class="段编辑字">第</span>
-                  <el-input-number
-                    v-model="段.起" :min="1" :max="总集" :controls="false"
-                    size="mini" style="width:54px"></el-input-number>
-                  <span class="段编辑字">–</span>
-                  <el-input-number
-                    v-model="段.止" :min="1" :max="总集" :controls="false"
-                    size="mini" style="width:54px"></el-input-number>
-                  <span class="段编辑字">集</span>
-                  <el-input
-                    v-model="段.值"
-                    type="textarea"
-                    :autosize="{ minRows: 1, maxRows: 3 }"
-                    class="段编辑值"></el-input>
-                  <i class="el-icon-close 段编辑删" title="删掉这一段" @click="删一段(键, 序)"></i>
-                </div>
-                <div class="段编辑底">
-                  <el-button type="text" size="mini" icon="el-icon-plus" @click="加一段(键)">加一段</el-button>
-                  <el-button type="text" size="mini" @click="合并字段(键)">合并成单值</el-button>
-                </div>
-              </div>
-              <!-- 单值：全剧不变，一句话写完 -->
-              <template v-else>
-                <el-input
-                  v-model="草稿.详[键]"
-                  type="textarea"
-                  :autosize="{ minRows: 1, maxRows: 4 }"></el-input>
-                <el-button
-                  v-if="可分段(键)"
-                  type="text"
-                  size="mini"
-                  class="拆分钮"
-                  @click="拆分字段(键)">按集拆分（会随剧情变就拆）</el-button>
-              </template>
-            </el-form-item>
-          </el-form>
-        </div>
-      </div>
-      <div class="弹窗底">
-        <el-button v-if="!新增模式" type="text" class="删除钮" @click="删除角色()">删除这个角色</el-button>
-        <div style="flex:1"></div>
-        <el-button @click="编辑显示 = false">取消</el-button>
-        <el-button type="primary" @click="保存角色()">{{ 新增模式 ? '加入人物设定' : '保存' }}</el-button>
-      </div>
-    </el-dialog>
+    <!-- 关系编辑弹窗（已拆分为独立组件） -->
+    <guanxi-edit-dialog
+      ref="关系编辑弹窗"
+      :显示.sync="关系编辑显示"
+      :总集="总集"
+      :角色名们="角色名们"
+      :关系表="关系表"
+      @已保存="存本地()"></guanxi-edit-dialog>
 
-    <!-- 关系编辑弹窗：一条边 = 甲 ↔ 乙 + 类型 + 关键词 + 一句话说明 -->
-    <el-dialog
-      :visible.sync="关系编辑显示"
-      width="580px"
-      top="10vh"
-      custom-class="关系编辑弹窗"
-      :show-close="false"
-      :close-on-click-modal="false">
-      <div class="弹窗头">
-        <div>
-          <div class="弹窗标题">{{ 关系新增模式 ? '新增关系' : '编辑关系 · ' + 关系草稿.甲 + ' ↔ ' + 关系草稿.乙 }}</div>
-          <div class="弹窗副题">两个人之间的这一条边：类型 + 关键词 + 说明。关系在第几集变了，就点「按集拆分」拆成几段</div>
-        </div>
-        <i class="el-icon-close 弹窗关闭" title="关闭" @click="关系编辑显示 = false"></i>
-      </div>
-      <div class="弹窗体">
-        <el-form label-width="72px" size="small">
-          <el-form-item label="甲">
-            <el-select v-model="关系草稿.甲" style="width:200px">
-              <el-option v-for="人 in 角色名们" :key="'甲' + 人" :label="人" :value="人"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="乙">
-            <el-select v-model="关系草稿.乙" style="width:200px">
-              <el-option v-for="人 in 角色名们" :key="'乙' + 人" :label="人" :value="人"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item v-if="!关系草稿.阶段.length" label="类型">
-            <el-select v-model="关系草稿.类型" style="width:200px">
-              <el-option v-for="型 in 关系类型们" :key="型" :label="型" :value="型"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="关键词">
-            <el-input v-model="关系草稿.关键词" placeholder="顿号分隔，例：挡与补位、出手权交接"></el-input>
-          </el-form-item>
-          <el-form-item v-if="!关系草稿.阶段.length" label="说明">
-            <el-input
-              v-model="关系草稿.说明"
-              type="textarea"
-              :rows="3"
-              placeholder="一句话写清这两人的关系从什么变成什么"></el-input>
-          </el-form-item>
-          <!-- 分阶段：这段关系在第几集变了，就拆成几段，各自一个类型 + 说明 -->
-          <el-form-item label="分阶段">
-            <div v-if="关系草稿.阶段.length" class="段编辑列">
-              <div v-for="(段, 序) in 关系草稿.阶段" :key="'关段' + 序" class="段编辑行">
-                <span class="段编辑字">第</span>
-                <el-input-number
-                  v-model="段.起" :min="1" :max="总集" :controls="false"
-                  size="mini" style="width:54px"></el-input-number>
-                <span class="段编辑字">–</span>
-                <el-input-number
-                  v-model="段.止" :min="1" :max="总集" :controls="false"
-                  size="mini" style="width:54px"></el-input-number>
-                <span class="段编辑字">集</span>
-                <el-select v-model="段.类型" size="mini" style="width:88px">
-                  <el-option v-for="型 in 关系类型们" :key="'关型' + 型" :label="型" :value="型"></el-option>
-                </el-select>
-                <el-input
-                  v-model="段.说明"
-                  type="textarea"
-                  :autosize="{ minRows: 1, maxRows: 3 }"
-                  class="段编辑值"
-                  placeholder="这一段关系是什么样"></el-input>
-                <i class="el-icon-close 段编辑删" title="删掉这一段" @click="删关系段(序)"></i>
-              </div>
-              <div class="段编辑底">
-                <el-button type="text" size="mini" icon="el-icon-plus" @click="加关系段()">加一段</el-button>
-                <el-button type="text" size="mini" @click="合并关系()">合并成单值</el-button>
-              </div>
-            </div>
-            <template v-else>
-              <el-button type="text" size="mini" @click="拆分关系()">按集拆分（这段关系会变就拆）</el-button>
-              <span class="段编辑注">不拆就是全剧一个类型，拆了才能写「第1-5集普通，第6集起情侣」</span>
-            </template>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div class="弹窗底">
-        <el-button v-if="!关系新增模式" type="text" class="删除钮" @click="删除关系()">删除这条关系</el-button>
-        <div style="flex:1"></div>
-        <el-button @click="关系编辑显示 = false">取消</el-button>
-        <el-button type="primary" @click="保存关系()">保存</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- AI 新增人物：说一句要加什么样的人 → AI 按「技能 + 技能引导提示词 + 引入数据」出一份设定
-         → 拆成字段填进上面的表单 → 你确认后才真正加进列表。 -->
-    <el-dialog
-      :visible.sync="AI新增显示"
-      width="720px"
-      top="6vh"
-      custom-class="AI新增弹窗"
-      :show-close="false"
-      :close-on-click-modal="false">
-      <div class="弹窗头">
-        <div>
-          <div class="弹窗标题">AI 新增人物</div>
-          <div class="弹窗副题">说一句要加什么样的人，AI 出一份角色设定；生成后先给你改，确认了才进列表</div>
-        </div>
-        <i class="el-icon-close 弹窗关闭" title="关闭" @click="AI新增显示 = false"></i>
-      </div>
-      <div class="弹窗体">
-        <!-- ① 技能 -->
-        <div class="AI段">
-          <div class="AI段头">
-            <span class="AI序">1</span><span class="AI段名">技能</span>
-            <span class="AI段说">用哪个技能来写这个角色</span>
-          </div>
-          <el-select v-model="新增技能id" size="small" style="width:320px" placeholder="选一个技能">
-            <el-option v-for="技 in 技能列表" :key="技.id" :label="技.名称" :value="技.id"></el-option>
-          </el-select>
-        </div>
-
-        <!-- ② 技能引导提示词 -->
-        <div class="AI段">
-          <div class="AI段头">
-            <span class="AI序">2</span><span class="AI段名">技能引导提示词</span>
-            <span class="AI段说">这次生成额外遵守的规则，只影响这一次</span>
-            <div style="flex:1"></div>
-            <el-button type="text" size="mini" @click="新增引导 = 新增默认引导">恢复默认</el-button>
-          </div>
-          <el-input v-model="新增引导" type="textarea" :rows="8"></el-input>
-        </div>
-
-        <!-- ③ 要加的人 -->
-        <div class="AI段">
-          <div class="AI段头">
-            <span class="AI序">3</span><span class="AI段名">要加的人</span>
-            <span class="AI段说">一句话说清用途：做什么的、制造什么冲突</span>
-          </div>
-          <el-input
-            v-model="新增需求"
-            type="textarea"
-            :rows="2"
-            placeholder="例：加一个守旧的教务处主任，前 2 集不断给主角使绊子，第 3 集被主角当面打脸"></el-input>
-        </div>
-
-        <!-- ④ 引入数据 -->
-        <div class="AI段">
-          <div class="AI段头">
-            <span class="AI序">4</span><span class="AI段名">引入数据</span>
-            <span class="AI段说">勾上的会随需求一起发给 AI，不勾就不发</span>
-            <div style="flex:1"></div>
-            <el-button type="text" size="mini" @click="全选新增引入(true)">全选</el-button>
-            <el-button type="text" size="mini" @click="全选新增引入(false)">全不选</el-button>
-          </div>
-          <div v-for="项 in 新增引入" :key="项.键" class="AI引入项">
-            <el-checkbox v-model="项.勾选">{{ 项.名 }}</el-checkbox>
-            <div class="AI引入值">{{ 项.值 || '（空）' }}</div>
-          </div>
-        </div>
-      </div>
-      <div class="弹窗底">
-        <el-button @click="AI新增显示 = false">取消</el-button>
-        <el-button type="primary" :loading="新增中" @click="生成新角色()">AI 生成这个角色</el-button>
-      </div>
-    </el-dialog>
+    <!-- AI 新增人物弹窗（已拆分为独立组件） -->
+    <ai-xinzeng-dialog
+      ref="AI新增人物弹窗"
+      :显示.sync="AI新增显示"
+      :技能列表="技能列表"
+      :扩写技能id="扩写技能id"
+      :剧名="剧名"
+      :集数="集数"
+      :题材="题材"
+      :创意文本="创意文本"
+      :已选方案名="已选方案名"
+      :已选方案文本="已选方案文本()"
+      :总集="总集"
+      :角色表="角色表"
+      @报错="扩写报错($event)"
+      @生成成功="$refs.角色编辑弹窗.填入新角色($event)"></ai-xinzeng-dialog>
 
     <!-- 技能生成弹窗：技能 + 技能引导提示词 + 引入数据（本页一套）。
          in-DOM 模板只认 ASCII 标签名，必须用 skill-dialog 别名（见 docs/09 第 8 节）；
@@ -577,14 +358,17 @@
 import 步骤条 from '@/共用/步骤条/index.vue'
 import 技能生成弹窗 from '@/共用/技能生成弹窗/index.vue'
 import 剧本页混入 from '@/共用/剧本页混入'
+import 角色编辑弹窗 from './角色编辑弹窗.vue'
+import 关系编辑弹窗 from './关系编辑弹窗.vue'
+import AI新增人物弹窗 from './AI新增人物弹窗.vue'
 import { 读引导, 读技能id, 读引入, 存引入, 读创意, 存创意, 适配技能id } from '@/共用/技能生成配置'
 import { 复制到剪贴板 } from '@/共用/复制文本'
 import { 发, 取 } from '@/接口/请求'
 import { 提交AI任务 } from '@/共用/AI任务'
 import {
-  角色字段, 字段分组, 关系类型们, 关系色, 可分段字段,
+  字段分组, 关系类型们, 关系色, 可分段字段,
   空角色详, 规整详, 规整段, 是分段,
-  拆分段, 合分段, 文本转值, 集标签, 值文本, 变化点,
+  文本转值, 集标签, 值文本, 变化点,
   关系类型, 关系说明, 关系一行, 解析关系阶段, 筛关系, 是同一条边
 } from '@/共用/人物工具'
 
@@ -617,17 +401,6 @@ const 默认引导文本 = [
   '7. 只输出这些行，不要表头、不要解释、不要前后缀。'
 ].join('\n')
 
-// 「AI 新增人物」的默认技能引导提示词：一个角色一行，字段序和编辑弹窗对得上
-const 新增默认引导文本 = [
-  '1. 你要写的是短剧「新增角色」的角色设定，不是视频/图片提示词：禁止输出 <Picture N>、<Video N>、<Audio N> 之类标签，也不要写镜头运动、光影、音效。',
-  '2. 只写一个新角色，一行，格式固定为 ' + 行格式说明 + '，中间用全角竖线 ｜ 分隔，一共 ' + (5 + 行字段.length) + ' 段。',
-  '3. 每段都要写满，不许留空；外貌/身材/穿搭要能直接拿去画，当前状态/当前姿势/内心想法写成「这一刻」的样子。',
-  '4. 会随剧情变的字段按集分段写：第1-5集：旧状态；第6集起：新状态；不变化就写一句话。会变的字段是：' + 可分段字段.join('、') + '。',
-  '5. 不许和已有角色重名，也不许和已有角色功能重复；本剧关系要能挂到已选方案的故事线上。',
-  '6. 新角色必须有用：要么制造压力/冲突，要么推动爽点，写清他在前几集干什么。',
-  '7. 只输出这一行，不要表头、不要解释、不要前后缀。'
-].join('\n')
-
 // 「AI 补关系网」的默认技能引导提示词：一行一条边
 const 关系默认引导文本 = [
   '1. 你要写的是短剧「人物关系网」，不是剧情、不是人物设定。',
@@ -657,7 +430,13 @@ function 拆行(文本) {
 export default {
   name: 'ScriptCharacter',
   mixins: [剧本页混入],
-  components: { 'step-bar': 步骤条, 'skill-dialog': 技能生成弹窗 },
+  components: {
+    'step-bar': 步骤条,
+    'skill-dialog': 技能生成弹窗,
+    'juese-edit-dialog': 角色编辑弹窗,
+    'guanxi-edit-dialog': 关系编辑弹窗,
+    'ai-xinzeng-dialog': AI新增人物弹窗
+  },
   created() {
     // 从别处带过来的「一句话创意」：路由有就记住，没有就用上次补的
     const 路由创意 = (this.$route.query.创意 || '').trim()
@@ -668,7 +447,6 @@ export default {
       this.创意文本 = 读创意(this.剧名)
     }
     this.载入本页配置()
-    this.载入新增配置()
     this.载入()
   },
   data() {
@@ -685,10 +463,8 @@ export default {
       关系筛选: '全部',
       关系预览: [],
       关系中: false,
+      /* 关系编辑弹窗（显隐留父，内容在 关系编辑弹窗.vue 里） */
       关系编辑显示: false,
-      关系新增模式: false,
-      关系编辑对象: null,
-      关系草稿: { 甲: '', 乙: '', 类型: '羁绊', 关键词: '', 说明: '', 阶段: [] },
       /* 真库载入状态 */
       载入中: false,
       载入报错: '',
@@ -710,19 +486,10 @@ export default {
       技能弹窗显示: false,
       技能引导: '',
       引入勾选: null,
-      /* 角色表单弹窗（新增 / 编辑共用） */
+      /* 角色表单弹窗（显隐留父，内容在 角色编辑弹窗.vue 里） */
       编辑显示: false,
-      新增模式: false,
-      编辑对象: null,
-      新增原文: '',
-      草稿: { 名: '', 关系: '', 性别: '', 年龄: '', 简介: '', 详: 空角色详() },
-      /* AI 新增人物弹窗 */
-      AI新增显示: false,
-      新增技能id: '',
-      新增引导: '',
-      新增需求: '',
-      新增勾选: null,
-      新增中: false
+      /* AI 新增人物弹窗（显隐留父，内容在 AI新增人物弹窗.vue 里） */
+      AI新增显示: false
     }
   },
   computed: {
@@ -775,29 +542,6 @@ export default {
     引入数据() {
       return this.造引入数据(this.引入勾选)
     },
-    /* ---- AI 新增人物 ---- */
-    // 新增弹窗的配置 key 单独一套：生成:/script/character#新增人物
-    新增配置类型() {
-      return '生成:' + (this.$route.path || '') + '#新增人物'
-    },
-    新增默认引导() {
-      return 新增默认引导文本
-    },
-    // 现有角色清单：给 AI 看，避免重名、避免功能重复。
-    // 会随集数变的字段按「第1-5集：…；第6集起：…」铺开，AI 才知道这个人是怎么长起来的
-    现有角色文本() {
-      const 行们 = ['角色名｜本剧关系｜性别｜年龄｜一句话简介｜性格｜身份｜关系网']
-      const 总 = this.总集
-      this.角色表.forEach(人 => {
-        if (String(人.资产ID || '').indexOf('CHAR_') !== 0) return
-        const 详 = 规整详(人.详)
-        行们.push([
-          人.名, 人.关系, 人.性别, 人.年龄, 人.简介,
-          值文本(详.性格, 总), 值文本(详.身份, 总), 值文本(详.关系网, 总)
-        ].join('｜'))
-      })
-      return 行们.join('\n')
-    },
     // 现有关系网：补新角色 / 补关系网时都要看，别补出一个和谁都不连的人。
     // 有阶段的边写成「第1-5集 协作（…）；第6-8集 羁绊（…）」，和 AI 输出格式互逆
     关系网文本() {
@@ -806,30 +550,6 @@ export default {
       const 总 = this.总集
       this.关系表.forEach(function (边) { 行们.push(关系一行(边, 总)) })
       return 行们.join('\n')
-    },
-    新增引入() {
-      const 勾 = this.新增勾选
-      const 项们 = [
-        { 键: '标题', 名: '标题（剧名）', 值: this.剧名 },
-        { 键: '创意', 名: '一句话创意', 值: this.创意文本 },
-        { 键: '方案', 名: '已选方案（' + this.已选方案名 + '）', 值: this.已选方案文本() },
-        { 键: '现有角色', 名: '现有角色（别重名、别重复功能）', 值: this.现有角色文本 }
-      ]
-      // null/undefined = 没配过，默认全选；[] = 用户点过「全不选」，要尊重
-      for (let i = 0; i < 项们.length; i++) {
-        项们[i].勾选 = 勾 == null ? true : 勾.indexOf(项们[i].键) >= 0
-      }
-      return 项们
-    },
-    // 编辑弹窗里的详情字段：按 字段分组 铺；姓名/性别/年龄 顶部已经单独有输入框，这里跳过
-    编辑分组() {
-      const 跳 = ['姓名', '性别', '年龄']
-      return 字段分组.map(function (组) {
-        return {
-          名: 组.名,
-          字段: 组.字段.filter(function (键) { return 跳.indexOf(键) < 0 })
-        }
-      }).filter(function (组) { return 组.字段.length > 0 })
     },
     /* ---- 关系网 ---- */
     角色数() {
@@ -1059,142 +779,9 @@ export default {
     },
 
     /* ---------------- 角色编辑 / 新增 ---------------- */
-    打开编辑(人) {
-      if (!人) return
-      this.新增模式 = false
-      this.新增原文 = ''
-      this.编辑对象 = 人
-      this.草稿 = JSON.parse(JSON.stringify({
-        名: 人.名, 关系: 人.关系, 性别: 人.性别, 年龄: 人.年龄,
-        简介: 人.简介, 详: 规整详(人.详)
-      }))
-      this.编辑显示 = true
-    },
-    // 手动新增：空白草稿，字段和编辑一样（23 个字段先铺满，缺的显示空）
-    打开新增() {
-      this.新增模式 = true
-      this.新增原文 = ''
-      this.编辑对象 = null
-      this.草稿 = {
-        名: '', 关系: '功能性角色', 性别: '', 年龄: '', 简介: '',
-        详: 空角色详()
-      }
-      this.编辑显示 = true
-    },
-    /* ---- 编辑弹窗里的「按集分段」：把一句话拆成第1-5集 / 第6-8集几段 ---- */
-    // 这个字段允不允许按集拆分（姓名/性别/年龄这种永远不变的就不给按钮）
-    可分段(键) {
-      return 可分段字段.indexOf(键) >= 0
-    },
-    // 草稿的这个字段现在是不是分段形态
-    是分段值(键) {
-      return 是分段(this.草稿 && this.草稿.详 ? this.草稿.详[键] : '')
-    },
-    // 单值 → 分段：先包成「第1集到最后一集」的一段，再自己拆
-    拆分字段(键) {
-      this.草稿.详[键] = 拆分段(this.草稿.详[键], this.总集)
-    },
-    // 分段 → 单值：取最新一段，并说清取的是哪一段（不静默丢信息）
-    合并字段(键) {
-      const 段们 = 规整段(this.草稿.详[键], this.总集)
-      const 末 = 段们[段们.length - 1]
-      this.草稿.详[键] = 合分段(this.草稿.详[键], this.总集)
-      if (末) {
-        this.$message({
-          message: '已合并成单值，取的是「' + 集标签(末.起, 末.止, this.总集) + '」这一段',
-          type: 'info'
-        })
-      }
-    },
-    // 加一段：从上一段结束的下一集开始，到最后一集
-    加一段(键) {
-      const 段们 = 规整段(this.草稿.详[键], this.总集)
-      const 末 = 段们[段们.length - 1]
-      const 起 = 末 ? Math.min(末.止 + 1, this.总集) : 1
-      this.草稿.详[键] = 段们.concat([{ 起: 起, 止: this.总集, 值: '', 类型: '', 说明: '' }])
-    },
-    删一段(键, 序) {
-      const 段们 = 规整段(this.草稿.详[键], this.总集)
-      if (段们.length <= 1) {
-        this.$message.warning('至少留一段；想变回一句话就点「合并成单值」')
-        return
-      }
-      段们.splice(序, 1)
-      this.草稿.详[键] = 段们
-    },
-    保存角色() {
-      if (this.新增模式) {
-        this.加入角色()
-        return
-      }
-      const 人 = this.编辑对象
-      if (!人) {
-        this.编辑显示 = false
-        return
-      }
-      const 旧名 = 人.名
-      人.名 = this.草稿.名
-      人.关系 = this.草稿.关系
-      人.性别 = this.草稿.性别
-      人.年龄 = this.草稿.年龄
-      人.简介 = this.草稿.简介
-      // 详情里的姓名/性别/年龄跟着顶部改，避免两处对不上
-      人.详 = Object.assign({}, 规整详(人.详), 规整详(this.草稿.详), {
-        姓名: this.草稿.名, 性别: this.草稿.性别, 年龄: this.草稿.年龄
-      })
-      // 改名要带着关系网一起改，否则边会指向一个不存在的角色
-      if (旧名 && 人.名 && 旧名 !== 人.名) {
-        this.关系表.forEach(function (边) {
-          if (边.甲 === 旧名) 边.甲 = 人.名
-          if (边.乙 === 旧名) 边.乙 = 人.名
-        })
-        if (this.关系筛选 === 旧名) this.关系筛选 = '全部'
-      }
-      this.编辑显示 = false
-      this.存本地()
-      this.$message.success('已保存「' + 人.名 + '」的设定')
-    },
-    // 新角色的 资产ID / id 接着现有的往下排，别和已有角色撞号
-    下一个角色编号() {
-      let 最大 = 0
-      let 最大id = 0
-      this.角色表.forEach(人 => {
-        if (人.id > 最大id) 最大id = 人.id
-        const 号 = parseInt(String(人.资产ID || '').replace('CHAR_', ''), 10)
-        if (!isNaN(号) && 号 > 最大) 最大 = 号
-      })
-      return { 号: 最大 + 1, id: 最大id + 1 }
-    },
-    加入角色() {
-      const 名 = (this.草稿.名 || '').trim()
-      if (!名) {
-        this.$message.warning('先给这个角色起个名')
-        return
-      }
-      const 编 = this.下一个角色编号()
-      const 新 = {
-        分组: '本剧角色',
-        来源: this.新增原文 ? 'AI新增' : '手动新增',
-        id: 编.id,
-        资产ID: 'CHAR_' + String(编.号).padStart(3, '0'),
-        关系: this.草稿.关系 || '功能性角色',
-        名: 名,
-        性别: this.草稿.性别 || '-',
-        年龄: this.草稿.年龄 || '-',
-        简介: this.草稿.简介 || '',
-        色: 角色色盘[(编.号 - 1) % 角色色盘.length],
-        详: Object.assign({}, 规整详(this.草稿.详), {
-          姓名: 名, 性别: this.草稿.性别 || '-', 年龄: this.草稿.年龄 || '-'
-        })
-      }
-      this.角色表.push(新)
-      this.选中角色 = 新
-      this.编辑显示 = false
-      this.存本地()
-      this.$message.success('已把「' + 名 + '」加进人物设定')
-    },
-    删除角色() {
-      const 人 = this.编辑对象
+    // 删除角色：弹窗里点「删除这个角色」后 $emit('删除', 编辑对象) 到这里。
+    // 因删除要整体重赋值 关系表（filter 出新数组）并重置 选中角色/关系筛选，逻辑留在父组件。
+    删除角色(人) {
       if (!人) return
       const 页 = this
       const 连边 = this.关系表.filter(function (边) { return 边.甲 === 人.名 || 边.乙 === 人.名 })
@@ -1216,122 +803,6 @@ export default {
       }).catch(function () {})
     },
 
-    /* ---------------- AI 新增人物 ---------------- */
-    async 载入新增配置() {
-      const 类型 = this.新增配置类型
-      this.新增技能id = 适配技能id(this.技能列表, 类型)
-      this.新增引导 = 新增默认引导文本
-      try {
-        const 引导 = await 读引导(类型)
-        if (引导) this.新增引导 = 引导
-        const 技能 = 读技能id(类型)
-        if (技能) this.新增技能id = 技能
-        this.新增勾选 = 读引入(类型)
-      } catch (e) {
-        /* 拉不到就用默认规则 */
-      }
-    },
-    打开AI新增() {
-      this.新增需求 = ''
-      this.新增引导 = this.新增引导 || 新增默认引导文本
-      if (!this.新增技能id) this.新增技能id = this.扩写技能id
-      this.AI新增显示 = true
-    },
-    全选新增引入(值) {
-      const 项们 = this.新增引入
-      const 勾 = []
-      if (值) {
-        for (let i = 0; i < 项们.length; i++) 勾.push(项们[i].键)
-      }
-      // 空数组也要存下来：代表「全不选」，不能退化成默认全选
-      this.新增勾选 = 勾
-    },
-    新增参考块() {
-      const 项们 = this.新增引入
-      const 行们 = []
-      for (let i = 0; i < 项们.length; i++) {
-        const 项 = 项们[i]
-        const 值 = String(项.值 || '').trim()
-        if (!项.勾选 || !值) continue
-        行们.push('【' + 项.名 + '】\n' + 值)
-      }
-      if (!行们.length) return ''
-      return ['参考数据（前面步骤已经定下来的，必须遵守，不要改动）：'].concat(行们).join('\n')
-    },
-    async 生成新角色() {
-      if (!this.新增技能id) {
-        this.$message.warning('请先选一个技能')
-        return
-      }
-      const 参考 = this.新增参考块()
-      const 需求 = (参考 ? [参考, ''] : []).concat([
-        '剧名：' + this.剧名,
-        '集数：' + this.集数 + ' 集',
-        '题材：' + this.题材,
-        '要生成的内容：给这部剧补一个新角色的设定',
-        '要求：' + (this.新增需求.trim() || '按已选方案补一个能制造冲突、推动爽点的新角色')
-      ]).join('\n')
-
-      this.新增中 = true
-      try {
-        const 文本 = String(await 提交AI任务({
-          正向: 需求,
-          系统: this.新增引导 || 新增默认引导文本,
-          技能id: this.新增技能id
-        }) || '').trim()
-        if (!文本) {
-          this.$message.warning('AI 没有返回内容，可稍后重试')
-          return
-        }
-        // 记住这次的技能 / 引导 / 勾选，下次打开还是这套
-        const 勾 = []
-        const 项们 = this.新增引入
-        for (let i = 0; i < 项们.length; i++) {
-          if (项们[i].勾选) 勾.push(项们[i].键)
-        }
-        this.新增勾选 = 勾
-        存引入(this.新增配置类型, 勾)
-        this.AI新增显示 = false
-        this.填入新角色(文本)
-      } catch (e) {
-        this.扩写报错(e)
-      } finally {
-        this.新增中 = false
-      }
-    },
-    // 把 AI 返回的一行文本拆成表单字段，拆不出来就把原文塞进简介，让人工接着改
-    填入新角色(文本) {
-      const 段 = 拆行(文本)
-      const 详 = 空角色详()
-
-      const 草 = { 名: '', 关系: '功能性角色', 性别: '', 年龄: '', 简介: '', 详: 详 }
-      if (段.length >= 3) {
-        草.名 = 段[0] || ''
-        草.关系 = 段[1] || '功能性角色'
-        草.性别 = 段[2] || ''
-        草.年龄 = 段[3] || ''
-        草.简介 = 段[4] || ''
-        // 从第 6 段开始按 行字段 的顺序对号入座（和默认引导里写的格式一致）。
-        // 值里如果带了「第1-5集：…；第6集起：…」，顺手拆成分段，编辑弹窗里直接就是时间轴
-        for (let i = 0; i < 行字段.length; i++) {
-          const 值 = 段[5 + i]
-          if (值) 详[行字段[i]] = 文本转值(值, this.总集)
-        }
-      } else {
-        // 格式没认出来：名字留空让人填，原文整段放进简介当参考
-        草.简介 = 文本
-      }
-      详.姓名 = 草.名
-      详.性别 = 草.性别
-      详.年龄 = 草.年龄
-
-      this.新增模式 = true
-      this.编辑对象 = null
-      this.新增原文 = 文本
-      this.草稿 = 草
-      this.编辑显示 = true
-      this.$message.success(段.length >= 3 ? 'AI 已出新角色，确认后再点「加入人物设定」' : 'AI 格式没认出来，已把原文放进表单，手动改一下')
-    },
 
     /* ---------------- 关系网 ---------------- */
     关系类型色(型) {
@@ -1377,134 +848,6 @@ export default {
     关系说明显示(边) {
       return 关系说明(边, this.总集, this.查看集)
     },
-    打开新增关系() {
-      const 名们 = this.角色名们
-      this.关系新增模式 = true
-      this.关系编辑对象 = null
-      this.关系草稿 = {
-        甲: 名们[0] || '', 乙: 名们[1] || '', 类型: '羁绊', 关键词: '', 说明: '', 阶段: []
-      }
-      this.关系编辑显示 = true
-    },
-    打开编辑关系(边) {
-      if (!边) return
-      this.关系新增模式 = false
-      this.关系编辑对象 = 边
-      this.关系草稿 = {
-        甲: 边.甲, 乙: 边.乙, 类型: 边.类型 || '羁绊',
-        关键词: (边.关键词 || []).join('、'), 说明: 边.说明 || '',
-        阶段: 是分段(边.阶段) ? 规整段(边.阶段, this.总集) : []
-      }
-      this.关系编辑显示 = true
-    },
-    /* ---- 关系弹窗里的「按集分段」 ---- */
-    // 单值 → 分段：用当前的类型 + 说明包成一段，再自己拆
-    拆分关系() {
-      this.关系草稿.阶段 = [{
-        起: 1,
-        止: this.总集,
-        类型: this.关系草稿.类型 || '羁绊',
-        说明: this.关系草稿.说明 || '',
-        值: ''
-      }]
-    },
-    // 分段 → 单值：类型和说明取最新一段
-    合并关系() {
-      const 段们 = 规整段(this.关系草稿.阶段, this.总集)
-      const 末 = 段们[段们.length - 1]
-      if (末) {
-        this.关系草稿.类型 = 末.类型 || this.关系草稿.类型
-        this.关系草稿.说明 = 末.说明 || this.关系草稿.说明
-      }
-      this.关系草稿.阶段 = []
-    },
-    加关系段() {
-      const 段们 = 规整段(this.关系草稿.阶段, this.总集)
-      const 末 = 段们[段们.length - 1]
-      const 起 = 末 ? Math.min(末.止 + 1, this.总集) : 1
-      this.关系草稿.阶段 = 段们.concat([{
-        起: 起, 止: this.总集,
-        类型: 末 ? (末.类型 || '羁绊') : '羁绊',
-        说明: '', 值: ''
-      }])
-    },
-    删关系段(序) {
-      const 段们 = 规整段(this.关系草稿.阶段, this.总集)
-      if (段们.length <= 1) {
-        this.$message.warning('至少留一段；想变回一个类型就点「合并成单值」')
-        return
-      }
-      段们.splice(序, 1)
-      this.关系草稿.阶段 = 段们
-    },
-    保存关系() {
-      const 甲 = String(this.关系草稿.甲 || '').trim()
-      const 乙 = String(this.关系草稿.乙 || '').trim()
-      if (!甲 || !乙) {
-        this.$message.warning('两端都要选一个角色')
-        return
-      }
-      if (甲 === 乙) {
-        this.$message.warning('同一个人不能和自己连一条边')
-        return
-      }
-      const 词 = String(this.关系草稿.关键词 || '')
-        .split(/[、,，/]/)
-        .map(function (s) { return s.trim() })
-        .filter(function (s) { return s })
-      const 说明 = String(this.关系草稿.说明 || '').trim()
-      // 有阶段就以阶段为准，顶层的类型/说明跟着最后一段走（筛选、喂 AI 时不用再判断）
-      const 阶段 = 规整段(this.关系草稿.阶段, this.总集)
-      const 末段 = 阶段[阶段.length - 1]
-      const 定型 = 末段 ? (末段.类型 || this.关系草稿.类型 || '羁绊') : (this.关系草稿.类型 || '羁绊')
-      const 定说 = 末段 ? (末段.说明 || 说明) : 说明
-
-      if (this.关系新增模式) {
-        const 撞 = this.关系表.some(function (边) { return 是同一条边(边, 甲, 乙) })
-        if (撞) {
-          this.$message.warning('「' + 甲 + '」和「' + 乙 + '」之间已经有一条边了，直接编辑那一条')
-          return
-        }
-        let 最大 = 0
-        this.关系表.forEach(function (边) { if (边.id > 最大) 最大 = 边.id })
-        this.关系表.push({
-          id: 最大 + 1, 甲: 甲, 乙: 乙,
-          类型: 定型, 关键词: 词, 说明: 定说, 阶段: 阶段
-        })
-      } else {
-        const 边 = this.关系编辑对象
-        if (!边) {
-          this.关系编辑显示 = false
-          return
-        }
-        边.甲 = 甲
-        边.乙 = 乙
-        边.类型 = 定型
-        边.关键词 = 词
-        边.说明 = 定说
-        边.阶段 = 阶段
-      }
-      this.关系编辑显示 = false
-      this.存本地()
-      this.$message.success('已保存「' + 甲 + ' ↔ ' + 乙 + '」' + (阶段.length > 1 ? '，按集拆成 ' + 阶段.length + ' 段' : ''))
-    },
-    删除关系() {
-      const 边 = this.关系编辑对象
-      if (!边) return
-      const 页 = this
-      this.$confirm('确定删除「' + 边.甲 + ' ↔ ' + 边.乙 + '」这条关系？', '删除关系', {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(function () {
-        const 序 = 页.关系表.indexOf(边)
-        if (序 >= 0) 页.关系表.splice(序, 1)
-        页.关系编辑显示 = false
-        页.存本地()
-        页.$message.success('已删除')
-      }).catch(function () {})
-    },
-
     /* ---- AI 补关系网 ---- */
     async 生成关系网() {
       if (!this.扩写技能id) {
@@ -2047,7 +1390,6 @@ export default {
   border: 1px solid var(--描边);
   border-radius: 10px;
 }
-.工具标题 { font-size: 14px; font-weight: 700; color: var(--字); }
 .工具数 { font-size: 12px; color: var(--字弱); }
 
 .角色组 { margin-bottom: 20px; }
@@ -2251,105 +1593,11 @@ export default {
 .预览文 { flex: 1; min-width: 0; color: var(--字次); line-height: 1.7; }
 .预览重 { color: #f59e0b; margin-left: 6px; }
 
-/* 编辑弹窗里的字段分组 */
-.编辑组 {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--描边);
-}
-.编辑组名 {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--主);
-  margin-bottom: 8px;
-}
-
-/* 编辑弹窗里的分段编辑器：第 [起] – [止] 集 [值] × */
-.段编辑列 { width: 100%; }
-.段编辑行 { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; }
-.段编辑字 { font-size: 12px; color: var(--字弱); line-height: 28px; white-space: nowrap; }
-.段编辑值 { flex: 1; min-width: 0; }
-.段编辑删 { cursor: pointer; color: var(--字弱); line-height: 28px; }
-.段编辑删:hover { color: #ef4444; }
-.段编辑底 { display: flex; align-items: center; gap: 10px; }
-.段编辑注 { font-size: 11px; color: var(--字弱); margin-left: 8px; }
-.拆分钮 { margin-top: 2px; padding: 0; }
-
 @media (max-width: 1200px) {
   .关系列 { grid-template-columns: minmax(0, 1fr); }
   .详情格 { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* ---- 编辑弹窗 ---- */
-.弹窗头 {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  padding-bottom: 14px; border-bottom: 1px solid var(--描边);
-}
-.弹窗标题 { font-size: 16px; font-weight: 700; color: var(--字); }
-.弹窗副题 { font-size: 12px; color: var(--字弱); margin-top: 4px; }
-.弹窗关闭 { cursor: pointer; color: var(--字弱); font-size: 16px; }
-.弹窗体 { padding: 16px 0 4px; max-height: 62vh; overflow-y: auto; }
-.弹窗底 {
-  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
-  padding-top: 14px; border-top: 1px solid var(--描边);
-}
-.删除钮 { color: #ef4444; }
 .新增标 { background: rgba(34, 197, 94, .12); border-color: rgba(34, 197, 94, .3); color: var(--主); }
 
-/* 新增角色时摊开的 AI 原文：方便对照是哪个字段拆歪了 */
-.AI原文 {
-  background: var(--卡片二);
-  border: 1px solid var(--描边);
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 14px;
-}
-.AI原文标 { font-size: 12px; font-weight: 700; color: var(--主); }
-.AI原文注 { font-size: 12px; color: var(--字弱); }
-.AI原文 .原文 {
-  margin: 0;
-  max-height: 140px;
-  overflow: auto;
-  font-family: inherit;
-  font-size: 12px;
-  line-height: 1.7;
-  color: var(--字次);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* ---- AI 新增人物弹窗：四段 ---- */
-.AI段 { margin-bottom: 18px; }
-.AI段:last-child { margin-bottom: 0; }
-.AI段头 {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 8px;
-}
-.AI序 {
-  width: 18px; height: 18px; border-radius: 999px;
-  background: var(--主浅); color: var(--主);
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex: 0 0 18px;
-}
-.AI段名 { font-size: 13px; font-weight: 700; color: var(--字); }
-.AI段说 { font-size: 12px; color: var(--字弱); }
-.AI引入项 {
-  padding: 8px 10px;
-  border: 1px solid var(--描边);
-  border-radius: 8px;
-  margin-bottom: 8px;
-  background: var(--卡片二);
-}
-.AI引入项:last-child { margin-bottom: 0; }
-.AI引入值 {
-  margin-top: 4px;
-  max-height: 96px;
-  overflow-y: auto;
-  font-size: 12px;
-  line-height: 1.7;
-  color: var(--字次);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
 </style>

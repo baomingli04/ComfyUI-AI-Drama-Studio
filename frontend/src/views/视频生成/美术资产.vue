@@ -172,119 +172,20 @@
       </div>
     </div>
 
-    <!-- 参考图弹窗 -->
-    <el-dialog :visible.sync="图窗显" :title="图窗组 ? 图窗组.名称 + ' · 参考图' : '参考图'"
-               width="860px" top="6vh" append-to-body>
-      <template v-if="图窗组">
-        <div class="窗操作行">
-          <el-upload action="#" :show-file-list="false" multiple accept="image/*"
-                     :http-request="上传参考图" :disabled="上传中">
-            <el-button size="small" type="primary" icon="el-icon-upload2" :loading="上传中">上传图片</el-button>
-          </el-upload>
-          <span class="窗形选">形态
-            <el-select v-model="上传形态" size="small" filterable allow-create clearable placeholder="通用" class="形选框">
-              <el-option v-for="形 in 形态选项们" :key="形" :label="形" :value="形" />
-            </el-select>
-          </span>
-          <span class="窗提示">可一次选多张；上传后自动解析提示词；每张图可改分类/形态/标注</span>
-        </div>
+    <!-- 参考图弹窗（已拆分为独立组件 美术资产参考图弹窗.vue；图窗显/图窗组/上传形态与业务方法留在本组件，操作经事件回传） -->
+    <art-ref-dialog :visible.sync="图窗显" :组="图窗组" :上传中="上传中" :解析中id="解析中id"
+                    :上传形态.sync="上传形态"
+                    @预览="预览图 = $event" @上传="上传参考图" @改字段="改图字段"
+                    @打开提示词="打开图提示词" @解析="解析图提示词" @AI编辑="打开AI编辑" @图操作="图操作" />
 
-        <div class="窗分组" v-for="形态组 in 图窗形态组们" :key="'f' + 形态组.名">
-          <div class="窗组题">{{ 形态组.名 }}（{{ 形态组.图们.length }}）</div>
-          <div class="图网格">
-            <div v-for="图 in 形态组.图们" :key="'c' + 图.id" class="图块">
-              <img class="图" :src="媒体地址(图.url)" @click="预览图 = 图" />
-              <div class="图注">
-                <input class="标注输入" :value="图.标注" placeholder="填写标注，如 正面定装"
-                       @change="改图字段(图, '标注', $event.target.value)" />
-                <div class="图选择行">
-                  <el-select :value="图.分类 || 图窗组.类型" size="mini" class="类选框"
-                             @change="改图字段(图, '分类', $event)">
-                    <el-option v-for="t in ['人物', '场景', '道具', '服装']" :key="t" :label="t" :value="t" />
-                  </el-select>
-                  <el-select :value="图.形态 || ''" size="mini" filterable allow-create clearable
-                             placeholder="形态" class="形选框2" @change="改图字段(图, '形态', $event)">
-                    <el-option v-for="形 in 形态选项们" :key="形" :label="形" :value="形" />
-                  </el-select>
-                </div>
-                <div class="提示词行" @click="打开图提示词(图)">
-                  <span :class="{ 无: !图.提示词 }">{{ 图.提示词 ? (图.提示词.length > 46 ? 图.提示词.slice(0, 46) + '…' : 图.提示词) : '（无提示词，点此解析/填写）' }}</span>
-                </div>
-                <span class="图签">{{ 图.来源 }} · E{{ 图.集号 }}</span>
-              </div>
-              <div class="图操作">
-                <button class="小钮" :disabled="解析中id === 图.id" @click="解析图提示词(图)">
-                  {{ 解析中id === 图.id ? '解析中…' : '解析提示词' }}
-                </button>
-                <button class="小钮 主" @click="打开AI编辑(图)">AI编辑</button>
-                <button class="小钮" @click="图操作(图, '转历史')">转历史</button>
-                <button class="小钮 删钮" @click="图操作(图, '删除')">删</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-if="!图窗组.当前图们.length" class="窗空">还没有当前参考图，上传或重新生成</div>
+    <!-- 图片预览（已拆分为独立组件 美术资产预览弹窗.vue；预览图/预览窗显留在本组件） -->
+    <art-preview-dialog :visible.sync="预览窗显" :图="预览图" />
 
-        <div class="窗分组" v-if="图窗组.历史图们.length">
-          <div class="窗组题">历史（{{ 图窗组.历史图们.length }}）</div>
-          <div class="图网格">
-            <div v-for="图 in 图窗组.历史图们" :key="'h' + 图.id" class="图块 历史块">
-              <img class="图" :src="媒体地址(图.url)" @click="预览图 = 图" />
-              <div class="图注">
-                <input class="标注输入" :value="图.标注" placeholder="标注"
-                       @change="改图字段(图, '标注', $event.target.value)" />
-                <div class="提示词行" v-if="图.提示词" @click="打开图提示词(图)">
-                  <span>{{ 图.提示词.length > 46 ? 图.提示词.slice(0, 46) + '…' : 图.提示词 }}</span>
-                </div>
-                <span class="图签">{{ 图.来源 }} · E{{ 图.集号 }}<template v-if="图.形态"> · {{ 图.形态 }}</template></span>
-              </div>
-              <div class="图操作">
-                <button class="小钮" @click="图操作(图, '恢复')">恢复为当前</button>
-                <button class="小钮 删钮" @click="图操作(图, '删除')">删</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-    </el-dialog>
+    <!-- 新增美术资产弹窗（全剧共用，不挂集；已拆分为独立组件 美术资产新增弹窗.vue；新增缓冲/保存新增留在本组件） -->
+    <art-create-dialog :visible.sync="新增窗显" :缓冲="新增缓冲" :分区表="分区表" :新增中="新增中" @保存="保存新增" />
 
-    <!-- 图片预览 -->
-    <el-dialog :visible.sync="预览窗显" title="预览" width="520px" append-to-body>
-      <img v-if="预览图" style="width:100%" :src="媒体地址(预览图.url)" />
-    </el-dialog>
-
-    <!-- 新增美术资产弹窗（全剧共用，不挂集） -->
-    <el-dialog :visible.sync="新增窗显" title="新增美术资产" width="520px" append-to-body>
-      <div v-if="新增缓冲">
-        <div class="表单块"><div class="表单标"><span style="color:#f56c6c">*</span> 类型（选错会带错功能：只有「人物」才有音色和关联角色）</div>
-          <el-select v-model="新增缓冲.类型" size="small" style="width:100%">
-            <el-option v-for="区 in 分区表" :key="区.键" :label="区.名" :value="区.键" />
-          </el-select></div>
-        <div class="表单块"><div class="表单标">名称（必填）</div>
-          <el-input v-model="新增缓冲.名称" size="small" placeholder="如 李宝明 / 忍者教室 / 苦无" /></div>
-        <div class="表单块"><div class="表单标">别名（用 、 分隔）</div>
-          <el-input v-model="新增缓冲.别名" size="small" /></div>
-        <div class="表单块"><div class="表单标">级别</div>
-          <el-input v-model="新增缓冲.级别" size="small" placeholder="主角 / 次主场景 / 关键道具等" /></div>
-        <div class="表单块"><div class="表单标">摘要（可拍细节，生成定装提示词的依据）</div>
-          <el-input v-model="新增缓冲.摘要" type="textarea" :rows="3" /></div>
-        <div class="表单块 新增注">新增资产为全剧共用资源（不挂集），资产 id 自动按类型顺延编号。</div>
-      </div>
-      <div slot="footer">
-        <el-button size="small" @click="新增窗显 = false">取消</el-button>
-        <el-button size="small" type="primary" :loading="新增中" @click="保存新增()">新增</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 单图提示词编辑 -->
-    <el-dialog :visible.sync="图提示词窗显" :title="编辑图 ? '参考图提示词' : ''" width="560px" append-to-body>
-      <el-input v-if="编辑图" type="textarea" :rows="6" v-model="编辑图.提示词"
-                placeholder="这张图自己的出图/编辑提示词说明；可用「解析提示词」让 AI 自动生成" />
-      <div slot="footer">
-        <el-button size="small" @click="图提示词窗显 = false">取消</el-button>
-        <el-button size="small" type="primary" :loading="图存中" @click="存图提示词()">保存</el-button>
-      </div>
-    </el-dialog>
+    <!-- 单图提示词编辑（已拆分为独立组件 美术资产单图提示词弹窗.vue；编辑图/编辑图组/存图提示词留在本组件） -->
+    <art-image-prompt-dialog :visible.sync="图提示词窗显" :编辑图="编辑图" :图存中="图存中" @保存="存图提示词" />
 
     <!-- 单图 AI 编辑（表单与 /test 三图编辑一致版页同款：图1/图2/图3 图位 + 正向提示词；图1 默认当前图） -->
     <el-dialog :visible.sync="AI编辑窗显" :title="AI编辑 ? 'AI 编辑图片' : ''" width="680px" append-to-body>
@@ -364,22 +265,8 @@
       </div>
     </el-dialog>
 
-    <!-- 编辑出图提示词 -->
-    <el-dialog :visible.sync="提示词窗显" :title="编辑组 ? '编辑出图提示词 · ' + 编辑组.名称 : ''"
-               width="640px" append-to-body>
-      <template v-if="编辑组">
-        <div class="表单块"><div class="表单标">生图提示词</div>
-          <el-input type="textarea" :rows="4" v-model="编辑组.生图提示词" placeholder="出图正向提示词" /></div>
-        <div class="表单块"><div class="表单标">必须保持（每行一条）</div>
-          <el-input type="textarea" :rows="4" v-model="编辑组.必须保持" placeholder="如：眯眼&#10;右眉骨被碎发遮住" /></div>
-        <div class="表单块"><div class="表单标">禁止出现（每行一条）</div>
-          <el-input type="textarea" :rows="3" v-model="编辑组.禁止出现" placeholder="如：长发" /></div>
-      </template>
-      <div slot="footer">
-        <el-button size="small" @click="提示词窗显 = false">取消</el-button>
-        <el-button size="small" type="primary" :loading="存中" @click="存提示词()">保存</el-button>
-      </div>
-    </el-dialog>
+    <!-- 编辑出图提示词（已拆分为独立组件 美术资产出图提示词弹窗.vue；编辑组/存提示词留在本组件） -->
+    <art-set-prompt-dialog :visible.sync="提示词窗显" :编辑组="编辑组" :存中="存中" @保存="存提示词" />
 
     <!-- 编辑音色 -->
     <el-dialog :visible.sync="音色窗显" :title="编辑组 ? '音色 · ' + 编辑组.名称 : ''" width="560px" append-to-body>
@@ -389,6 +276,22 @@
                     placeholder="格式：男，青年，自然 · 22 岁，木叶忍者学校三班新任班主任" /></div>
         <div class="表单块" v-if="编辑组.音色url"><div class="表单标">当前音色文件</div>
           <audio :src="音色播放地址(编辑组.音色url)" controls style="width:100%" /></div>
+        <div class="表单块">
+          <div class="表单标">AI 合成音色（Edge-TTS · 联网调用微软免费接口）</div>
+          <div class="行间" style="gap:8px;flex-wrap:wrap">
+            <el-select v-model="合成音色名" size="small" style="width:210px" :disabled="音色合成中">
+              <el-option v-for="音 in 音色合成选项" :key="音.值" :label="音.标" :value="音.值" />
+            </el-select>
+          </div>
+          <el-input type="textarea" :rows="2" v-model="合成文本" placeholder="要合成的台词文本（默认取音色提示词）"
+                    style="margin-top:8px" :disabled="音色合成中" />
+          <div class="行间" style="margin-top:8px;gap:8px">
+            <el-button size="small" type="primary" :loading="音色合成中" @click="AI合成音色()">
+              {{ 音色合成中 ? '合成中…' : '合成并填入' }}
+            </el-button>
+            <span v-if="音色合成中" style="font-size:12px;color:var(--字弱)">合成任务后台执行中，完成后自动填入下方音色文件</span>
+          </div>
+        </div>
         <el-upload action="#" :show-file-list="false" accept="audio/*" :http-request="上传音色文件">
           <el-button size="small" icon="el-icon-upload2" :loading="上传中">上传音色文件</el-button>
         </el-upload>
@@ -433,6 +336,11 @@ import { 提交图片任务 } from '@/共用/图片任务'
 import { 读引导, 存配置, 读技能id, 记技能id, 适配技能id } from '@/共用/技能生成配置'
 import { 默认扩写规则 } from '@/共用/扩写行'
 import { 音色列表 } from '@/views/共用/假数据'
+import 美术资产预览弹窗 from './美术资产预览弹窗.vue'
+import 美术资产参考图弹窗 from './美术资产参考图弹窗.vue'
+import 美术资产新增弹窗 from './美术资产新增弹窗.vue'
+import 美术资产单图提示词弹窗 from './美术资产单图提示词弹窗.vue'
+import 美术资产出图提示词弹窗 from './美术资产出图提示词弹窗.vue'
 
 /* 类型分区（固定顺序，未出现的类型也显示 0） */
 const 分区表 = [
@@ -452,7 +360,15 @@ const 分类解析要求 = {
 
 export default {
   name: 'ArtAssets',
-  components: { 'ep-rail': 剧集侧栏 },
+  components: {
+    'ep-rail': 剧集侧栏,
+    /* 弹窗子组件统一用 ASCII 别名注册（本项目约定：自定义标签用 ASCII 名） */
+    'art-preview-dialog': 美术资产预览弹窗,
+    'art-ref-dialog': 美术资产参考图弹窗,
+    'art-create-dialog': 美术资产新增弹窗,
+    'art-image-prompt-dialog': 美术资产单图提示词弹窗,
+    'art-set-prompt-dialog': 美术资产出图提示词弹窗
+  },
   data() {
     return {
       载入中: true,
@@ -479,6 +395,21 @@ export default {
       库播文件: '',
       存中: false,
       上传中: false,
+      /* AI 合成音色（Edge-TTS，2026-11-04 新增） */
+      音色合成中: false,
+      音色轮询器: null,
+      合成音色名: 'zh-CN-XiaoxiaoNeural',
+      合成文本: '',
+      音色合成选项: [
+        { 值: 'zh-CN-XiaoxiaoNeural', 标: '晓晓 · 女声' },
+        { 值: 'zh-CN-XiaoyiNeural', 标: '晓伊 · 女声' },
+        { 值: 'zh-CN-YunjianNeural', 标: '云健 · 男声' },
+        { 值: 'zh-CN-YunxiNeural', 标: '云希 · 男声' },
+        { 值: 'zh-CN-YunxiaNeural', 标: '云夏 · 少年' },
+        { 值: 'zh-CN-YunyangNeural', 标: '云扬 · 男声·播音' },
+        { 值: 'zh-CN-liaoning-XiaobeiNeural', 标: '晓北 · 女声·东北' },
+        { 值: 'zh-CN-shaanxi-XiaoniNeural', 标: '晓妮 · 女声·陕西' }
+      ],
       /* ＋新增（全剧共用，集号=0） */
       新增窗显: false,
       新增缓冲: null,
@@ -589,30 +520,7 @@ export default {
       get() { return !!this.预览图 },
       set(值) { if (!值) this.预览图 = null }
     },
-    /* 图窗：该资产已有过的全部形态（供下拉复用） */
-    形态选项们() {
-      const 组 = this.图窗组
-      if (!组) return []
-      const 列 = []
-      for (const 图 of 组.图们) {
-        const 形 = (图.形态 || '').trim()
-        if (形 && 列.indexOf(形) < 0) 列.push(形)
-      }
-      return 列
-    },
-    /* 图窗：当前参考图按形态分节（空形态归入「通用」） */
-    图窗形态组们() {
-      const 组 = this.图窗组
-      if (!组) return []
-      const 映射 = {}
-      const 顺序 = []
-      for (const 图 of 组.当前图们) {
-        const 名 = (图.形态 || '').trim() || '通用'
-        if (!映射[名]) { 映射[名] = { 名: 名, 图们: [] }; 顺序.push(名) }
-        映射[名].图们.push(图)
-      }
-      return 顺序.map(名 => 映射[名])
-    },
+    /* 图窗的 形态选项们/图窗形态组们 两个计算属性已随参考图弹窗拆入 美术资产参考图弹窗.vue */
     /* AI 编辑弹窗：所属资产组（按组键从最新 组们 解析，重拉后仍指向新对象） */
     AI编辑组() {
       if (!this.AI编辑) return null
@@ -660,6 +568,9 @@ export default {
   created() {
     this.载入()
     this.拉图扩技能()
+  },
+  beforeDestroy() {
+    this.停音色轮询()
   },
   methods: {
     媒体地址,
@@ -1133,8 +1044,63 @@ export default {
       页.存中 = false
     },
     编辑音色(组) {
+      this.停音色轮询()
+      this.音色合成中 = false
       this.编辑组 = 组
+      this.合成文本 = 组.音色提示词 || '大家好，这是一段音色试听示例。'
+      this.合成音色名 = 'zh-CN-XiaoxiaoNeural'
       this.音色窗显 = true
+    },
+    /* AI 合成音色：发起「音色合成」任务并轮询，成功后把产物填进当前表单，
+       用户点「保存」走既有 存音色 流程落库（2026-11-04 新增） */
+    async AI合成音色() {
+      const 页 = this
+      const 组 = 页.编辑组
+      if (!组 || !组.定装id) return
+      const 文本 = (页.合成文本 || '').trim()
+      if (!文本) { 页.$message.warning('请先填写要合成的台词文本'); return }
+      if (页.音色合成中) return
+      页.音色合成中 = true
+      try {
+        const 数据 = await 发('/api/任务/提交', { 类型: '音色合成', 正向提示词: 文本, 模式: 页.合成音色名 })
+        const 任务id = 数据 && 数据.id
+        if (!任务id) throw new Error('后端未返回任务 id')
+        页.启动音色轮询(任务id)
+      } catch (e) {
+        页.$message.error('发起合成失败：' + ((e && e.message) || e))
+        页.音色合成中 = false
+      }
+    },
+    启动音色轮询(任务id) {
+      const 页 = this
+      页.停音色轮询()
+      页.音色轮询器 = setInterval(async function () {
+        try {
+          const 数据 = await 取('/api/任务/状态?id=' + 任务id)
+          const 态 = 数据 && 数据.状态
+          if (态 === '成功') {
+            页.停音色轮询()
+            页.音色合成中 = false
+            if (数据.产物视频1 && 页.编辑组) 页.编辑组.音色url = 数据.产物视频1
+            if (页.编辑组) 页.编辑组.音色状态 = '已生成'
+            页.$message.success('音色已合成，点「保存」落库')
+          } else if (态 === '失败' || 态 === '中断') {
+            页.停音色轮询()
+            页.音色合成中 = false
+            页.$message.error('合成失败：' + ((数据 && 数据.错误信息) || '未知原因'))
+          } else if (态 === '已取消') {
+            页.停音色轮询()
+            页.音色合成中 = false
+            页.$message.warning('合成任务已取消')
+          }
+        } catch (e) { /* 单次轮询失败继续等 */ }
+      }, 2000)
+    },
+    停音色轮询() {
+      if (this.音色轮询器) {
+        clearInterval(this.音色轮询器)
+        this.音色轮询器 = null
+      }
     },
     async 存音色() {
       const 页 = this
@@ -1422,40 +1388,8 @@ export default {
 .关标 { font-size: 12px; color: var(--字次); flex: none; }
 .关选 { width: 180px; }
 
-/* ---- 参考图弹窗 ---- */
-.窗操作行 { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-.窗提示 { font-size: 12px; color: var(--字弱); }
-.窗形选 { font-size: 12px; color: var(--字次); display: inline-flex; align-items: center; gap: 6px; }
-.形选框 { width: 130px; }
-.形选框2 { width: 110px; }
-.类选框 { width: 92px; }
-.窗分组 { margin-bottom: 16px; }
-.窗组题 { font-size: 13px; font-weight: 700; color: var(--字); margin-bottom: 10px; }
+/* 参考图弹窗的样式已随组件拆入 美术资产参考图弹窗.vue；此处仅保留 AI 编辑弹窗仍用到的 .窗空 */
 .窗空 { font-size: 12px; color: var(--字弱); padding: 20px 0; text-align: center; }
-.图网格 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-.图块 {
-  border: 1px solid var(--描边); border-radius: 8px; overflow: hidden;
-  background: var(--卡片二); display: flex; flex-direction: column;
-}
-.图块.历史块 { opacity: .75; }
-.图 { width: 100%; height: 170px; object-fit: cover; display: block; cursor: zoom-in; }
-.图注 { padding: 6px 8px 2px; display: flex; flex-direction: column; gap: 4px; }
-.标注输入 {
-  font-size: 12px; color: var(--字);
-  background: transparent; border: 1px dashed transparent;
-  border-radius: 4px; padding: 2px 6px; width: 100%;
-}
-.标注输入:hover, .标注输入:focus { border-color: var(--描边); outline: none; background: var(--卡片); }
-.图选择行 { display: flex; gap: 6px; }
-.提示词行 {
-  font-size: 11px; line-height: 1.6; color: var(--字次);
-  background: var(--卡片); border-radius: 4px; padding: 4px 6px;
-  cursor: pointer; word-break: break-all;
-}
-.提示词行:hover { color: var(--主); }
-.提示词行 .无 { color: var(--字弱); font-style: italic; }
-.图签 { font-size: 10px; color: var(--字弱); }
-.图操作 { display: flex; gap: 6px; padding: 6px 8px 8px; flex-wrap: wrap; }
 
 /* ---- 编辑弹窗 ---- */
 .表单块 { margin-bottom: 14px; }

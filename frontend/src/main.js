@@ -51,6 +51,7 @@ import 导演台 from './views/视频生成/导演台.vue'
 import 成片剪辑 from './views/视频生成/成片剪辑.vue'
 import 资产库 from './views/我的资产/资产库.vue'
 import 音色库 from './views/音色库/音色库.vue'
+import 任务面板 from './views/任务面板/index.vue'
 
 Vue.use(VueRouter)
 Vue.use(ElementUI)
@@ -109,7 +110,8 @@ const 路由 = new VueRouter({
         { path: 'video/director', component: 导演台 },
         { path: 'video/film', component: 成片剪辑 },
         { path: 'assets', component: 资产库 },
-        { path: 'voices', component: 音色库 }
+        { path: 'voices', component: 音色库 },
+        { path: 'tasks', component: 任务面板 }
       ]
     }
   ]

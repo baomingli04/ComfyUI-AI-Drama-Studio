@@ -1,12 +1,11 @@
 @echo off
 rem ============================================================
-rem  AICG platform - one-click start (database / backend / frontend)
+rem  AICG platform - one-click start (backend / frontend)
+rem  Database is REMOTE (192.168.31.131:3308) - no local MariaDB needed.
 rem  Encoding: GBK / ANSI - do NOT re-save this file as UTF-8.
 rem ============================================================
 setlocal EnableDelayedExpansion
 
-set MYSQL_BIN=D:\MariaDB\mariadb-11.4.13-winx64\bin
-set MYSQL_INI=D:\MariaDB\mariadb-11.4.13-winx64\my.ini
 set BE_DIR=%~dp0backend
 set FE_DIR=%~dp0frontend
 
@@ -16,8 +15,6 @@ echo.
 
 rem ---------- 0. preflight ----------
 set ERR=0
-if not exist "%MYSQL_BIN%\mysqld.exe" (echo [PREFLIGHT] MISSING: mysqld.exe & set ERR=1)
-if not exist "%MYSQL_INI%" (echo [PREFLIGHT] MISSING: my.ini & set ERR=1)
 if not exist "%BE_DIR%\manage.py" (echo [PREFLIGHT] MISSING: manage.py & set ERR=1)
 if not exist "%BE_DIR%\.venv\Scripts\python.exe" (echo [PREFLIGHT] MISSING: venv python & set ERR=1)
 if not exist "%FE_DIR%\package.json" (echo [PREFLIGHT] MISSING: package.json & set ERR=1)
@@ -28,32 +25,15 @@ if "%ERR%"=="1" (
 )
 echo [PREFLIGHT] paths OK.
 
-rem ---------- 1. MariaDB 3306 ----------
-netstat -ano | findstr ":3306 " | findstr "LISTENING" >nul
-if not errorlevel 1 (
-    echo [1/3] MariaDB 3306 already listening, skipped.
-) else (
-    echo [1/3] MariaDB not running, starting...
-    start "AICG-Database" cmd /k "cd /d %MYSQL_BIN% && mysqld.exe --defaults-file=%MYSQL_INI% --console"
-    call :WaitPort 3306 120 DB_OK
-    if "!DB_OK!"=="1" (
-        echo [1/3] Database ready.
-    ) else (
-        echo [1/3] ERROR: MariaDB did not open 3306 within 120s.
-        echo       Read the real error in the "AICG-Database" window.
-        pause
-        exit /b 1
-    )
-)
-
 rem ---------- 1.5 Apply Django migrations (best-effort, idempotent) ----------
-echo [1.5/3] Applying Django migrations (best-effort)...
+rem Database is remote (192.168.31.131:3308); this only runs Django migrate, no local DB start.
+echo [1/3] Applying Django migrations (best-effort)...
 cd /d "%BE_DIR%"
 .venv\Scripts\python.exe manage.py migrate --noinput
 if not errorlevel 1 (
-    echo [1.5/3] Migrations applied / already up to date.
+    echo [1/3] Migrations applied / already up to date.
 ) else (
-    echo [1.5/3] WARNING: migrate reported errors - see output above.
+    echo [1/3] WARNING: migrate reported errors - see output above.
     echo           backend may still work if tables were created via aicg.sql
 )
 cd /d "%~dp0"

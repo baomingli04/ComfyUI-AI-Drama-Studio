@@ -7,7 +7,7 @@
         <div class="副题">剧本创作里已生成分集剧本的项目，在这里接着做出片</div>
       </div>
       <div class="右">
-        <el-button size="small" icon="el-icon-view" title="打开列表第一个短剧的成片页" @click="展示视频()">展示视频</el-button>
+        <el-button size="small" icon="el-icon-view" title="打开筛选结果中第一个短剧的成片页" @click="展示视频()">展示视频</el-button>
         <el-button size="small" type="primary" icon="el-icon-plus" @click="新建()">新建短剧</el-button>
       </div>
     </div>
@@ -72,6 +72,7 @@
             </div>
             <div class="行间" style="gap:8px" @click.stop>
               <el-button size="small" type="primary" @click.stop="进剧集(剧)">进入<i class="el-icon-arrow-right"></i></el-button>
+              <el-button size="small" icon="el-icon-video-play" @click.stop="展示视频(剧)">看视频</el-button>
               <el-button size="small" icon="el-icon-delete" @click.stop="删除剧(剧)">删除</el-button>
             </div>
           </div>
@@ -175,14 +176,14 @@ export default {
     新建() {
       this.$router.push({ path: '/script/new' })
     },
-    /* 打开列表第一个短剧的成片页 */
-    展示视频() {
-      const 行 = this.列表[0]
-      if (!行) {
+    /* 打开短剧的成片页：传剧行则开那一部；不传开筛选结果第一个（2026-11-04 修复硬编码） */
+    展示视频(行) {
+      const 剧 = 行 || this.过滤后[0] || this.列表[0]
+      if (!剧) {
         this.$message.warning('还没有短剧，先新建或去剧本创作立项')
         return
       }
-      this.$router.push({ path: '/video/film', query: { ep: 行.id, name: 行.名, 集: 1 } })
+      this.$router.push({ path: '/video/film', query: { ep: 剧.id, name: 剧.名, 集: 1 } })
     }
   }
 }

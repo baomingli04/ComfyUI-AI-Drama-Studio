@@ -11,6 +11,7 @@ from 接口.controllers.技能分类新增 import 技能分类新增, 技能分�
 from 接口.controllers.技能列表 import 技能列表
 from 接口.controllers.任务提交 import 任务提交
 from 接口.controllers.任务列表 import 任务列表
+from 接口.controllers.任务重试 import 任务重试
 from 接口.controllers.任务取消 import 任务取消
 from 接口.controllers.任务删除 import 任务删除
 from 接口.controllers.任务日志 import 任务日志
@@ -52,7 +53,8 @@ from 接口.controllers.分镜列表 import 分镜列表
 from 接口.controllers.分镜保存 import 分镜保存
 from 接口.controllers.分镜视频保存 import 分镜视频接口
 from 接口.controllers.分镜图保存 import 分镜图接口
-from 接口.controllers.成片合成 import 成片合成接口
+from 接口.controllers.成片合成 import 成片合成接口, 成片合成状态
+from 接口.controllers.任务状态 import 任务状态
 from 接口.controllers.资产列表 import 资产列表
 from 接口.controllers.资产全部 import 资产全部
 from 接口.controllers.资产保存 import 资产保存
@@ -76,7 +78,9 @@ urlpatterns = [
     path('api/技能/删除', 技能删除),
     path('api/任务/提交', 任务提交),
     path('api/任务列表', 任务列表),
+    path('api/任务/状态', 任务状态),
     path('api/任务/取消', 任务取消),
+    path('api/任务/重试', 任务重试),
     path('api/任务/删除', 任务删除),
     path('api/任务/日志', 任务日志),
     path('api/上传', 上传),
@@ -120,6 +124,7 @@ urlpatterns = [
     path('api/分镜/图保存', 分镜图接口),
     path('api/成片/列表', 成片合成接口),
     path('api/成片/合成', 成片合成接口),
+    path('api/成片/合成状态', 成片合成状态),
     path('api/资产/列表', 资产列表),
     path('api/资产/全部', 资产全部),
     path('api/资产/保存', 资产保存),

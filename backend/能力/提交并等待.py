@@ -27,7 +27,7 @@ import urllib.request
 from pathlib import Path
 
 from django.conf import settings
-from django.db import connection
+from django.db import connection, transaction
 from django.utils import timezone
 
 from 接口.models.task import task
@@ -45,8 +45,20 @@ Comfy类型 = ('生成图片', '文生图8K',
             '导演台全能')
 LLM类型 = ('文本回复', '图片解析')
 
+# 执行器线程分池（2026-11-04 补丁）：此前 LLM 单线程里一条 300 秒的文本回复
+# 会把图片解析全堵死；且 ffmpeg/edge-tts/whisper 这类本机 CPU 任务不该和
+# Comfy 抢 GPU。拆成四个独立工作线程，各自只认领自己的类型池。
+文本类型 = ('文本回复',)
+图片解析类型 = ('图片解析',)
+本地计算类型 = ('成片合成', '音色合成', '字幕生成')
+
 总超时秒 = 3600          # 单任务从提交到终态的最大等待
 轮询间隔秒 = 1.0
+
+# 终态集合：一旦落库不允许再被改写（防止取消/中断被后续「成功」覆盖的竞态）
+终态集合 = ('成功', '失败', '中断', '已取消')
+# 过程态集合：后端重启时需要被对账成「中断」的残留状态
+过程态集合 = ('已提交', '排队中', '生成中')
 
 # 两张图时按 Comfy 返回文件名的放大标记分流：带标记的是放大图（产物图片2），
 # 不带的是原图/成品（产物图片）。文生图8K 用 _4x（1x + 4x 两张），
@@ -93,19 +105,36 @@ def 记日志(任务id, 文本):
 
 
 def _置状态(任务id, 状态, **字段):
-    任务 = task.objects.filter(id=任务id).first()
-    if 任务 is None:
-        return None
-    if 任务.状态 == '已取消' and 状态 != '已取消':
-        return 任务  # 已取消的任务不再改状态
-    for k, v in 字段.items():
-        setattr(任务, k, v)
-    if 任务.状态 != 状态:
+    """置任务状态；条件更新防竞态（2026-11-04 补丁）。
+
+    规则：
+    - 终态（成功/失败/中断/已取消）一旦落库不允许再改成其它状态，杜绝
+      「用户点了取消，执行器随后又把任务写成功」这种最后写者胜的竞态。
+    - 更新用 filter(状态=读到的旧值) 做条件更新：并发窗口内状态被别人改过
+      就不落库，重读重试 3 次，3 次都没命中就以数据库最新状态为准放弃。
+    """
+    for _ in range(3):
+        任务 = task.objects.filter(id=任务id).first()
+        if 任务 is None:
+            return None
         旧 = 任务.状态
-        任务.状态 = 状态
-        记日志(任务id, '[状态] %s -> %s' % (旧, 状态))
-    任务.save()
-    return 任务
+        if 旧 in 终态集合 and 状态 != 旧:
+            记日志(任务id, '[状态] 拒绝 %s -> %s（任务已是终态）' % (旧, 状态))
+            return 任务
+        if 旧 == 状态 and not 字段:
+            return 任务
+        数据 = dict(字段)
+        if 旧 != 状态:
+            数据['状态'] = 状态
+        行数 = task.objects.filter(id=任务id, 状态=旧).update(**数据)
+        if 行数:
+            if 旧 != 状态:
+                记日志(任务id, '[状态] %s -> %s' % (旧, 状态))
+            for k, v in 数据.items():
+                setattr(任务, k, v)
+            return 任务
+        # update 没命中：状态刚被并发改掉，重读重试
+    return task.objects.filter(id=任务id).first()
 
 
 def _取错误位置(异常):
@@ -249,7 +278,30 @@ def 启动执行器():
             return
         _已启动 = True
     threading.Thread(target=_comfy线程, daemon=True, name='comfy执行器').start()
-    threading.Thread(target=_llm线程, daemon=True, name='llm执行器').start()
+    threading.Thread(target=_llm文本线程, daemon=True, name='llm文本执行器').start()
+    threading.Thread(target=_llm图片线程, daemon=True, name='llm图片执行器').start()
+    threading.Thread(target=_本地计算线程, daemon=True, name='本地计算执行器').start()
+
+
+def 启动对账():
+    """后端启动时把残留的过程态任务对账成「中断」（2026-11-04 崩溃恢复补丁）。
+
+    背景：执行器只认领 状态='已创建' 的任务；Django 中途被杀后，卡在
+    已提交/排队中/生成中 的任务永远无人认领，前端就一直显示「生成中」。
+    这里在服务启动时统一判为「中断」并写原因，用户可重新提交。
+    只应由 runserver 启动路径调用（见 接口/apps.py ready() 的 argv 收口）。
+    """
+    try:
+        残留 = list(task.objects.filter(状态__in=过程态集合).order_by('id'))
+    except Exception:
+        traceback.print_exc()
+        return
+    for 任务 in 残留:
+        _置状态(任务.id, '中断',
+                错误信息='后端重启，任务执行过程被打断，请重新提交。',
+                结束时间=timezone.now())
+    if 残留:
+        print('[启动对账] 已把 %d 个残留过程态任务判为「中断」' % len(残留))
 
 
 def 入队(任务id):
@@ -258,8 +310,14 @@ def 入队(任务id):
 
 
 def _取最旧已创建(类型集合):
-    return (task.objects.filter(状态='已创建', 类型__in=类型集合)
-            .order_by('id').first())
+    # select_for_update 行锁（2026-11-04 补丁）：并发认领时串行化读取。
+    # 注意：事务提交时不迁移任务状态，行锁本身不能阻止两个进程先后认领同一条
+    # 已创建任务——真正的防重复认领靠「单服务进程」（apps.py 按 RUN_MAIN 收口
+    # 执行器）+「启动互斥」端口锁双保险；这里的行锁是防多线程读竞争的最后防线。
+    with transaction.atomic():
+        return (task.objects.select_for_update()
+                .filter(状态='已创建', 类型__in=类型集合)
+                .order_by('id').first())
 
 
 def _线程取任务(类型集合):
@@ -317,26 +375,49 @@ def _comfy线程():
                 traceback.print_exc()
 
 
-def _llm线程():
-    from 能力.文本回复 import 执行文本回复
-    from 能力.图片解析 import 执行图片解析
+def _通用工作线程(类型集合, 分发表):
+    """通用执行线程：领取任务 → 按类型分发执行 → 异常兜底标失败。
+
+    各分池线程共用这个骨架；Comfy 线程因带显存清理逻辑单独保留。
+    """
     while True:
-        任务 = _线程取任务(LLM类型)
+        任务 = _线程取任务(类型集合)
         if 任务 is None:
             _唤醒.wait(timeout=2.0)
             _唤醒.clear()
             continue
         try:
-            if 任务.类型 == '文本回复':
-                执行文本回复(任务.id)
-            else:
-                执行图片解析(任务.id)
+            执行函数 = 分发表.get(任务.类型)
+            if 执行函数 is None:
+                raise ValueError('类型 %s 没有对应的执行函数' % 任务.类型)
+            执行函数(任务.id)
         except Exception as 异常:
             traceback.print_exc()
             try:
                 标记失败(任务.id, 异常)
             except Exception:
                 pass
+
+
+def _llm文本线程():
+    from 能力.文本回复 import 执行文本回复
+    _通用工作线程(文本类型, {'文本回复': 执行文本回复})
+
+
+def _llm图片线程():
+    from 能力.图片解析 import 执行图片解析
+    _通用工作线程(图片解析类型, {'图片解析': 执行图片解析})
+
+
+def _本地计算线程():
+    from 能力.成片合成 import 执行成片合成
+    from 能力.音色合成 import 执行音色合成
+    from 能力.字幕生成 import 执行字幕生成
+    _通用工作线程(本地计算类型, {
+        '成片合成': 执行成片合成,
+        '音色合成': 执行音色合成,
+        '字幕生成': 执行字幕生成,
+    })
 
 
 def _跑comfy任务(任务id):
@@ -437,6 +518,7 @@ def _跑comfy任务(任务id):
     已存产物 = False
     查询失败秒 = 0          # 连续查询失败容忍（Comfy 忙时会瞬时 503，不该立刻判中断）
     查询容忍秒 = 120
+    消失轮数 = 0            # 连续「queue 和 history 都查不到」的秒数（2026-11-04 补丁）
     while time.time() - 开始 < 总超时秒:
         time.sleep(轮询间隔秒)
 
@@ -483,7 +565,22 @@ def _跑comfy任务(任务id):
                 return
             continue
         if prompt_id not in 历史:
+            # history 查不到且 queue 里也找不到：任务已从 ComfyUI 消失。
+            # 典型场景：ComfyUI 中途重启，queue 与 history 全被清空，
+            # /history/<prompt_id> 永远查不到 —— 原逻辑只会 continue 空转到
+            # 3600 秒总超时。连续 30 秒两处都查不到就快速判中断。
+            # 注意「还在 queue 里（排队等前面任务）」属正常等待，不计入消失。
+            if not 运行中 and not 排队中:
+                消失轮数 += 1
+                if 消失轮数 >= 30:
+                    标记中断(任务id,
+                            '任务从 ComfyUI 消失（queue 与 history 均查不到，'
+                            '可能 ComfyUI 已重启），连续 %d 秒未恢复' % 消失轮数)
+                    return
+            else:
+                消失轮数 = 0
             continue
+        消失轮数 = 0
         条目 = 历史[prompt_id]
         状态信息 = (条目.get('status') or {})
         if 状态信息.get('status_str') == 'error' or 状态信息.get('completed') is False:

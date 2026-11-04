@@ -149,7 +149,7 @@
             </div>
             <el-button type="primary" style="width:100%;margin-top:4px" :loading="合成中" @click="合成全部()">合成全部</el-button>
             <div style="font-size:11px;color:var(--字弱);line-height:1.6">
-              合成会把本集各镜「正式使用」视频按镜号顺序拼接转码（分辨率/字幕/配乐选项为后续粗剪预留，暂不参与转码）。
+              合成会把本集各镜「正式使用」视频按镜号顺序拼接转码；开启字幕会把各镜台词烧进画面。后台执行，完成后自动刷新列表。
             </div>
           </div>
         </div>
@@ -217,6 +217,7 @@ export default {
       当前镜号: '',
       /* 成片合成 */
       合成中: false,
+      合成轮询器: null,
       成片们: [],
       /* 导出设置（后续粗剪预留） */
       分辨率: '720p',
@@ -233,6 +234,9 @@ export default {
     '$route.query.集'() {
       this.载入()
     }
+  },
+  beforeDestroy() {
+    this.停轮询()
   },
   computed: {
     剧名() {
@@ -332,7 +336,7 @@ export default {
     上一页() {
       this.$router.push({ path: '/video/director', query: this.$route.query })
     },
-    /* 真合成：后端取本集各镜「正式使用」视频 ffmpeg 拼接转码 */
+    /* 异步合成（2026-11-04）：后端建「成片合成」任务后台跑 ffmpeg，这里轮询状态 */
     async 合成全部() {
       const 页 = this
       if (页.合成中) return
@@ -344,20 +348,54 @@ export default {
       try {
         await 页.$confirm(
           '本集 ' + 页.片段.length + ' 个镜头，正式使用 ' + 页.已生成数 + ' 个' +
-          (缺 ? '；还有 ' + 缺 + ' 个镜头没有正式使用版，会提示缺失' : '') +
+          (缺 ? '；还有 ' + 缺 + ' 个镜头没有正式使用版，将无法合成（需先补齐）' : '') +
+          (页.字幕 ? '；将按各镜台词烧录字幕' : '') +
           '。开始合成？', '合成全部', {
             confirmButtonText: '开始合成', cancelButtonText: '取消', type: 'info'
           })
       } catch (e) { return }
       页.合成中 = true
       try {
-        const 数据 = await 发('/api/成片/合成', { 剧id: 页.剧id, 集号: 页.集号 })
-        页.$message.success('成片已生成：' + ((数据 && 数据.片段数) || '?') + ' 个片段 · ' + ((数据 && 数据.时长秒) || '?') + ' 秒')
-        await 页.拉成片列表()
+        const 数据 = await 发('/api/成片/合成', { 剧id: 页.剧id, 集号: 页.集号, 字幕: 页.字幕 })
+        const 任务id = 数据 && 数据.任务id
+        if (!任务id) throw new Error('后端未返回任务 id')
+        页.$message.info('合成任务已创建，后台执行中…')
+        页.轮询合成状态(任务id)
       } catch (e) {
-        页.$message.error(((e && e.message) || '合成失败'))
+        页.$message.error(((e && e.message) || '创建合成任务失败'))
+        页.合成中 = false
       }
-      页.合成中 = false
+    },
+    /* 每 2 秒查一次合成任务状态，终态后收尾 */
+    轮询合成状态(任务id) {
+      const 页 = this
+      页.停轮询()
+      页.合成轮询器 = setInterval(async function () {
+        try {
+          const 数据 = await 取('/api/成片/合成状态?任务id=' + 任务id)
+          const 态 = 数据 && 数据.状态
+          if (态 === '成功') {
+            页.停轮询()
+            页.合成中 = false
+            页.$message.success('成片已合成完成')
+            await 页.拉成片列表()
+          } else if (态 === '失败' || 态 === '中断') {
+            页.停轮询()
+            页.合成中 = false
+            页.$message.error('合成失败：' + ((数据 && 数据.错误信息) || '未知原因，可到任务页看日志'))
+          } else if (态 === '已取消') {
+            页.停轮询()
+            页.合成中 = false
+            页.$message.warning('合成任务已取消')
+          }
+        } catch (e) { /* 单次轮询失败继续等 */ }
+      }, 2000)
+    },
+    停轮询() {
+      if (this.合成轮询器) {
+        clearInterval(this.合成轮询器)
+        this.合成轮询器 = null
+      }
     },
     /* 成片 mp4 拉成 blob 触发浏览器下载 */
     async 下载成片(片) {

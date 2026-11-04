@@ -12,6 +12,9 @@ export function 提交AI任务(选项) {
   const 技能id = 选项值.技能id || ''
   const 轮询间隔 = 选项值.轮询间隔 || 2000
   const 最长等待 = 选项值.最长等待 || 600000
+  // 可选进度回调：生成中后端把已生成部分文本写回 task.回复，
+  // 每次轮询都会带着它回调 进度回调(部分文本, 任务id)，页面可实时显示进度
+  const 进度回调 = 选项值.进度回调 || null
   if (!正向) return Promise.reject(new Error('生成需求为空'))
   let 任务id = 0
   const 开始时刻 = Date.now()
@@ -22,17 +25,20 @@ export function 提交AI任务(选项) {
     .then(function (数据) {
       任务id = (数据 && 数据.id) || 0
       if (!任务id) throw new Error('任务提交失败：后端没有返回任务 id')
-      return 等待任务(任务id, 开始时刻, 轮询间隔, 最长等待)
+      return 等待任务(任务id, 开始时刻, 轮询间隔, 最长等待, 进度回调)
     })
 }
 
-function 等待任务(任务id, 开始时刻, 间隔, 最长) {
+function 等待任务(任务id, 开始时刻, 间隔, 最长, 进度回调) {
   return 取('/api/任务列表?类型=' + encodeURIComponent('文本回复') + '&条数=100')
     .then(function (数据) {
       const 行们 = (数据 && 数据.列表) || []
       let 行 = null
       for (let i = 0; i < 行们.length; i++) {
         if (行们[i].id === 任务id) { 行 = 行们[i]; break }
+      }
+      if (行 && 进度回调 && 行.回复 && 终态们.indexOf(行.状态) < 0) {
+        try { 进度回调(行.回复, 任务id) } catch (e) { /* 进度回调不许打断等待 */ }
       }
       if (行 && 终态们.indexOf(行.状态) >= 0) {
         if (行.状态 === '成功') return 行.回复 || ''
@@ -42,7 +48,7 @@ function 等待任务(任务id, 开始时刻, 间隔, 最长) {
         throw new Error('AI 任务超时未完成（任务 ' + 任务id + '），可稍后在测试台任务列表查看结果')
       }
       return new Promise(function (解决) { setTimeout(解决, 间隔) }).then(function () {
-        return 等待任务(任务id, 开始时刻, 间隔, 最长)
+        return 等待任务(任务id, 开始时刻, 间隔, 最长, 进度回调)
       })
     })
 }

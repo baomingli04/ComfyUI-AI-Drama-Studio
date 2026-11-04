@@ -39,6 +39,58 @@ def 调用LLM(消息列表, 超时=300):
         raise RuntimeError('LLM 返回格式异常：%s' % json.dumps(数据, ensure_ascii=False)[:300])
 
 
+def 调用LLM流式(消息列表, 超时=300, on增量=None):
+    """流式调用 LLM：on增量(累计文本) 每收到一块回调一次，返回完整回复文本。
+
+    服务端不支持 stream 或流式过程中断时，自动回退到一次性的 调用LLM。
+    """
+    配置 = 取模型配置()
+    地址 = 补协议(配置.LLM地址)
+    if not 地址:
+        raise RuntimeError('模型配置未填写 LLM地址，请先到「模型配置」页保存。')
+    模型名 = 配置.LLM模型名 or 配置.大模型名称 or ''
+    body = {'model': 模型名, 'messages': 消息列表, 'stream': True}
+    头 = {'Content-Type': 'application/json', 'Accept': 'text/event-stream'}
+    if 配置.LLM密钥:
+        头['Authorization'] = 'Bearer ' + 配置.LLM密钥
+    req = urllib.request.Request(
+        地址 + '/v1/chat/completions',
+        data=json.dumps(body).encode('utf-8'), headers=头)
+    累计 = []
+    try:
+        with 直连opener.open(req, timeout=超时) as resp:
+            for 原始行 in resp:
+                行 = 原始行.decode('utf-8', 'replace').strip()
+                if not 行.startswith('data:'):
+                    continue
+                数据块 = 行[len('data:'):].strip()
+                if not 数据块 or 数据块 == '[DONE]':
+                    if 数据块 == '[DONE]':
+                        break
+                    continue
+                try:
+                    片 = json.loads(数据块)
+                except ValueError:
+                    continue
+                选择们 = 片.get('choices') or [{}]
+                delta = 选择们[0].get('delta') or {}
+                文本 = delta.get('content') or ''
+                if 文本:
+                    累计.append(文本)
+                    if on增量:
+                        try:
+                            on增量(''.join(累计))
+                        except Exception:
+                            pass
+        结果 = ''.join(累计)
+        if 结果:
+            return 结果
+    except Exception:
+        # 流式链路任何异常（服务端不支持 stream / 中途断流）都回退一次性调用
+        pass
+    return 调用LLM(消息列表, 超时=超时)
+
+
 def 图片转数据URI(文件路径):
     后缀 = 文件路径.rsplit('.', 1)[-1].lower() or 'png'
     with open(文件路径, 'rb') as f:

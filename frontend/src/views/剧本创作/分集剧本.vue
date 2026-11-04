@@ -221,8 +221,8 @@
           @重写="生成本集()"
           @复核="标记复核()"
           @全文="打开全文()"
-          @新增场="新增一场()"
-          @编辑场="打开编辑场"></script-card>
+          @新增场="$refs.场次编辑弹窗.新增一场()"
+          @编辑场="(场, 序) => $refs.场次编辑弹窗.打开编辑场(场, 序)"></script-card>
 
         <div v-else class="卡片 空场">这一集不在目录里，请回「分集目录」补齐。</div>
       </div>
@@ -232,76 +232,21 @@
       <el-button @click="上一步()">返回分集目录</el-button>
     </div>
 
-    <!-- ============ 场次编辑 / 新增弹窗 ============ -->
-    <el-dialog
-      :visible.sync="编辑显示"
-      width="720px"
-      top="6vh"
-      custom-class="场次编辑弹窗"
-      :show-close="false"
-      :close-on-click-modal="false">
-      <div class="弹窗头">
-        <div>
-          <div class="弹窗标题">{{ 新增模式 ? '新增一场' : '编辑 ' + 草稿.场 }}</div>
-          <div class="弹窗副题">{{ 新增模式 ? '填完点「加入本集」，这一场会排到最后' : '改完点保存，直接写回这一场' }}</div>
-        </div>
-        <i class="el-icon-close 弹窗关闭" title="关闭" @click="编辑显示 = false"></i>
-      </div>
-      <div class="弹窗体">
-        <el-form label-width="72px" size="small">
-          <el-form-item label="场次号">
-            <el-input v-model="草稿.场" maxlength="10" placeholder="例：1-3"></el-input>
-          </el-form-item>
-          <el-form-item label="地点">
-            <el-input v-model="草稿.地点" maxlength="40" placeholder="例：内 · 忍校三班教室 · 日"></el-input>
-          </el-form-item>
-          <el-form-item label="人物">
-            <el-input v-model="草稿.人物" maxlength="80" placeholder="这一场出场的人，顿号分隔"></el-input>
-          </el-form-item>
-          <el-form-item label="道具">
-            <el-input v-model="草稿.道具" maxlength="120" placeholder="这一场要用到的道具，顿号分隔"></el-input>
-          </el-form-item>
-          <el-form-item label="正文">
-            <el-input
-              v-model="草稿.正文"
-              type="textarea"
-              :rows="14"
-              placeholder="一行一句。动作行以 △ 开头；台词写成「角色名（动作）：台词」"></el-input>
-            <div class="字段注">一行一句，保存时按行拆开；动作行以 △ 开头，台词写「角色名（动作）：台词」</div>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div class="弹窗底">
-        <el-button v-if="!新增模式" type="text" class="删除钮" @click="删除这一场()">删除这一场</el-button>
-        <div style="flex:1"></div>
-        <el-button @click="编辑显示 = false">取消</el-button>
-        <el-button type="primary" @click="保存这一场()">{{ 新增模式 ? '加入本集' : '保存' }}</el-button>
-      </div>
-    </el-dialog>
+    <!-- 场次编辑 / 新增弹窗（已拆分为独立组件 分集剧本场次编辑弹窗.vue） -->
+    <scene-dialog
+      ref="场次编辑弹窗"
+      :显示.sync="编辑显示"
+      :当前剧="当前剧"
+      :当前集="当前集"
+      :存本集="存本集"
+      :同步目录="同步目录"
+      @写库="写剧本库"></scene-dialog>
 
-    <!-- ============ 全文弹窗 ============ -->
-    <el-dialog
-      :visible.sync="全文显示"
-      width="820px"
-      top="6vh"
-      :show-close="false"
-      :close-on-click-modal="false">
-      <div class="弹窗头">
-        <div>
-          <div class="弹窗标题">第 {{ 当前集 }} 集全文</div>
-          <div class="弹窗副题">正文 + 五个档案块，可直接整段复制走</div>
-        </div>
-        <i class="el-icon-close 弹窗关闭" title="关闭" @click="全文显示 = false"></i>
-      </div>
-      <div class="弹窗体">
-        <pre class="原文 高">{{ 全文内容 }}</pre>
-      </div>
-      <div class="弹窗底">
-        <div style="flex:1"></div>
-        <el-button @click="全文显示 = false">关闭</el-button>
-        <el-button type="primary" @click="复制全文()">复制全文</el-button>
-      </div>
-    </el-dialog>
+    <!-- 全文弹窗（已拆分为独立组件 分集剧本全文弹窗.vue） -->
+    <fulltext-dialog
+      :显示.sync="全文显示"
+      :当前集="当前集"
+      :当前剧="当前剧"></fulltext-dialog>
 
     <!-- 技能生成弹窗：技能 + 技能引导提示词 + 引入数据（人物列表 / 分集目录 / 上一集剧本 / 本集大纲）。
          in-DOM 模板只认 ASCII 标签名，必须用 skill-dialog 别名；
@@ -324,11 +269,13 @@ import 步骤条 from '@/共用/步骤条/index.vue'
 import 剧本卡 from '@/共用/剧本卡/index.vue'
 import 分页条 from '@/共用/分页条/index.vue'
 import 技能生成弹窗 from '@/共用/技能生成弹窗/index.vue'
+import 分集剧本场次编辑弹窗 from './分集剧本场次编辑弹窗.vue'
+import 分集剧本全文弹窗 from './分集剧本全文弹窗.vue'
 import 剧本页混入 from '@/共用/剧本页混入'
 import { 读引导, 读技能id, 读引入, 存引入, 读创意, 存创意, 适配技能id } from '@/共用/技能生成配置'
 import { 复制到剪贴板 } from '@/共用/复制文本'
 import {
-  解析生成结果, 数字数, 体检剧本, 拼正文, 拼全文, 档案块们
+  解析生成结果, 数字数, 体检剧本, 档案块们
 } from '@/共用/剧本档案'
 import { 文本转值, 值文本 } from '@/共用/人物工具'
 import { 取, 发 } from '@/接口/请求'
@@ -468,7 +415,9 @@ export default {
     'step-bar': 步骤条,
     'script-card': 剧本卡,
     'page-bar': 分页条,
-    'skill-dialog': 技能生成弹窗
+    'skill-dialog': 技能生成弹窗,
+    'scene-dialog': 分集剧本场次编辑弹窗,
+    'fulltext-dialog': 分集剧本全文弹窗
   },
   created() {
     const 路由创意 = (this.$route.query.创意 || '').trim()
@@ -523,13 +472,9 @@ export default {
       技能引导: '',
       引入勾选: null,
       快捷意见: 快捷意见,
-      /* 场次编辑弹窗 */
+      /* 场次编辑弹窗（拆分至 分集剧本场次编辑弹窗.vue，显隐留本页） */
       编辑显示: false,
-      新增模式: false,
-      编辑对象: null,
-      编辑序: -1,
-      草稿: { 场: '', 地点: '', 人物: '', 道具: '', 正文: '' },
-      /* 全文弹窗 */
+      /* 全文弹窗（拆分至 分集剧本全文弹窗.vue，显隐留本页） */
       全文显示: false
     }
   },
@@ -659,9 +604,7 @@ export default {
       if (首条) return 首条.length > 90 ? 首条.slice(0, 90) + '…' : 首条
       return this.方案卡名
     },
-    全文内容() {
-      return 拼全文(this.当前剧)
-    },
+    /* 全文内容 computed 已随全文弹窗拆分至 分集剧本全文弹窗.vue */
     /* 引入数据：标题 + 创意 + 方案 + 方案七块 + 人物列表 + 场景道具 + 分集目录 + 上一集 + 本集大纲 */
     引入数据() {
       return this.造引入数据(this.引入勾选)
@@ -1327,10 +1270,7 @@ export default {
       const 成功 = await 复制到剪贴板(this.生成结果)
       this.$message[成功 ? 'success' : 'error'](成功 ? '已复制到剪贴板' : '复制失败，请手动选择复制')
     },
-    async 复制全文() {
-      const 成功 = await 复制到剪贴板(this.全文内容)
-      this.$message[成功 ? 'success' : 'error'](成功 ? '已复制全文' : '复制失败，请手动选择复制')
-    },
+    // 复制全文 已随全文弹窗拆分至 分集剧本全文弹窗.vue
     打开全文() {
       if (!this.当前剧) {
         this.$message.warning('这一集还没生成剧本')
@@ -1347,97 +1287,10 @@ export default {
       this.扩写需求 = 现 ? 现.replace(/[，,\s]+$/, '') + '，' + 句 : 句
     },
 
-    /* ---------------- 场次编辑 / 新增 ---------------- */
-    打开编辑场(场, 序) {
-      if (!场) return
-      this.新增模式 = false
-      this.编辑对象 = 场
-      this.编辑序 = 序
-      this.草稿 = {
-        场: 场.场, 地点: 场.地点, 人物: 场.人物,
-        道具: 场.道具 || '',
-        正文: (场.正文 || []).join('\n')
-      }
-      this.编辑显示 = true
-    },
-    新增一场() {
-      if (!this.当前剧) {
-        this.$message.warning('这一集还没生成剧本，先让 AI 出一版再改')
-        return
-      }
-      const 场们 = this.当前剧.场们 || []
-      this.新增模式 = true
-      this.编辑对象 = null
-      this.编辑序 = -1
-      this.草稿 = {
-        场: this.当前集 + '-' + (场们.length + 1),
-        地点: '内 · ',
-        人物: '',
-        道具: '',
-        正文: ''
-      }
-      this.编辑显示 = true
-    },
-    async 保存这一场() {
-      const 剧 = this.当前剧
-      if (!剧) return
-      const 正文行 = String(this.草稿.正文 || '')
-        .split(/\r?\n/)
-        .map(s => s.trim())
-        .filter(s => s)
-      const 条 = {
-        场: (this.草稿.场 || '').trim(),
-        地点: (this.草稿.地点 || '').trim(),
-        人物: (this.草稿.人物 || '').trim(),
-        道具: (this.草稿.道具 || '').trim(),
-        正文: 正文行
-      }
-      if (!条.场) {
-        this.$message.warning('先填场次号')
-        return
-      }
-      const 场们 = (剧.场们 || []).slice()
-      if (this.新增模式) {
-        场们.push(条)
-      } else {
-        const 位 = 场们.indexOf(this.编辑对象)
-        if (位 < 0) {
-          this.编辑显示 = false
-          return
-        }
-        场们[位] = 条
-      }
-      this.$set(this.剧本库, this.当前集, Object.assign({}, 剧, {
-        场们: 场们,
-        正文: 拼正文(场们),
-        状态: '待复核'
-      }))
-      this.编辑显示 = false
-      if (!(await this.存本集(this.当前集))) return
-      await this.同步目录(this.当前集)
-      this.$message.success(this.新增模式 ? '已加入第 ' + this.当前集 + ' 集' : '已保存 ' + 条.场)
-    },
-    删除这一场() {
-      const 剧 = this.当前剧
-      const 场 = this.编辑对象
-      if (!剧 || !场) return
-      const 页 = this
-      this.$confirm('确定删除 ' + 场.场 + '？', '删除这一场', {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async function () {
-        const 场们 = (剧.场们 || []).filter(function (项) { return 项 !== 场 })
-        页.$set(页.剧本库, 页.当前集, Object.assign({}, 剧, {
-          场们: 场们,
-          正文: 拼正文(场们),
-          状态: '待复核'
-        }))
-        页.编辑显示 = false
-        if (!(await 页.存本集(页.当前集))) return
-        await 页.同步目录(页.当前集)
-        页.$message.success('已删除 ' + 场.场)
-      }).catch(function () {})
+    /* ---------------- 场次编辑 / 新增（弹窗本体拆分至 分集剧本场次编辑弹窗.vue） ---------------- */
+    // 子组件 @写库 的落点：原弹窗内的 this.$set(剧本库, …) 原样保留在父组件里
+    写剧本库(集号, 剧) {
+      this.$set(this.剧本库, 集号, 剧)
     },
 
     /* ---------------- 列表交互 ---------------- */
@@ -1633,7 +1486,6 @@ export default {
   white-space: pre-wrap;
   word-break: break-word;
 }
-.原文.高 { max-height: 64vh; font-size: 13px; }
 
 /* ---- 左侧集数列表 ---- */
 .侧栏 { align-self: start; }
@@ -1699,21 +1551,7 @@ export default {
 
 .空场 { text-align: center; padding: 40px 0; color: var(--字弱); font-size: 13px; }
 
-/* ---- 弹窗 ---- */
-.弹窗头 {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  padding-bottom: 14px; border-bottom: 1px solid var(--描边);
-}
-.弹窗标题 { font-size: 16px; font-weight: 700; color: var(--字); }
-.弹窗副题 { font-size: 12px; color: var(--字弱); margin-top: 4px; }
-.弹窗关闭 { cursor: pointer; color: var(--字弱); font-size: 16px; }
-.弹窗体 { padding: 16px 0 4px; max-height: 64vh; overflow-y: auto; }
-.弹窗底 {
-  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
-  padding-top: 14px; border-top: 1px solid var(--描边);
-}
-.删除钮 { color: #ef4444; }
-.字段注 { margin-top: 6px; font-size: 12px; color: var(--字弱); line-height: 1.6; }
+/* ---- 弹窗（弹窗头/体/底等公共样式已随弹窗拆分进 分集剧本场次编辑弹窗.vue / 分集剧本全文弹窗.vue） ---- */
 
 @media (max-width: 1200px) {
   .预览格 { grid-template-columns: minmax(0, 1fr); }

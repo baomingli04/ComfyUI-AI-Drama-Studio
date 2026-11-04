@@ -2,7 +2,8 @@
 """资产保存控制器：POST api/资产/保存。/video/assets 资产清单页落库。
 
 请求体 {剧id, 集号, 项们:[{资产id, 类型, 名称, 别名(顿号分隔文本), 关系, 级别, 摘要}]}：
-字段白名单校验 + 按列长截断；事务内全量替换该剧该集的资产行（按传参顺序写 排序）。
+字段白名单校验 + 按列长截断；事务内按 资产id 对齐 upsert 该剧该集的资产行（按传参顺序写 排序，
+已有行原位更新保住主键，新增行插入，缺失行连带定装/参考图级联删除）。
 项们 传空数组 = 清空该集资产。类型必须是 人物/场景/道具/服装 之一。
 归属校验：剧的用户id 必须等于当前登录用户。
 """
@@ -88,9 +89,38 @@ def 资产保存(请求):
 
         此刻 = datetime.datetime.now()
         with transaction.atomic():
-            资产.objects.filter(剧id=剧id, 集号=集号).delete()
+            # 2026-11-04 修复断链：改为按 资产id 对齐的 upsert，不再整段删表重建。
+            # 资产.id 是 美术定装.资产行id / 参考图 的挂接主键，旧逻辑每保存一次
+            # 主键全换，美术页配置的提示词/参考图/音色全部悬空丢失。
+            已有们 = {行.资产id: 行 for 行 in 资产.objects.filter(剧id=剧id, 集号=集号)}
+            保留ids = set()
             for 行 in 准备们:
-                资产.objects.create(剧id=剧id, 集号=集号, 创建时间=此刻, 更新时间=此刻, **行)
+                旧 = 已有们.get(行['资产id'])
+                if 旧 is None:
+                    新 = 资产.objects.create(剧id=剧id, 集号=集号, 创建时间=此刻, 更新时间=此刻, **行)
+                    保留ids.add(新.id)
+                else:
+                    旧.类型 = 行['类型']
+                    旧.名称 = 行['名称']
+                    旧.别名 = 行['别名']
+                    旧.关系 = 行['关系']
+                    旧.级别 = 行['级别']
+                    旧.摘要 = 行['摘要']
+                    旧.排序 = 行['排序']
+                    旧.更新时间 = 此刻
+                    旧.save(update_fields=['类型', '名称', '别名', '关系', '级别', '摘要', '排序', '更新时间'])
+                    保留ids.add(旧.id)
+            # 本次没传的资产行 = 用户删掉了：连带其定装行与参考图一起清，不留孤儿
+            删行们 = [旧 for 资产id码, 旧 in 已有们.items() if 旧.id not in 保留ids]
+            if 删行们:
+                from 接口.models.美术定装 import 美术定装
+                from 接口.models.参考图 import 参考图
+                删资产ids = [行.id for 行 in 删行们]
+                定装ids = list(美术定装.objects.filter(资产行id__in=删资产ids).values_list('id', flat=True))
+                if 定装ids:
+                    参考图.objects.filter(资产行id__in=定装ids).delete()
+                美术定装.objects.filter(资产行id__in=删资产ids).delete()
+                资产.objects.filter(id__in=删资产ids).delete()
 
         return Response({'ok': True, '剧id': 剧id, '集号': 集号, '项数': len(准备们)})
 

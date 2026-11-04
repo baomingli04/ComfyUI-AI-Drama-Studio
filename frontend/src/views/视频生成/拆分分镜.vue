@@ -148,7 +148,7 @@
               <span class="格态">
                 <video v-if="镜版本(镜).选中版" class="镜视频"
                        :src="媒体地址(镜版本(镜).选中版.url)" muted
-                       @click="视频预览 = 镜版本(镜).选中版.url"></video>
+                       @click="视频预览 = 镜版本(镜).选中版.url; 预览显 = true"></video>
                 <span v-else class="态签" :class="{ 生成中: 镜.视频状态 === '生成中' }">
                   {{ 镜.视频状态 === '已生成' ? '已生成' : (镜.视频状态 === '生成中' ? '生成中…' : '待生成') }}
                 </span>
@@ -184,31 +184,17 @@
           <el-button type="primary" @click="进合成()">下一步：成片合成<i class="el-icon-arrow-right"></i></el-button>
         </div>
 
-        <!-- 编辑分镜弹窗 -->
-        <el-dialog title="编辑分镜" :visible.sync="编辑弹窗显示" width="620px" append-to-body>
-          <div v-if="编辑缓冲" class="编辑单">
-            <div class="编格">
-              <label class="编项"><span class="编名">镜号</span><el-input :value="编辑缓冲.镜号" size="small" disabled /></label>
-              <label class="编项"><span class="编名">所属场次</span><el-input v-model="编辑缓冲.场次" size="small" /></label>
-            </div>
-            <div class="编格 编格三">
-              <label class="编项"><span class="编名">景别</span><el-input v-model="编辑缓冲.景别" size="small" /></label>
-              <label class="编项"><span class="编名">运镜</span><el-input v-model="编辑缓冲.运镜" size="small" /></label>
-              <label class="编项"><span class="编名">时长（如 3s）</span><el-input v-model="编辑缓冲.时长" size="small" /></label>
-            </div>
-            <label class="编项"><span class="编名">画面描述</span><el-input v-model="编辑缓冲.画面" type="textarea" :rows="4" /></label>
-            <label class="编项"><span class="编名">台词（无台词写「（无）」或留空）</span><el-input v-model="编辑缓冲.台词" size="small" /></label>
-          </div>
-          <div slot="footer">
-            <el-button size="small" @click="编辑弹窗显示 = false">取消</el-button>
-            <el-button size="small" type="primary" :loading="存编辑中" @click="保存编辑()">保存</el-button>
-          </div>
-        </el-dialog>
+        <!-- 编辑分镜弹窗：拆出为独立组件「拆分分镜编辑弹窗.vue」（表单/存编辑中/保存编辑已搬入子组件，
+             in-DOM 约定用 ASCII 别名 edit-dialog；保存后经 @已保存 把新列表写回） -->
+        <edit-dialog
+          :显示.sync="编辑弹窗显示"
+          :缓冲="编辑缓冲"
+          :分镜列表="分镜列表"
+          :存全库="存全库"
+          @已保存="分镜列表 = $event"></edit-dialog>
 
-        <!-- 视频预览 -->
-        <el-dialog :visible.sync="预览显" title="本镜视频" width="680px" append-to-body>
-          <video v-if="视频预览" :src="媒体地址(视频预览)" style="width:100%;border-radius:8px;background:#000" controls playsinline></video>
-        </el-dialog>
+        <!-- 视频预览弹窗：拆出为独立组件「拆分分镜预览弹窗.vue」（ASCII 别名 preview-dialog） -->
+        <preview-dialog :显示.sync="预览显" :地址="视频预览"></preview-dialog>
 
         <!-- 技能生成弹窗：技能 + 技能引导提示词 + 引入数据（本集剧本 / 人物 / 资产 / 拆分要求）。
              in-DOM 模板只认 ASCII 标签名，必须用 skill-dialog 别名；事件处理器必须带括号。 -->
@@ -231,6 +217,8 @@
 <script>
 import 剧集侧栏 from '@/共用/剧集侧栏/index.vue'
 import 技能生成弹窗 from '@/共用/技能生成弹窗/index.vue'
+import 拆分分镜编辑弹窗 from './拆分分镜编辑弹窗.vue'
+import 拆分分镜预览弹窗 from './拆分分镜预览弹窗.vue'
 import { 取, 发 } from '@/接口/请求'
 import { 媒体地址 } from '@/接口/媒体'
 import { 提交AI任务 } from '@/共用/AI任务'
@@ -249,7 +237,7 @@ const 默认引导文本 = [
 
 export default {
   name: 'ShotSplit',
-  components: { 'ep-rail': 剧集侧栏, 'skill-dialog': 技能生成弹窗 },
+  components: { 'ep-rail': 剧集侧栏, 'skill-dialog': 技能生成弹窗, 'edit-dialog': 拆分分镜编辑弹窗, 'preview-dialog': 拆分分镜预览弹窗 },
   data() {
     return {
       /* 读库状态 */
@@ -280,10 +268,9 @@ export default {
       视频预览: '',
       预览显: false,
       监控定时器: null,
-      /* 行编辑 */
+      /* 行编辑（弹窗本体已拆出为 edit-dialog，显隐与缓冲留在父组件） */
       编辑弹窗显示: false,
       编辑缓冲: null,
-      存编辑中: false,
       /* 技能生成（与剧本创作页同一套） */
       技能弹窗显示: false,
       技能列表: [],
@@ -718,31 +705,7 @@ export default {
       }
       this.编辑弹窗显示 = true
     },
-    async 保存编辑() {
-      const 页 = this
-      const 缓 = 页.编辑缓冲
-      if (!缓 || !缓.画面.trim()) {
-        页.$message.warning('画面描述不能为空')
-        return
-      }
-      页.存编辑中 = true
-      try {
-        const 新列表 = 页.分镜列表.map(function (镜) {
-          if (镜.镜号 !== 缓.镜号) return 镜
-          return Object.assign({}, 镜, {
-            场次: 缓.场次 || 镜.场次, 景别: 缓.景别, 运镜: 缓.运镜,
-            画面: 缓.画面, 台词: 缓.台词 || '（无）', 时长: 缓.时长
-          })
-        })
-        await 页.存全库(新列表)
-        页.分镜列表 = 新列表
-        页.编辑弹窗显示 = false
-        页.$message.success('已保存 ' + 缓.镜号 + '（已落库）')
-      } catch (e) {
-        页.$message.error('保存失败：' + ((e && e.message) || e))
-      }
-      页.存编辑中 = false
-    },
+    /* 保存编辑已搬入子组件「拆分分镜编辑弹窗.vue」（保存后经 @已保存 写回 分镜列表） */
     /* 传完整列表（后端该集全量替换语义） */
     async 存全库(列表) {
       const 页 = this
@@ -992,12 +955,7 @@ export default {
 .格操作 .删钮 { color: var(--败, #f56c6c); }
 .提示行 { font-size: 12px; color: var(--字弱); text-align: center; padding: 4px 0 14px; }
 
-/* ---- 编辑弹窗 ---- */
-.编辑单 { display: flex; flex-direction: column; gap: 12px; }
-.编项 { display: flex; flex-direction: column; gap: 4px; }
-.编名 { font-size: 12px; color: var(--字弱); }
-.编格 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.编格三 { grid-template-columns: 1fr 1fr 1fr; }
+/* ---- 编辑弹窗样式已随弹窗搬入「拆分分镜编辑弹窗.vue」 ---- */
 
 @media (max-width: 1100px) {
   .行头 { display: none; }

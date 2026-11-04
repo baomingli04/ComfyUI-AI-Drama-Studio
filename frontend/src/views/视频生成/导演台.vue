@@ -97,7 +97,7 @@
                 <div class="图网格">
                   <div v-for="图 in 本镜图们" :key="'r' + 图.id" class="资图"
                        :class="{ 首帧: 图.标注 === '首帧', 参考: 图.标注 === '参考' }">
-                    <img class="资图图" :src="媒体地址(图.url)" @click="预览图 = 图.url" />
+                    <img class="资图图" :src="媒体地址(图.url)" @click="预览图 = 图.url; 预览显 = true" />
                     <div class="资图注">
                       <input class="标输入" :value="图.标注" placeholder="标注"
                              @change="改图标注(图, $event.target.value)" />
@@ -342,85 +342,37 @@
       </div>
     </div>
 
-    <!-- 从资产引入弹窗：参考图 / 音色 两页签，搜索 + 类型筛选 + 分页 -->
-    <el-dialog title="从资产引入" :visible.sync="资产窗显" width="880px" append-to-body custom-class="资窗弹窗" @open="资产窗页 = 1">
-      <div class="资窗说明">只复制引用到本镜资源区，不改美术资产。</div>
-      <el-tabs v-model="资产窗标签" @tab-click="资产窗页 = 1">
-        <!-- 页签一：参考图 -->
-        <el-tab-pane label="参考图" name="图">
-          <div class="资窗筛">
-            <el-input v-model="资产窗搜索" size="small" placeholder="搜资产名 / 别名 / 资产id" prefix-icon="el-icon-search"
-                      style="width:230px" clearable @input="资产窗页 = 1" />
-            <span class="资窗筛题">类型</span>
-            <span v-for="类 in ['全部', '人物', '场景', '道具', '服装']" :key="'f' + 类"
-                  class="chip" :class="{ 选中: 资产窗类型 === 类 }" @click="资产窗选类型(类)">{{ 类 }}</span>
-            <span style="flex:1"></span>
-            <el-pagination v-if="资产窗图分页.length > 1" layout="prev, pager, next" small
-                           :page-size="6" :total="资产窗图行们.length" :current-page.sync="资产窗页" />
-          </div>
-          <div v-if="资产窗图分页.length" class="资窗卡栅">
-            <div v-for="行 in 资产窗图分页" :key="'a' + 行.资产行id" class="资窗卡">
-              <div class="资窗卡头">
-                <b class="资窗卡名">{{ 行.名称 }}</b>
-                <span class="小标签 灰">{{ 行.类型 }}</span>
-                <code class="资窗卡id">{{ 行.资产id }}</code>
-              </div>
-              <div class="资窗图行">
-                <div v-for="图 in 行.图们.filter(function (g) { return g.状态 === '当前' })" :key="'ai' + 图.id"
-                     class="资窗图块" :title="'引入：' + (图.标注 || 图.形态 || '参考图')" @click="引入资产图(行, 图)">
-                  <img class="资窗图" :src="媒体地址(图.url)" />
-                  <div class="资窗标">{{ 图.标注 || 图.形态 || '参考图' }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div v-else class="资窗空">没有匹配的资产（换个关键词或类型试试）</div>
-        </el-tab-pane>
-        <!-- 页签二：音色 -->
-        <el-tab-pane label="音色" name="音色">
-          <div class="资窗筛">
-            <el-input v-model="资产窗搜索" size="small" placeholder="搜角色名 / 别名" prefix-icon="el-icon-search"
-                      style="width:230px" clearable @input="资产窗页 = 1" />
-            <span style="flex:1"></span>
-            <el-pagination v-if="资产窗音分页.length > 1" layout="prev, pager, next" small
-                           :page-size="6" :total="资产窗音行们.length" :current-page.sync="资产窗页" />
-          </div>
-          <div v-if="资产窗音分页.length" class="资窗卡栅">
-            <div v-for="行 in 资产窗音分页" :key="'v' + 行.资产行id" class="资窗卡">
-              <div class="资窗卡头">
-                <b class="资窗卡名">{{ 行.名称 }}</b>
-                <span class="小标签 灰">{{ 行.定装.音色名 || '音色' }}</span>
-                <span style="flex:1"></span>
-                <el-button size="mini" type="primary" plain @click="引入音色(行)">引入为参考音频</el-button>
-              </div>
-              <audio class="资窗音预" :src="音色地址(行.定装.音色url)" controls preload="none"></audio>
-            </div>
-          </div>
-          <div v-else class="资窗空">还没有已合成音色的角色：去 美术资产 页给人物卡合成音色后，这里就能引入</div>
-        </el-tab-pane>
-      </el-tabs>
-    </el-dialog>
+    <!-- 从资产引入弹窗：已拆到 导演台资产窗弹窗.vue（注册别名 dt-asset-win）。
+         显隐 资产窗显 留在本页（:visible.sync）；打开页签经 资产窗开签 传入；
+         共享数据 资产行们/音色行们 用 props 下发；
+         @引入图/@引入音色 回传本页 引入资产图/引入音色 落库 -->
+    <dt-asset-win
+      :visible.sync="资产窗显"
+      :开签="资产窗开签"
+      :资产行们="资产行们"
+      :音色行们="音色行们"
+      @引入图="引入资产图"
+      @引入音色="引入音色" />
 
-    <!-- 媒体预览 -->
-    <el-dialog :visible.sync="预览显" title="预览" width="720px" append-to-body>
-      <video v-if="预览图 && 是视频路径(预览图)" :src="媒体地址(预览图)" style="width:100%" controls playsinline></video>
-      <img v-else-if="预览图" :src="媒体地址(预览图)" style="width:100%" />
-    </el-dialog>
+    <!-- 媒体预览弹窗：已拆到 导演台预览弹窗.vue（注册别名 dt-preview-win），预览图/预览显 留在本页 -->
+    <dt-preview-win :visible.sync="预览显" :图="预览图" />
   </div>
 </template>
 
 <script>
 import 剧集侧栏 from '@/共用/剧集侧栏/index.vue'
 import { 取, 发, 基础地址, 取令牌 } from '@/接口/请求'
-import { 媒体地址, 是视频 } from '@/接口/媒体'
+import { 媒体地址 } from '@/接口/媒体'
 import { 提交图片任务 } from '@/共用/图片任务'
 import {
   方式表, 方式分组们, 方式来源页表, 方式默认参数, 算画布, 取镜秒, 新种子,
   拼任务参数, 校验方式, 推荐方式, 匹配资产, 提示词草稿,
-  对账生成中版本, 落对账结果, 睡眠
+  对账生成中版本, 落对账结果
 } from '@/共用/分镜视频'
 import 扩写行 from '@/共用/扩写行/index.vue'
 import { 默认规则集, 扩写模式集 } from '@/views/测试/导演台全能/扩写规则'
+import 导演台资产窗弹窗 from '@/views/视频生成/导演台资产窗弹窗.vue'
+import 导演台预览弹窗 from '@/views/视频生成/导演台预览弹窗.vue'
 
 /* ---- 底膜（与 /test/d-all 完全同一套：模式→族→文件，切换精度=换文件重载） ---- */
 const 底膜族表 = {
@@ -450,7 +402,13 @@ const 模式中文表 = { t2v: '文生视频', i2v: '图生视频', fl2v: '首�
 
 export default {
   name: 'Director',
-  components: { 'ep-rail': 剧集侧栏, 'ai-expand': 扩写行 },
+  /* 弹窗子组件用 ASCII 别名注册（in-DOM 模板只认 ASCII 标签名，本项目既有约定） */
+  components: {
+    'ep-rail': 剧集侧栏,
+    'ai-expand': 扩写行,
+    'dt-asset-win': 导演台资产窗弹窗,
+    'dt-preview-win': 导演台预览弹窗
+  },
   data() {
     return {
       载入中: true,
@@ -464,12 +422,9 @@ export default {
       音色行们: [],
       当前镜号: '',
       本镜图们: [],
-      /* 从资产引入弹窗 */
+      /* 从资产引入弹窗：显隐留在本页，筛选/页签状态在子组件内（打开页签经 资产窗开签 传入） */
       资产窗显: false,
-      资产窗标签: '图',
-      资产窗搜索: '',
-      资产窗类型: '全部',
-      资产窗页: 1,
+      资产窗开签: '图',
       /* 生成表单。参数默认值=当前初始方式（参考生视频）的原页默认；切方式时按 方式默认参数 整套换 */
       方式键: '参考生视频',
       提示词: '',
@@ -618,26 +573,8 @@ export default {
     方式用参考音频() {
       return this.方式用参考视频 || this.方式键 === '参考改视频' || this.方式键 === '二采重绘'
     },
-    /* 引入弹窗：按页签+类型+关键词过滤后分页 */
-    资产窗图行们() {
-      const 词 = this.资产窗搜索.trim()
-      return this.资产行们.filter(function (行) {
-        return (this.资产窗类型 === '全部' || 行.类型 === this.资产窗类型) &&
-          (!词 || (行.名称 || '').indexOf(词) >= 0 || (行.别名 || '').indexOf(词) >= 0 || (行.资产id || '').indexOf(词) >= 0)
-      }, this)
-    },
-    资产窗图分页() {
-      return this.资产窗图行们.slice((this.资产窗页 - 1) * 6, this.资产窗页 * 6)
-    },
-    资产窗音行们() {
-      const 词 = this.资产窗搜索.trim()
-      return this.音色行们.filter(function (行) {
-        return !词 || (行.名称 || '').indexOf(词) >= 0 || (行.别名 || '').indexOf(词) >= 0
-      })
-    },
-    资产窗音分页() {
-      return this.资产窗音行们.slice((this.资产窗页 - 1) * 6, this.资产窗页 * 6)
-    },
+    /* 引入弹窗的筛选/分页 computed（资产窗图行们/资产窗图分页/资产窗音行们/资产窗音分页）
+       已随弹窗拆到 导演台资产窗弹窗.vue */
     参考图上限() {
       return this.方式键 === '二采重绘' ? 8 : 9
     },
@@ -716,8 +653,7 @@ export default {
     if (this.监控定时器) { clearInterval(this.监控定时器); this.监控定时器 = null }
   },
   methods: {
-    媒体地址, 是视频,
-    是视频路径(路径) { return 是视频(路径) },
+    媒体地址,
     async 载入() {
       const 页 = this
       页.载入中 = true
@@ -922,6 +858,7 @@ export default {
       }
       页.上传图中 = false
     },
+    /* 引入资产图到本镜资源区——由子组件 导演台资产窗弹窗 @引入图 触发（落库走共享的 落本镜图） */
     async 引入资产图(行, 图) {
       const 页 = this
       try {
@@ -931,30 +868,18 @@ export default {
         页.$message.error('引入失败：' + ((e && e.message) || e))
       }
     },
-    /* 打开引入弹窗：'图'=参考图页签，'音色'=音色页签 */
+    /* 打开引入弹窗：'图'=参考图页签，'音色'=音色页签。
+       筛选/页签状态已随弹窗拆到 导演台资产窗弹窗.vue（子组件 watch visible 时按 开签 重置） */
     开资产窗(标签) {
-      this.资产窗标签 = 标签 === '音色' ? '音色' : '图'
-      this.资产窗搜索 = ''
-      this.资产窗类型 = '全部'
-      this.资产窗页 = 1
+      this.资产窗开签 = 标签 === '音色' ? '音色' : '图'
       this.资产窗显 = true
     },
-    资产窗选类型(类) {
-      this.资产窗类型 = 类
-      this.资产窗页 = 1
-    },
-    /* 引入角色音色为参考音频（≤3，与上传同一上限） */
+    /* 引入角色音色为参考音频（≤3，与上传同一上限）——由子组件 导演台资产窗弹窗 @引入音色 触发 */
     引入音色(行) {
       const 页 = this
       if (页.参考音频们.length >= 3) { 页.$message.warning('参考音频最多 3 个'); return }
       页.参考音频们.push(行.定装.音色url)
       页.$message.success('已引入「' + 行.名称 + '」的音色为参考音频')
-    },
-    /* 音色文件播放地址：/voices/ 开头是前端静态目录直出，其余走后端媒体接口（与美术资产页同规则） */
-    音色地址(url) {
-      if (!url) return ''
-      if (url.indexOf('/voices/') === 0) return url
-      return this.媒体地址(url)
     },
     async 改图标注(图, 值) {
       const 页 = this
@@ -1392,64 +1317,11 @@ export default {
 .底条 { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; }
 .底题 { font-size: 14px; font-weight: 600; color: var(--主); }
 
-/* 资产引入弹窗（参考图/音色 两页签，搜索+类型+分页） */
-/* 弹窗 append-to-body 传到了 .创作模块 外，全局 .chip/.小标签 样式够不着，这里自带一份 */
-.资窗筛 .chip {
-  display: inline-flex; align-items: center;
-  height: 28px; padding: 0 12px;
-  border-radius: 999px;
-  border: 1px solid var(--描边);
-  background: transparent;
-  color: var(--字次);
-  font-size: 12px;
-  cursor: pointer;
-  user-select: none;
-}
-.资窗筛 .chip:hover { border-color: var(--描边亮); color: var(--字); }
-.资窗筛 .chip.选中 { background: var(--主); border-color: var(--主); color: #06210f; font-weight: 500; }
-.资窗卡 .小标签 { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--描边); background: var(--描边); color: var(--字次); font-size: 10px; }
-.资窗说明 { font-size: 12px; color: var(--字弱); margin-bottom: 10px; }
-.资窗筛 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-.资窗筛题 { font-size: 12px; color: var(--字弱); }
-.资窗卡栅 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-height: 180px; align-content: start; }
-.资窗卡 { border: 1px solid var(--描边); border-radius: 10px; padding: 10px 12px; }
-.资窗卡:hover { border-color: var(--主); }
-.资窗卡头 { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.资窗卡名 { font-size: 13px; color: var(--字); }
-.资窗卡id { font-size: 10px; color: var(--字弱); margin-left: auto; }
-.资窗图行 { display: flex; gap: 8px; flex-wrap: wrap; }
-.资窗图块 { width: 96px; cursor: pointer; border: 1px solid var(--描边); border-radius: 8px; overflow: hidden; }
-.资窗图块:hover { border-color: var(--主); }
-.资窗图 { width: 100%; height: 72px; object-fit: contain; display: block; background: var(--面板弱, rgba(0,0,0,.03)); }
-.资窗标 { font-size: 10px; color: var(--字弱); text-align: center; padding: 3px 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.资窗音预 { width: 100%; height: 36px; display: block; }
-.资窗空 { text-align: center; color: var(--字弱); font-size: 13px; padding: 48px 0; }
+/* 资产引入弹窗的 .资窗* 样式与 .资窗弹窗 色板块已随弹窗拆到 导演台资产窗弹窗.vue */
 
 @media (max-width: 1100px) {
   .两列 { flex-direction: column; }
   .右列 { flex: 1 1 auto; width: 100%; }
   .方式行 { grid-template-columns: repeat(2, 1fr); }
 }
-</style>
-
-<style>
-/* 引入弹窗 append-to-body 挂在 .创作模块 外，主题变量继承不到（var(--描边) 等整条失效），
-   这里在弹窗根上补挂同一套色板（与 模块主题.css 一致） */
-.资窗弹窗 {
-  --底: #0a0f1a;
-  --卡片: #151e32;
-  --卡片二: #0f172a;
-  --描边: #1e293b;
-  --描边亮: #334155;
-  --主: #22c55e;
-  --主暗: #16a34a;
-  --主浅: rgba(34, 197, 94, 0.12);
-  --字: #e2e8f0;
-  --字次: #94a3b8;
-  --字弱: #64748b;
-  background: var(--卡片二);
-  color: var(--字);
-}
-.资窗弹窗 .el-dialog__title { color: var(--字); }
-.资窗弹窗 .el-dialog__body { padding-top: 12px; }
 </style>

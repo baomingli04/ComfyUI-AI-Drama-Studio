@@ -64,5 +64,8 @@ export const 菜单 = [
   },
   {
     标题: '音色库', 分组: '音色库', 路径: '/voices', 图标: 'el-icon-microphone', 扁平: true
+  },
+  {
+    标题: '任务面板', 分组: '任务面板', 路径: '/tasks', 图标: 'el-icon-list', 扁平: true, 分隔: true
   }
 ]

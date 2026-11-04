@@ -245,174 +245,30 @@
     </div>
     </template>
 
-    <!-- ============ 体检弹窗 ============ -->
-    <el-dialog
-      :visible.sync="体检显示"
-      width="640px"
-      top="8vh"
-      :show-close="false"
-      :close-on-click-modal="false">
-      <div class="弹窗头">
-        <div>
-          <div class="弹窗标题">目录体检 · {{ 体检项.length }} 条</div>
-          <div class="弹窗副题">全部是前端算出来的：情绪分、目标字数、点位、集数，没有一条靠 AI 猜</div>
-        </div>
-        <i class="el-icon-close 弹窗关闭" title="关闭" @click="体检显示 = false"></i>
-      </div>
-      <div class="弹窗体">
-        <div v-if="!体检项.length" class="体检空">没查出问题：集数对得上、字数在目标 ±20% 内、没有连续低谷、钩子都兑了。</div>
-        <div v-for="(项, 序) in 体检项" :key="'检' + 序" class="体检项">
-          <span class="体检级" :class="项.级">{{ 项.级 === '红' ? '重' : '轻' }}</span>
-          <div>
-            <div class="体检类">{{ 项.类 }}</div>
-            <div class="体检文">{{ 项.文 }}</div>
-          </div>
-        </div>
-      </div>
-      <div class="弹窗底">
-        <div style="flex:1"></div>
-        <el-button type="primary" @click="体检显示 = false">知道了</el-button>
-      </div>
-    </el-dialog>
+    <!-- 体检弹窗（已拆分为独立组件：体检弹窗.vue，体检项仍由本页 computed 算好传入） -->
+    <health-dialog :显示.sync="体检显示" :体检项="体检项"></health-dialog>
 
-    <!-- ============ 单集编辑 / 新增弹窗 ============ -->
-    <el-dialog
-      :visible.sync="编辑显示"
-      width="680px"
-      top="6vh"
-      custom-class="集编辑弹窗"
-      :show-close="false"
-      :close-on-click-modal="false">
-      <div class="弹窗头">
-        <div>
-          <div class="弹窗标题">{{ 新增模式 ? '新增一集' : '编辑第 ' + 草稿.集 + ' 集' }}</div>
-          <div class="弹窗副题">{{ 新增模式 ? '填完点「加入目录」，这一集会排到最后' : '改完点保存，直接写回这一行' }}</div>
-        </div>
-        <i class="el-icon-close 弹窗关闭" title="关闭" @click="编辑显示 = false"></i>
-      </div>
-      <div class="弹窗体">
-        <el-form label-width="80px" size="small">
-          <div class="表单两列">
-            <el-form-item label="集">
-              <el-input-number v-model="草稿.集" :min="1" :max="999" controls-position="right"></el-input-number>
-            </el-form-item>
-            <el-form-item label="幕">
-              <el-select v-model="草稿.幕" style="width:170px">
-                <el-option label="第一幕 · 建置" value="第一幕 · 建置"></el-option>
-                <el-option label="第二幕 · 对抗" value="第二幕 · 对抗"></el-option>
-                <el-option label="第三幕 · 收束" value="第三幕 · 收束"></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <el-form-item label="标题">
-            <el-input v-model="草稿.标题" maxlength="30" placeholder="这一集的看点，12 字内最好"></el-input>
-          </el-form-item>
-          <el-form-item label="梗概">
-            <el-input v-model="草稿.梗概" type="textarea" :rows="4" placeholder="1~2 句：这一集发生什么、结尾卡在哪"></el-input>
-          </el-form-item>
-          <el-form-item label="出场">
-            <el-input v-model="草稿.出场" maxlength="80" placeholder="顿号分隔，例如：李宝明、雏田、天天"></el-input>
-          </el-form-item>
-          <el-form-item label="开场钩子">
-            <el-input v-model="草稿.钩子" maxlength="80" placeholder="开场三拍里最先抓住人的那个画面"></el-input>
-          </el-form-item>
-          <el-form-item label="尾钩">
-            <el-input v-model="草稿.尾钩" maxlength="80" placeholder="这一集卡在哪，让观众必须看下一集"></el-input>
-          </el-form-item>
-          <el-form-item label="中心句">
-            <el-input v-model="草稿.中心句" type="textarea" :rows="2" placeholder="一句话说清这一集的内核"></el-input>
-          </el-form-item>
-          <div class="表单两列">
-            <el-form-item label="情绪分">
-              <el-rate v-model="草稿.情绪分" :max="5" :colors="['#ef4444', '#f59e0b', '#22c55e']"></el-rate>
-            </el-form-item>
-            <el-form-item label="状态">
-              <el-select v-model="草稿.状态" style="width:140px">
-                <el-option label="待创作" value="待创作"></el-option>
-                <el-option label="进行中" value="进行中"></el-option>
-                <el-option label="已完成" value="已完成"></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="表单两列">
-            <el-form-item label="字数">
-              <el-input-number v-model="草稿.字数" :min="0" :max="20000" :step="100" controls-position="right"></el-input-number>
-            </el-form-item>
-            <el-form-item label="目标字数">
-              <el-input-number v-model="草稿.目标" :min="0" :max="20000" :step="100" controls-position="right"></el-input-number>
-            </el-form-item>
-          </div>
-          <div class="字段注">2 分钟短剧一般 2500~3000 字；偏离目标 20% 以上会在集卡上标红</div>
-          <div class="表单两列 开关行">
-            <el-form-item label="关键集">
-              <el-switch v-model="草稿.关键"></el-switch>
-            </el-form-item>
-            <el-form-item label="付费卡点">
-              <el-switch v-model="草稿.卡点"></el-switch>
-            </el-form-item>
-          </div>
-        </el-form>
-      </div>
-      <div class="弹窗底">
-        <el-button v-if="!新增模式" type="text" class="删除钮" @click="删除这一集()">删除这一集</el-button>
-        <div style="flex:1"></div>
-        <el-button @click="编辑显示 = false">取消</el-button>
-        <el-button type="primary" @click="保存这一集()">{{ 新增模式 ? '加入目录' : '保存' }}</el-button>
-      </div>
-    </el-dialog>
+    <!-- 单集编辑 / 新增弹窗（已拆分为独立组件：单集编辑弹窗.vue）。
+         草稿仍由本页 打开编辑/新增一集 构建；保存/删除在子组件里改 目录表 后
+         通过事件通知本页做落库与提示（编辑弹窗新增落库 等）。 -->
+    <episode-edit-dialog
+      :显示.sync="编辑显示"
+      :新增模式="新增模式"
+      :编辑对象="编辑对象"
+      :草稿="草稿"
+      :目录表="目录表"
+      @重置筛选="只看关键 = false"
+      @翻到集="翻到集($event)"
+      @已新增="编辑弹窗新增落库($event)"
+      @已保存="编辑弹窗保存落库($event)"
+      @已删除="编辑弹窗删除落库($event)"></episode-edit-dialog>
 
-    <!-- ============ 打点位弹窗 ============ -->
-    <el-dialog
-      :visible.sync="点位显示"
-      width="560px"
-      top="10vh"
-      :show-close="false"
-      :close-on-click-modal="false">
-      <div class="弹窗头">
-        <div>
-          <div class="弹窗标题">EP{{ 点位对象 ? 点位对象.集 : '' }} · 钩子点位</div>
-          <div class="弹窗副题">这里打一条，上面的台账和「未回收」立刻跟着变</div>
-        </div>
-        <i class="el-icon-close 弹窗关闭" title="关闭" @click="点位显示 = false"></i>
-      </div>
-      <div class="弹窗体">
-        <div v-if="点位对象 && (点位对象.点位 || []).length" class="已有点">
-          <div v-for="(点, 序) in 点位对象.点位" :key="'已' + 序" class="已有点行">
-            <span class="点" :class="'点-' + 点.类型">{{ 点.类型 }} {{ 点.点 }}</span>
-            <span class="已有点文">{{ 点.内容 }}</span>
-            <el-button type="text" size="mini" class="删点" @click="删点位(序)">删除</el-button>
-          </div>
-        </div>
-        <div v-else class="已有点 空">这一集还没有点位</div>
-
-        <el-form label-width="64px" size="small" style="margin-top:14px">
-          <div class="表单两列">
-            <el-form-item label="动作">
-              <el-select v-model="点位草稿.类型" style="width:130px">
-                <el-option v-for="类 in 钩子类型们" :key="类" :label="类" :value="类"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="点位">
-              <el-select v-model="点位草稿.点" style="width:110px">
-                <el-option label="P01" value="P01"></el-option>
-                <el-option label="P02" value="P02"></el-option>
-                <el-option label="P03" value="P03"></el-option>
-                <el-option label="P04" value="P04"></el-option>
-                <el-option label="P05" value="P05"></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <el-form-item label="内容">
-            <el-input v-model="点位草稿.内容" maxlength="40" placeholder="一句话，例如：宣布小组积分制"></el-input>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div class="弹窗底">
-        <div style="flex:1"></div>
-        <el-button @click="点位显示 = false">关闭</el-button>
-        <el-button type="primary" @click="保存点位()">加一条</el-button>
-      </div>
-    </el-dialog>
+    <!-- 打点位弹窗（已拆分为独立组件：点位弹窗.vue，点位草稿已搬入子组件） -->
+    <point-dialog
+      :显示.sync="点位显示"
+      :点位对象="点位对象"
+      @保存="点位保存落库()"
+      @删除="点位删除落库()"></point-dialog>
 
     <!-- 技能生成弹窗：技能 + 技能引导提示词 + 引入数据（本页一套，引入数据里带人物设定）。
          in-DOM 模板只认 ASCII 标签名，必须用 skill-dialog 别名（见 docs/09 第 8 节）；
@@ -440,9 +296,12 @@ import 情绪折线 from '@/共用/情绪折线/index.vue'
 import 钩子台账 from '@/共用/钩子台账/index.vue'
 import 集卡 from '@/共用/集卡/index.vue'
 import 分页条 from '@/共用/分页条/index.vue'
-import { 钩子类型们, 建台账, 找未回收, 连续低谷, 估情绪分 } from '@/共用/节奏工具'
+import { 建台账, 找未回收, 连续低谷, 估情绪分 } from '@/共用/节奏工具'
 import { 取, 发 } from '@/接口/请求'
 import { 提交AI任务 } from '@/共用/AI任务'
+import 体检弹窗 from './体检弹窗.vue'
+import 单集编辑弹窗 from './单集编辑弹窗.vue'
+import 点位弹窗 from './点位弹窗.vue'
 
 // 「引入数据」里来自方案详情的五块（真库 = 方案表分区列，见 this.方案分区值）
 const 方案分区 = [
@@ -516,7 +375,10 @@ export default {
     'emotion-chart': 情绪折线,
     'hook-ledger': 钩子台账,
     'episode-card': 集卡,
-    'page-bar': 分页条
+    'page-bar': 分页条,
+    'health-dialog': 体检弹窗,
+    'episode-edit-dialog': 单集编辑弹窗,
+    'point-dialog': 点位弹窗
   },
   created() {
     // 老地址 /script/outline?步=script|audit 以前是分集剧本/合规审查。
@@ -584,16 +446,14 @@ export default {
       技能引导: '',
       引入勾选: null,
       快捷意见: 快捷意见,
-      /* 单集编辑弹窗 */
+      /* 单集编辑弹窗（弹窗本体在 单集编辑弹窗.vue，草稿构建留在本页） */
       编辑显示: false,
       新增模式: false,
       编辑对象: null,
       草稿: 空草稿(1),
-      /* 打点位弹窗 */
+      /* 打点位弹窗（弹窗本体在 点位弹窗.vue） */
       点位显示: false,
-      点位对象: null,
-      点位草稿: { 类型: '埋', 点: 'P01', 内容: '' },
-      钩子类型们: 钩子类型们
+      点位对象: null
     }
   },
   computed: {
@@ -1390,121 +1250,54 @@ export default {
       this.草稿.幕 = this.按比例分幕(最大 + 1, this.目标集数 || 最大 + 1)
       this.编辑显示 = true
     },
-    草稿转集(草稿) {
-      return {
-        集: 草稿.集,
-        幕: 草稿.幕,
-        标题: 草稿.标题,
-        关键: !!草稿.关键,
-        卡点: !!草稿.卡点,
-        梗概: 草稿.梗概,
-        出场: String(草稿.出场 || '').split(/[、,，\s]+/).filter(function (人) { return !!人 }),
-        钩子: 草稿.钩子,
-        尾钩: 草稿.尾钩,
-        中心句: 草稿.中心句,
-        情绪分: 草稿.情绪分 || 3,
-        字数: 草稿.字数,
-        目标: 草稿.目标,
-        状态: 草稿.状态
-      }
-    },
-    保存这一集() {
-      if (this.新增模式) {
-        if (!String(this.草稿.标题 || '').trim()) {
-          this.$message.warning('先给这一集起个标题')
-          return
-        }
-        const 新集 = this.草稿转集(this.草稿)
-        新集.点位 = []
-        this.目录表.push(新集)
-        this.目录表.sort(function (a, b) { return a.集 - b.集 })
-        this.只看关键 = false
-        this.翻到集(新集.集)
-        this.编辑显示 = false
-        const 页2 = this
-        this.存全库().then(function () {
-          页2.$message.success('已加入第 ' + 新集.集 + ' 集并保存')
-        }).catch(function (e) {
-          页2.$message.warning('已加入页面，但落库失败：' + ((e && e.message) || ''))
-        })
-        return
-      }
-      const 集 = this.编辑对象
-      if (!集) {
-        this.编辑显示 = false
-        return
-      }
-      const 改后 = this.草稿转集(this.草稿)
-      // 整条替换而不是逐字段赋值：老数据可能没有 幕/关键/卡点/情绪分 这些新键，
-      // 直接赋新键 Vue 2 不认（不是响应式），卡片不会刷新。
-      const 序 = this.目录表.indexOf(集)
-      const 新集 = Object.assign({}, 集, 改后)
-      if (序 >= 0) this.$set(this.目录表, 序, 新集)
-      this.目录表.sort(function (a, b) { return a.集 - b.集 })
-      this.编辑显示 = false
+    // —— 以下三个是 单集编辑弹窗（已拆分为独立组件）的落库收尾：
+    //    子组件负责改 目录表 / 关弹窗，落库与提示留在本页（文案与拆分前一致）。
+    编辑弹窗新增落库(集号) {
       const 页2 = this
       this.存全库().then(function () {
-        页2.$message.success('已保存第 ' + 新集.集 + ' 集并落库')
+        页2.$message.success('已加入第 ' + 集号 + ' 集并保存')
+      }).catch(function (e) {
+        页2.$message.warning('已加入页面，但落库失败：' + ((e && e.message) || ''))
+      })
+    },
+    编辑弹窗保存落库(集号) {
+      const 页2 = this
+      this.存全库().then(function () {
+        页2.$message.success('已保存第 ' + 集号 + ' 集并落库')
       }).catch(function (e) {
         页2.$message.warning('已保存到页面，但落库失败：' + ((e && e.message) || ''))
       })
     },
-    删除这一集() {
-      const 集 = this.编辑对象
-      if (!集) return
+    编辑弹窗删除落库(集) {
       const 页 = this
-      this.$confirm('确定删除第 ' + 集.集 + ' 集「' + 集.标题 + '」？', '删除这一集', {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(function () {
-        const 序 = 页.目录表.indexOf(集)
-        if (序 >= 0) 页.目录表.splice(序, 1)
-        页.编辑显示 = false
-        页.存全库().then(function () {
-          页.$message.success('已删除第 ' + 集.集 + ' 集并落库')
-        }).catch(function (e) {
-          页.$message.warning('已从页面删除，但落库失败：' + ((e && e.message) || ''))
-        })
-      }).catch(function () {})
-    },
-    状态类型(状态) {
-      if (状态 === '已完成') return 'success'
-      if (状态 === '进行中') return 'warning'
-      return 'info'
+      this.存全库().then(function () {
+        页.$message.success('已删除第 ' + 集.集 + ' 集并落库')
+      }).catch(function (e) {
+        页.$message.warning('已从页面删除，但落库失败：' + ((e && e.message) || ''))
+      })
     },
 
     /* ---------------- 钩子点位 ---------------- */
+    // 打点位弹窗（已拆分为独立组件）：点位草稿在子组件里，打开时由子组件重置
     打开点位(集) {
       if (!集) return
       this.点位对象 = 集
-      this.点位草稿 = { 类型: '埋', 点: 'P01', 内容: '' }
       this.点位显示 = true
     },
-    保存点位() {
-      const 集 = this.点位对象
-      if (!集) return
-      const 文 = String(this.点位草稿.内容 || '').trim()
-      if (!文) {
-        this.$message.warning('写一句这个点位是什么')
-        return
-      }
-      if (!集.点位) this.$set(集, '点位', [])
-      集.点位.push({ 类型: this.点位草稿.类型, 点: this.点位草稿.点, 内容: 文 })
-      this.点位草稿.内容 = ''
+    // —— 以下两个是 点位弹窗（已拆分为独立组件）的落库收尾：
+    //    子组件负责改 点位对象.点位，落库与提示留在本页（文案与拆分前一致）。
+    点位保存落库() {
       const 页2 = this
+      const 集 = this.点位对象
       this.存全库().then(function () {
         页2.$message.success('已加到 EP' + 集.集 + ' 并落库')
       }).catch(function (e) {
         页2.$message.warning('已加到页面，但落库失败：' + ((e && e.message) || ''))
       })
     },
-    删点位(序) {
+    点位删除落库() {
       const 页2 = this
-      const 集 = this.点位对象
-      if (!集 || !集.点位) return
-      集.点位.splice(序, 1)
-      页2.存全库().catch(function (e) {
+      this.存全库().catch(function (e) {
         页2.$message.warning('点位已删，但落库失败：' + ((e && e.message) || ''))
       })
     },
@@ -1800,81 +1593,11 @@ export default {
   color: var(--字弱);
 }
 
-/* ---------- 弹窗 ---------- */
-.弹窗头 {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  padding-bottom: 14px; border-bottom: 1px solid var(--描边);
-}
-.弹窗标题 { font-size: 16px; font-weight: 700; color: var(--字); }
-.弹窗副题 { font-size: 12px; color: var(--字弱); margin-top: 4px; }
-.弹窗关闭 { cursor: pointer; color: var(--字弱); font-size: 16px; }
-.弹窗体 { padding: 16px 0 4px; max-height: 64vh; overflow-y: auto; }
-.弹窗底 {
-  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
-  padding-top: 14px; border-top: 1px solid var(--描边);
-}
-.删除钮 { color: #ef4444; }
-.字段注 { font-size: 12px; color: var(--字弱); margin: -4px 0 14px 80px; }
-
-.表单两列 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 16px;
-}
-.开关行 { margin-top: 4px; }
-
-/* ---------- 体检弹窗 ---------- */
-.体检空 { padding: 24px 0; text-align: center; font-size: 13px; color: var(--字弱); }
-.体检项 {
-  display: flex;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--描边);
-}
-.体检项:last-child { border-bottom: 0; }
-.体检级 {
-  flex: 0 0 auto;
-  height: 20px;
-  line-height: 18px;
-  padding: 0 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  border: 1px solid;
-}
-.体检级.红 { color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.12); }
-.体检级.黄 { color: #fcd34d; border-color: rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.12); }
-.体检类 { font-size: 13px; font-weight: 650; color: var(--字); }
-.体检文 { font-size: 12.5px; line-height: 1.7; color: var(--字次); }
-
-/* ---------- 点位弹窗 ---------- */
-.已有点 {
-  background: var(--卡片二);
-  border: 1px solid var(--描边);
-  border-radius: 8px;
-  padding: 8px 10px;
-}
-.已有点.空 { font-size: 12px; color: var(--字弱); text-align: center; padding: 14px 10px; }
-.已有点行 { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
-.已有点文 { flex: 1; min-width: 0; font-size: 12px; color: var(--字次); }
-.删点 { color: #ef4444 !important; }
-.已有点行 .点 {
-  font-size: 10px;
-  line-height: 16px;
-  border-radius: 4px;
-  padding: 0 6px;
-  border: 1px solid;
-  font-family: Consolas, 'Courier New', monospace;
-}
-.已有点行 .点-埋 { color: #93c5fd; border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.12); }
-.已有点行 .点-露 { color: #a5b4fc; border-color: rgba(129, 140, 248, 0.4); background: rgba(129, 140, 248, 0.12); }
-.已有点行 .点-压 { color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.12); }
-.已有点行 .点-兑 { color: #86efac; border-color: rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.12); }
-.已有点行 .点-假兑 { color: #fcd34d; border-color: rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.12); }
-.已有点行 .点-回收 { color: #5eead4; border-color: rgba(45, 212, 191, 0.4); background: rgba(45, 212, 191, 0.12); }
-.已有点行 .点-转 { color: #d8b4fe; border-color: rgba(192, 132, 252, 0.4); background: rgba(192, 132, 252, 0.12); }
+/* ---------- 弹窗 ----------
+   三个弹窗（体检 / 单集编辑 / 打点位）已拆分为独立组件，
+   弹窗骨架与弹窗专属样式随组件搬走（见 体检弹窗.vue / 单集编辑弹窗.vue / 点位弹窗.vue）。 */
 
 @media (max-width: 1100px) {
   .总览带 { grid-template-columns: 1fr; }
-  .表单两列 { grid-template-columns: 1fr; }
 }
 </style>

@@ -7,6 +7,7 @@ body: { 剧id, 方案们: [{id?, 版本号?, 候选卡:{标题,故事线,题材,
 """
 import traceback
 
+from django.db import transaction
 from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -58,49 +59,52 @@ def 方案保存(请求):
             选定id = 0
 
         现在 = timezone.now()
-        提交ids = []
-        结果行 = []
-        for 序, 项 in enumerate(方案们):
-            if not isinstance(项, dict):
-                continue
-            卡 = _洗候选卡(项.get('候选卡'))
-            版本 = (str(项.get('版本号') or '').strip()
-                    or (版本名[序] if 序 < len(版本名) else '方案' + str(序 + 1)))
-            行id = 项.get('id')
-            try:
-                行id = int(行id) if 行id else 0
-            except (TypeError, ValueError):
-                行id = 0
-
-            if 行id:
-                一行 = 方案.objects.filter(id=行id, 剧id=剧id).first()
-                if 一行 is None:
+        # 2026-11-04：三步写（对齐行 → 清选定 → 置选定）包进事务，
+        # 中途异常不再留下"删了旧方案又没写进新方案"的半删脏状态
+        with transaction.atomic():
+            提交ids = []
+            结果行 = []
+            for 序, 项 in enumerate(方案们):
+                if not isinstance(项, dict):
                     continue
-                一行.版本号 = 版本
-                一行.候选卡 = 卡
-                一行.更新时间 = 现在
-                一行.save(update_fields=['版本号', '候选卡', '更新时间'])
+                卡 = _洗候选卡(项.get('候选卡'))
+                版本 = (str(项.get('版本号') or '').strip()
+                        or (版本名[序] if 序 < len(版本名) else '方案' + str(序 + 1)))
+                行id = 项.get('id')
+                try:
+                    行id = int(行id) if 行id else 0
+                except (TypeError, ValueError):
+                    行id = 0
+
+                if 行id:
+                    一行 = 方案.objects.filter(id=行id, 剧id=剧id).first()
+                    if 一行 is None:
+                        continue
+                    一行.版本号 = 版本
+                    一行.候选卡 = 卡
+                    一行.更新时间 = 现在
+                    一行.save(update_fields=['版本号', '候选卡', '更新时间'])
+                else:
+                    一行 = 方案.objects.create(
+                        剧id=剧id, 版本号=版本, 是否选定=False, 候选卡=卡,
+                        创建时间=现在, 更新时间=现在,
+                    )
+                提交ids.append(一行.id)
+                结果行.append(一行)
+
+            if not 结果行:
+                return Response({'ok': False, 'error': '没有可保存的方案。'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # 删掉前端已不存在的行（重新生成时全量对齐）
+            方案.objects.filter(剧id=剧id).exclude(id__in=提交ids).delete()
+
+            # 选定：只留一行 =1；未指定时定在提交顺序的第一行
+            方案.objects.filter(剧id=剧id).update(是否选定=False)  # 先全清
+            if 选定id and 选定id in 提交ids:
+                方案.objects.filter(id=选定id).update(是否选定=True)
             else:
-                一行 = 方案.objects.create(
-                    剧id=剧id, 版本号=版本, 是否选定=False, 候选卡=卡,
-                    创建时间=现在, 更新时间=现在,
-                )
-            提交ids.append(一行.id)
-            结果行.append(一行)
-
-        if not 结果行:
-            return Response({'ok': False, 'error': '没有可保存的方案。'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # 删掉前端已不存在的行（重新生成时全量对齐）
-        方案.objects.filter(剧id=剧id).exclude(id__in=提交ids).delete()
-
-        # 选定：只留一行 =1；未指定时定在提交顺序的第一行
-        方案.objects.filter(剧id=剧id).update(是否选定=False)  # 先全清
-        if 选定id and 选定id in 提交ids:
-            方案.objects.filter(id=选定id).update(是否选定=True)
-        else:
-            选定id = 结果行[0].id
-            方案.objects.filter(id=选定id).update(是否选定=True)
+                选定id = 结果行[0].id
+                方案.objects.filter(id=选定id).update(是否选定=True)
 
         行 = 方案.objects.filter(剧id=剧id).order_by('id')
         return Response({'ok': True, '选定id': 选定id, '列表': [方案_to_dict(一) for 一 in 行]})

@@ -30,11 +30,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'aicg',
         'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'PASSWORD': 'smartR00t',
+        'HOST': '192.168.31.131',
+        'PORT': '3308',
         'OPTIONS': {
             'charset': 'utf8mb4',
+            # 2026-11-04：MySQL 8 服务端默认尝试 TLS，自签证书在本机不可信，
+            # pymysql 握手会报证书错误，显式禁用 SSL 走明文（内网局域网环境）
+            'ssl_disabled': True,
         },
     }
 }

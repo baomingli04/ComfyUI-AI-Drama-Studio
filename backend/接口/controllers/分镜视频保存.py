@@ -135,16 +135,19 @@ def 分镜视频接口(请求):
             return Response({'ok': True, 'id': 版.id, '选中': True})
 
         if 动作 == '删除':
+            # 2026-11-04：删版本+补选中包进事务，防并发时出现"无任何选中版"（成片会拒合）
+            from django.db import transaction as _事务
             原选中 = 版.选中
-            版.delete()
-            若删除了选中 = False
-            if 原选中:
-                最新 = 分镜视频.objects.filter(剧id=剧id, 集号=集号, 镜号=镜号).order_by('-id').first()
-                if 最新:
-                    最新.选中 = True
-                    最新.更新时间 = 此刻
-                    最新.save()
-                    若删除了选中 = True
+            with _事务.atomic():
+                版.delete()
+                若删除了选中 = False
+                if 原选中:
+                    最新 = 分镜视频.objects.filter(剧id=剧id, 集号=集号, 镜号=镜号).order_by('-id').first()
+                    if 最新:
+                        最新.选中 = True
+                        最新.更新时间 = 此刻
+                        最新.save()
+                        若删除了选中 = True
             return Response({'ok': True, '补选中': 若删除了选中})
 
     except Exception as 异常:

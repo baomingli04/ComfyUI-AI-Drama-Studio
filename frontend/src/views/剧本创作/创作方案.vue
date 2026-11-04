@@ -409,12 +409,16 @@ export default {
     铺空卡(n) {
       const 旧 = this.方案列表
       const 版本字 = '一二三四五六七八九十'
-      this.方案列表 = Array.apply(null, { length: n }).map(function (_, 序) {
+      const 新 = Array.apply(null, { length: n }).map(function (_, 序) {
         return Object.assign(
           { id: 旧[序] ? 旧[序].id : 0, 版本号: '方案' + (版本字[序] || (序 + 1)) },
           { 标题: '', 故事线: '', 题材: '', 基调: '', 结局: '', 驱动: '', 风险: '' }
         )
       })
+      // 2026-11-04 修复：旧方案超过 n 张时，多出的卡（含 id 和内容）原样追加保留，
+      // 不再因落库时全量对齐被静默删除
+      if (旧.length > n) 新.push.apply(新, 旧.slice(n))
+      this.方案列表 = 新
     },
     // 打开某一版方案的编辑弹窗：把卡片字段拷进草稿，改草稿不影响卡片
     打开编辑(序) {
