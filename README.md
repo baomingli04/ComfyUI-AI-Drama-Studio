@@ -116,7 +116,8 @@ aicg/
 ├── 表结构.sql           # 建库建表 SQL
 ├── 开发标准手册.md      # 开发规范（唯一参照）
 ├── start-platform.bat  # 一键启动（MariaDB + Django 8001 + Vite 8081）
-└── 1-stop.bat          # 一键停止
+├── 数据库导出_aicg_2026-11-04.sql  # 全库导出（33 张表，含表结构，可直接导入）
+└── 表结构.sql           # 建库建表 SQL（空库结构版）
 ```
 
 ---
@@ -125,13 +126,16 @@ aicg/
 
 > 前置要求：本机已安装并启动 **ComfyUI**（默认 `127.0.0.1:8188`）、Python 3.11、Node.js、MySQL/MariaDB。
 
-### 1. 建库
+### 1. 建库（二选一）
 
-```sql
-CREATE DATABASE aicg DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+**方式 A：直接导入全量导出**（含表结构 + 全部 33 张表，最快上手）：
+
+```bash
+mysql -uroot -p -e "CREATE DATABASE aicg DEFAULT CHARACTER SET utf8mb4"
+mysql -uroot -p aicg < 数据库导出_aicg_2026-11-04.sql
 ```
 
-导入表结构：`mysql -uroot -p aicg < 表结构.sql`，再按需执行 `docs/02-数据库文档.md` 中的增量 ALTER（分镜线两张表）。
+**方式 B：只建空库结构**（干净起步）：导入 `表结构.sql`，再按需执行 `docs/02-数据库文档.md` 中的增量 ALTER（分镜线两张表）。
 
 ### 2. 后端
 

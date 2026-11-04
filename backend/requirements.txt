@@ -1,20 +1,20 @@
-# comfyui本地漫剧制作平台 —— 后端依赖
-# 说明：原 backend/.venv 基于已失效的 D:\Python39（该机已无此解释器），
-# 现改用 Python 3.11 重建。下面带版本号的包 = 原环境实际装过的版本，保持一致；
-# 不带版本号的 = 源码里实际 import 了但原环境缺失的，补齐。
-# 生成方式：pip freeze > requirements.txt（本机已跑通后重新导出可覆盖本文件）
-Django==4.2.16
+# comfyui本地漫剧制作平台 —— 后端依赖（pip 安装文件）
+# 由 backend/.venv 实际环境 pip freeze 导出（Python 3.11），安装：pip install -r requirements.txt
 asgiref==3.11.1
+certifi==2026.10.19
+charset-normalizer==3.5.2
+Django==4.2.16
 django-cors-headers==4.9.0
 djangorestframework==3.15.1
-djangorestframework-simplejwt==5.5.1
+djangorestframework_simplejwt==5.5.1
+et_xmlfile==2.0.0
+idna==3.20
+openpyxl==3.1.5
 PyJWT==2.14.0
 PyMySQL==1.2.0
+PyYAML==6.0.3
+requests==2.34.2
 sqlparse==0.5.5
 typing_extensions==4.16.0
 tzdata==2026.4
-
-# 源码 import 了、原 .venv 里缺失，补齐
-requests
-PyYAML
-openpyxl
+urllib3==2.8.0
