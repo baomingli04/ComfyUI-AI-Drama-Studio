@@ -1,0 +1,40 @@
+.测试页 {
+  color: #d1d5db;
+}
+
+.页标题 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.表单卡 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 20px 20px 4px 20px;
+  margin-bottom: 16px;
+}
+
+.表格区 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.上传路径 {
+  color: #6b7280;
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.图位行 { display: flex; flex-wrap: wrap; gap: 10px; }
+.图位块 { border: 1px solid #dcdfe6; border-radius: 4px; padding: 8px 10px; min-width: 160px; cursor: pointer; }
+.图位块.选中 { border-color: #409eff; box-shadow: 0 0 0 2px rgba(64, 158, 255, .2); }
+.图位名 { font-size: 13px; margin-bottom: 6px; }
+
+.组块 { border: 1px solid #ebeef5; border-radius: 4px; padding: 8px 10px; margin-bottom: 8px; }
+.组头 { font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.组时长 { margin-top: 6px; font-size: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }

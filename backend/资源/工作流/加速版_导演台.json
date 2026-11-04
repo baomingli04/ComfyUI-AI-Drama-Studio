@@ -1,0 +1,163 @@
+{
+  "1": {
+    "inputs": {
+      "unet_name": "minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "MiniMax H3 UNET"
+    }
+  },
+  "2": {
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+      "type": "minimax",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "CLIP (minimax / Qwen3-VL)"
+    }
+  },
+  "3": {
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Video VAE"
+    }
+  },
+  "4": {
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Audio VAE"
+    }
+  },
+  "6": {
+    "inputs": {
+      "fps": [
+        "12",
+        2
+      ],
+      "bit_depth": 8,
+      "images": [
+        "12",
+        0
+      ],
+      "audio": [
+        "12",
+        1
+      ]
+    },
+    "class_type": "CreateVideo",
+    "_meta": {
+      "title": "创建视频"
+    }
+  },
+  "7": {
+    "inputs": {
+      "filename_prefix": "video/MiniMaxH3_Director",
+      "format": "auto",
+      "codec": "auto",
+      "video": [
+        "6",
+        0
+      ]
+    },
+    "class_type": "SaveVideo",
+    "_meta": {
+      "title": "保存视频"
+    }
+  },
+  "8": {
+    "inputs": {
+      "source": [
+        "12",
+        5
+      ]
+    },
+    "class_type": "PreviewAny",
+    "_meta": {
+      "title": "Director 运行报告"
+    }
+  },
+  "12": {
+    "inputs": {
+      "task_type": "r2v — 参考主体生视频(Reference to Video)",
+      "global_prompt": "",
+      "bd_grp_sample": "采样设置",
+      "cfg": 1,
+      "seed": 888,
+      "frame_rate": 24,
+      "width": 864,
+      "height": 480,
+      "ref_max_size": 864,
+      "total_frames": 243,
+      "timeline_data": "{\"version\":5,\"editMode\":\"segment\",\"totalFrames\":243,\"frameRate\":24,\"video\":{\"fileName\":\"《征服》名场面：这瓜保熟吗？孙红雷这段演绎堪称经典！.mp4\",\"videoFile\":\"《征服》名场面：这瓜保熟吗？孙红雷这段演绎堪称经典！.mp4\",\"subfolder\":\"\",\"type\":\"input\",\"frames\":[],\"frameMap\":[],\"deletedSourceRanges\":[],\"sourceFrameCount\":2448,\"width\":1252,\"height\":720,\"id\":\"mse24gmql44wq\",\"duration\":98.494878,\"nativeFps\":24.854084346630998,\"nativeFrameCount\":2448,\"storageWidth\":864,\"storageHeight\":480},\"videoClips\":[{\"id\":\"mse24gmql44wq\",\"fileName\":\"《征服》名场面：这瓜保熟吗？孙红雷这段演绎堪称经典！.mp4\",\"videoFile\":\"《征服》名场面：这瓜保熟吗？孙红雷这段演绎堪称经典！.mp4\",\"subfolder\":\"\",\"type\":\"input\",\"width\":1252,\"height\":720,\"duration\":98.494878,\"nativeFps\":24.854084346630998,\"nativeFrameCount\":2448,\"sourceFrameCount\":2448,\"storageWidth\":864,\"storageHeight\":480,\"frames\":[]}],\"global\":{\"taskType\":\"r2v — 参考主体生视频(Reference to Video)\",\"prompt\":\"\",\"refs\":[],\"referenceVideo\":{\"videoFile\":\"\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},\"continuousReference\":false,\"genImage\":{\"imageFile\":\"\"},\"sourceWidth\":768,\"sourceHeight\":1024,\"refAudios\":[],\"refVideos\":[],\"commonEnabled\":false,\"commonCollapsed\":false},\"output\":{\"mode\":\"fixed\",\"aspectRatio\":\"16:9 (宽屏)\",\"megapixels\":0.4,\"multiple\":32,\"longEdge\":864,\"width\":864,\"height\":480,\"maxExportFrames\":0,\"exportMode\":\"all\",\"audioMode\":\"source\",\"exportSourceImages\":false,\"exportPreFaceRefine\":false,\"refImageSize\":\"match\",\"continuityEnabled\":false,\"continuityOverlapFrames\":5,\"continuityMode\":\"guide\",\"continuityRedraw\":0.1,\"continuityKeepTail\":true},\"runSelectEnabled\":false,\"runSelection\":[],\"segments\":[{\"id\":\"mse3lbnz61yvx\",\"start\":0,\"length\":243,\"frameCount\":243,\"durationSec\":10,\"prompt\":\"主体定义:\\n<Picture 1> 是男孩主角，展现正面、侧面与背面的三视图，棕色乱发，身穿带火箭贴布的牛仔外套，卡其工装裤配红白帆布鞋，背景为温馨书房。\\n<Picture 2> 是宠物狗主角，同样呈现正侧背三视角，深棕卷毛，佩戴蓝色项圈与胸背带，身旁散落骨头与小黄鸭，背景呼应书房。\\n<Subject 1> 锁定为 <Picture 1> 中的男孩，特征为蓬松短发、标志性火箭夹克。\\n<Subject 2> 锁定为 <Picture 2> 中的棕狗，特征为垂耳、厚实毛发与蓝色背带。\\n\\n摘要:\\n基于双主角三视图参考的 3D 动画短片，聚焦男孩与爱犬在书房内的互动瞬间，采用 C4D 渲染质感，光影温暖，强调角色清晰的剪影与 SSS 肌肤质感，构建充满童趣的开场画面。\\n\\n保留分析:\\n保留 <Picture 1> 中男孩的蓬松发量与红色鞋底的细节，确保角色在运动中不失其生动的面部表情；同时保留 <Picture 2> 中狗狗的垂耳形态与项圈上的骨牌吊坠，维持两者在相同书房环境下的空间连贯性，避免比例失调。\\n\\n详细描述:\\n[Shot 1] 镜头推近至男孩与狗狗的半身互动，背景虚化突出主体。男孩 <Subject 1> 正侧身回头，牛仔外套上的火箭贴布在暖光下微微反光；狗狗 <Subject 2> 抬头仰望，深棕色毛发在 C4D 渲染下呈现细腻的绒毛感。地面投射着柔和的窗户光斑，地板上的小黄鸭作为前景点缀。画面顶部保留 <Picture 1> 中的空间纵深感，书架与玩具模糊在后方，营造沉浸式 3D 空间。\\n\\n整体声景:\\n环境音以温暖的木地板吱呀声开场，混合着铅笔在纸上沙沙的摩擦声。背景里隐约传来一只小鸭子被踩到的“啪嗒”轻响，随后是男孩轻快的脚步声与狗狗急促的呼吸声，构建出充满生活气息的午后书房氛围。\\n\\n非叙事配乐:\\n轻快活泼的钢琴与木琴合奏，节奏明快如心跳。低音弦乐铺垫出 C4D 特有的厚实质感，旋律在男孩与狗狗的视线交汇时推高，随后缓缓落下，为 10 秒的短镜头留出呼吸感，强化情感连接。\\n\\n画面广告文案:\\nLeo & Milo: 3D\",\"negativePrompt\":\"\",\"taskType\":\"\",\"refs\":[{\"index\":0,\"imageFile\":\"Gemini_Generated_Image_yhwnv2yhwnv2yhwn.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},{\"index\":1,\"imageFile\":\"Gemini_Generated_Image_skjq82skjq82skjq.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"}],\"refAudios\":[],\"refVideos\":[],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"startImage\":null,\"endImage\":null,\"continuityFromPrev\":false,\"refImageSize\":\"match\"}],\"timelineMode\":\"prompt_batch\",\"width\":864,\"height\":480,\"refMaxSize\":864,\"gen\":{\"defaultFrameCount\":124},\"keyframes\":[{\"id\":\"msdtx3zi62ktv_s\",\"imageFile\":\"0059.png\",\"width\":768,\"height\":1024,\"start\":0,\"length\":62,\"frameCount\":62,\"durationSec\":5,\"prompt\":\"一个猴子在极速奔跑，跑的过程中裤子掉在地上，但他仍然继续奔跑。过程中伴随自然的跑步声\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":false},{\"id\":\"msdtx3zi62ktv_e\",\"imageFile\":\"0060.png\",\"width\":512,\"height\":682,\"start\":62,\"length\":62,\"frameCount\":62,\"durationSec\":5,\"prompt\":\"\",\"negativePrompt\":\"bad video\",\"isStartFrame\":false,\"isEndFrame\":true},{\"id\":\"msdtx87njf33g_s\",\"imageFile\":\"0060.png\",\"width\":512,\"height\":682,\"start\":124,\"length\":62,\"frameCount\":62,\"durationSec\":5,\"prompt\":\"猴子在快速奔跑，双臂自然摆动，跑到一个岩石旁，慢慢的坐下，随着时间的流逝，沙尘慢慢消失，漏出蓝天背景。过程中伴随自然的跑步、坐下时候产生的声音\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":false},{\"id\":\"msdtx87njf33g_e\",\"imageFile\":\"0062.png\",\"width\":768,\"height\":1024,\"start\":186,\"length\":62,\"frameCount\":62,\"durationSec\":5,\"prompt\":\"\",\"negativePrompt\":\"bad video\",\"isStartFrame\":false,\"isEndFrame\":true},{\"id\":\"msdtwxyuscavj_s\",\"imageFile\":\"0062.png\",\"width\":768,\"height\":1024,\"start\":248,\"length\":62,\"frameCount\":62,\"durationSec\":5,\"prompt\":\"猴子从岩石上起身，起身后穿上衣服，背上书包，去教室上课，慢慢走到教室里，过程中伴随穿衣、背书包、走路的背景音\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":false},{\"id\":\"msdtwxyuscavj_e\",\"imageFile\":\"0086.png\",\"width\":768,\"height\":1024,\"start\":310,\"length\":62,\"frameCount\":62,\"durationSec\":5,\"prompt\":\"\",\"negativePrompt\":\"bad video\",\"isStartFrame\":false,\"isEndFrame\":true},{\"id\":\"msdx1e2eigp2x\",\"imageFile\":\"\",\"width\":0,\"height\":0,\"start\":372,\"length\":124,\"frameCount\":124,\"durationSec\":5,\"prompt\":\"\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":false}],\"durationSec\":20,\"shots\":[{\"id\":\"msdtx3zi62ktv\",\"durationSec\":5,\"prompt\":\"一个猴子在极速奔跑，跑的过程中裤子掉在地上，但他仍然继续奔跑。过程中伴随自然的跑步声\",\"negativePrompt\":\"bad video\",\"startImage\":{\"imageFile\":\"0059.png\",\"width\":768,\"height\":1024},\"endImage\":{\"imageFile\":\"0060.png\",\"width\":512,\"height\":682}},{\"id\":\"msdtx87njf33g\",\"durationSec\":5,\"prompt\":\"猴子在快速奔跑，双臂自然摆动，跑到一个岩石旁，慢慢的坐下，随着时间的流逝，沙尘慢慢消失，漏出蓝天背景。过程中伴随自然的跑步、坐下时候产生的声音\",\"negativePrompt\":\"bad video\",\"startImage\":{\"imageFile\":\"0060.png\",\"width\":512,\"height\":682},\"endImage\":{\"imageFile\":\"0062.png\",\"width\":768,\"height\":1024}},{\"id\":\"msdtwxyuscavj\",\"durationSec\":5,\"prompt\":\"猴子从岩石上起身，起身后穿上衣服，背上书包，去教室上课，慢慢走到教室里，过程中伴随穿衣、背书包、走路的背景音\",\"negativePrompt\":\"bad video\",\"startImage\":{\"imageFile\":\"0062.png\",\"width\":768,\"height\":1024},\"endImage\":{\"imageFile\":\"0086.png\",\"width\":768,\"height\":1024}},{\"id\":\"msdx1e2eigp2x\",\"durationSec\":5,\"prompt\":\"\",\"negativePrompt\":\"bad video\",\"startImage\":null,\"endImage\":null}],\"liveTaePreview\":false,\"batchDetailMode\":\"solo\",\"batchWorkspaces\":{\"r2v\":{\"selectedIndex\":0,\"editMode\":\"segment\",\"runSelectEnabled\":false,\"runSelection\":[],\"segments\":[{\"id\":\"mse3lbnz61yvx\",\"start\":0,\"length\":243,\"frameCount\":243,\"durationSec\":10,\"prompt\":\"主体定义:\\n<Picture 1> 是男孩主角，展现正面、侧面与背面的三视图，棕色乱发，身穿带火箭贴布的牛仔外套，卡其工装裤配红白帆布鞋，背景为温馨书房。\\n<Picture 2> 是宠物狗主角，同样呈现正侧背三视角，深棕卷毛，佩戴蓝色项圈与胸背带，身旁散落骨头与小黄鸭，背景呼应书房。\\n<Subject 1> 锁定为 <Picture 1> 中的男孩，特征为蓬松短发、标志性火箭夹克。\\n<Subject 2> 锁定为 <Picture 2> 中的棕狗，特征为垂耳、厚实毛发与蓝色背带。\\n\\n摘要:\\n基于双主角三视图参考的 3D 动画短片，聚焦男孩与爱犬在书房内的互动瞬间，采用 C4D 渲染质感，光影温暖，强调角色清晰的剪影与 SSS 肌肤质感，构建充满童趣的开场画面。\\n\\n保留分析:\\n保留 <Picture 1> 中男孩的蓬松发量与红色鞋底的细节，确保角色在运动中不失其生动的面部表情；同时保留 <Picture 2> 中狗狗的垂耳形态与项圈上的骨牌吊坠，维持两者在相同书房环境下的空间连贯性，避免比例失调。\\n\\n详细描述:\\n[Shot 1] 镜头推近至男孩与狗狗的半身互动，背景虚化突出主体。男孩 <Subject 1> 正侧身回头，牛仔外套上的火箭贴布在暖光下微微反光；狗狗 <Subject 2> 抬头仰望，深棕色毛发在 C4D 渲染下呈现细腻的绒毛感。地面投射着柔和的窗户光斑，地板上的小黄鸭作为前景点缀。画面顶部保留 <Picture 1> 中的空间纵深感，书架与玩具模糊在后方，营造沉浸式 3D 空间。\\n\\n整体声景:\\n环境音以温暖的木地板吱呀声开场，混合着铅笔在纸上沙沙的摩擦声。背景里隐约传来一只小鸭子被踩到的“啪嗒”轻响，随后是男孩轻快的脚步声与狗狗急促的呼吸声，构建出充满生活气息的午后书房氛围。\\n\\n非叙事配乐:\\n轻快活泼的钢琴与木琴合奏，节奏明快如心跳。低音弦乐铺垫出 C4D 特有的厚实质感，旋律在男孩与狗狗的视线交汇时推高，随后缓缓落下，为 10 秒的短镜头留出呼吸感，强化情感连接。\\n\\n画面广告文案:\\nLeo & Milo: 3D\",\"negativePrompt\":\"\",\"taskType\":\"\",\"refs\":[{\"index\":0,\"imageFile\":\"Gemini_Generated_Image_yhwnv2yhwnv2yhwn.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},{\"index\":1,\"imageFile\":\"Gemini_Generated_Image_skjq82skjq82skjq.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"}],\"refAudios\":[],\"refVideos\":[],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"referenceVideo\":{\"videoFile\":\"\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},\"_videoFrameCount\":243,\"previewFps\":24,\"refImageSize\":\"match\"}],\"globalCommon\":{\"commonEnabled\":false,\"commonCollapsed\":false,\"prompt\":\"\",\"refs\":[],\"refAudios\":[],\"refVideos\":[]}}}}",
+      "bd_grp_advanced": "高级采样",
+      "steps": 20,
+      "sampler": "res_multistep",
+      "scheduler": "simple",
+      "shift_video": 12,
+      "shift_audio": 3,
+      "export_source_images": false,
+      "export_pre_face_refine": false,
+      "bd_grp_perf": "Ollama",
+      "clear_vram_between_segments": "",
+      "clear_vram_before_refine": false,
+      "clear_vram_before_face_refine": false,
+      "minimax_director_ui": "",
+      "model": [
+        "15",
+        0
+      ],
+      "video_vae": [
+        "3",
+        0
+      ],
+      "audio_vae": [
+        "4",
+        0
+      ],
+      "clip": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3Director",
+    "_meta": {
+      "title": "MiniMaxH3Director"
+    }
+  },
+  "14": {
+    "inputs": {
+      "sage_attention": "auto",
+      "allow_compile": false,
+      "model": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "PathchSageAttentionKJ",
+    "_meta": {
+      "title": "Patch Sage Attention KJ"
+    }
+  },
+  "15": {
+    "inputs": {
+      "model": [
+        "14",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3MemoryEfficientSageAttentionPatch",
+    "_meta": {
+      "title": "MiniMax H3 Memory Efficient Sage Attention Patch"
+    }
+  }
+}

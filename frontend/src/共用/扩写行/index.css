@@ -1,0 +1,52 @@
+.扩写行 {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.扩写技能 {
+  max-width: 220px;
+  flex: 1;
+}
+.扩写需求 {
+  flex: 1;
+}
+.配置区 {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  background: #0a0f1a;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+}
+.配置提示 {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+.配置按钮行 {
+  margin-top: 12px;
+  text-align: right;
+}
+.配置按钮 {
+  background: #1e293b;
+  color: #cbd5e1;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 9px 18px;
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.配置按钮:hover {
+  border-color: #475569;
+}
+.配置按钮.主 {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+.配置按钮:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

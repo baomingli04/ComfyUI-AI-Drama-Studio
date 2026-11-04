@@ -1,0 +1,68 @@
+.技能页 {
+  color: #d1d5db;
+}
+
+.页标题 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.分类卡 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.分类头 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.分类项 {
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #d1d5db;
+}
+
+.分类项:hover {
+  background: #1e293b;
+}
+
+.分类项.选中 {
+  background: #1e293b;
+  color: #22c55e;
+}
+
+.系统标记 {
+  float: right;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.分类删除钮 {
+  float: right;
+  padding: 0;
+  color: #6b7280;
+}
+
+.分类删除钮:hover {
+  color: #f56c6c;
+}
+
+.技能表格卡 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.技能表格头 {
+  margin-bottom: 10px;
+}

@@ -1,0 +1,307 @@
+{
+  "1": {
+    "inputs": {
+      "unet_name": "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "MiniMax H3 UNET (fl2va)"
+    }
+  },
+  "2": {
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+      "type": "minimax",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "CLIP (minimax / Qwen3-VL)"
+    }
+  },
+  "3": {
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Video VAE"
+    }
+  },
+  "4": {
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Audio VAE"
+    }
+  },
+  "5": {
+    "inputs": {
+      "task_type": "fl2v — 首尾帧生视频(First-Last Frame)",
+      "global_prompt": "",
+      "bd_grp_sample": "采样设置",
+      "cfg": 1,
+      "seed": 258628207195851,
+      "frame_rate": 24,
+      "width": 576,
+      "height": 736,
+      "ref_max_size": 736,
+      "total_frames": 734,
+      "timeline_data": "{\"version\":5,\"editMode\":\"segment\",\"timelineMode\":\"fl2v\",\"totalFrames\":734,\"frameRate\":24,\"width\":576,\"height\":736,\"refMaxSize\":736,\"output\":{\"mode\":\"fixed\",\"aspectRatio\":\"3:4 (竖版标准)\",\"megapixels\":0.4,\"multiple\":32,\"longEdge\":736,\"width\":576,\"height\":736,\"maxExportFrames\":0,\"exportMode\":\"all\",\"audioMode\":\"generate\",\"exportSourceImages\":false,\"exportPreFaceRefine\":false,\"refImageSize\":\"match\",\"continuityEnabled\":false,\"continuityOverlapFrames\":5,\"continuityMode\":\"guide\",\"continuityRedraw\":0.1,\"continuityKeepTail\":true},\"videoClips\":[],\"video\":{\"fileName\":\"\",\"videoFile\":\"\",\"subfolder\":\"\",\"type\":\"input\",\"frames\":[],\"frameMap\":[],\"sourceFrameCount\":124,\"deletedSourceRanges\":[]},\"global\":{\"taskType\":\"fl2v — 首尾帧生视频(First-Last Frame)\",\"prompt\":\"\",\"refs\":[],\"referenceVideo\":{\"videoFile\":\"\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},\"continuousReference\":false,\"genImage\":{\"imageFile\":\"\"},\"refAudios\":[],\"refVideos\":[],\"commonEnabled\":false,\"commonCollapsed\":false},\"segments\":[{\"id\":\"shot0\",\"start\":0,\"length\":124,\"frameCount\":124,\"durationSec\":5,\"prompt\":\"猴子在快速奔跑，过程中裤子掉了，仍然在跑\",\"negativePrompt\":\"bad video\",\"continuityFromPrev\":false,\"isStartFrame\":true,\"isEndFrame\":true,\"genImage\":{\"imageFile\":\"0059.png\",\"width\":0,\"height\":0},\"endImage\":{\"imageFile\":\"0060.png\",\"width\":0,\"height\":0},\"taskType\":\"\",\"refs\":[]},{\"id\":\"shot1\",\"start\":124,\"length\":124,\"frameCount\":124,\"durationSec\":5,\"prompt\":\"一个卡通猴子坐在岩石上给大家打招呼，说“你们好啊！”\",\"negativePrompt\":\"bad video\",\"continuityFromPrev\":true,\"isStartFrame\":true,\"isEndFrame\":false,\"genImage\":{\"imageFile\":\"0062.png\",\"width\":0,\"height\":0},\"endImage\":null,\"taskType\":\"\",\"refs\":[]},{\"id\":\"msjtg4886omng\",\"start\":248,\"length\":124,\"frameCount\":124,\"durationSec\":5,\"prompt\":\"动漫风格，一个美女从房间走出去，剩下空挡的房间\",\"negativePrompt\":\"bad video\",\"continuityFromPrev\":true,\"isStartFrame\":false,\"isEndFrame\":true,\"genImage\":{\"imageFile\":\"\",\"width\":0,\"height\":0},\"endImage\":{\"imageFile\":\"Anima_00392_.png\",\"width\":0,\"height\":0},\"taskType\":\"\",\"refs\":[]},{\"id\":\"msjvfxck73qcc\",\"start\":372,\"length\":362,\"frameCount\":362,\"durationSec\":15,\"prompt\":\"15秒，16:9横版视频。将实拍的办公室办公场景与手绘发光动画融合的影像。0-3秒：实拍镜头中，一只真实的人手在粗糙木纹桌面上随意滑动，指尖轻点，仿佛唤醒了潜伏在空气中的光影；一只由蜡笔质感构成的橘猫从画面右侧探出头，眼神清澈却带着几分呆萌，与周围略显模糊的电脑屏幕形成虚实交错的质感。3-6秒：橘猫突然向前一扑，身体在空气中拉长变形，蜡笔线条随之断裂又重组，它撞向桌角时激起一圈彩色的粉笔晕染，仿佛实体撞进了二维的画布里。6-10秒：镜头微微滞后半拍，橘猫顺势滚落至桌下，实拍背景中隐约可见的办公椅腿与手绘的猫身形成景深对比，猫在阴影里打了个滚，尾巴像根彩色铅笔一样在阴影中扫出长长的轨迹。10-13秒：光影开始流动，橘猫身上的蜡笔纹理逐渐晕染成一片柔和的粉彩，它伸了个懒腰，前爪悬空抓挠着空气，指尖滴落出几滴发光的颜料，像是从现实世界渗漏出的色彩。13-15秒：画面空间整体微微上提，仿佛猫把视角拉高，它猛地跳向镜头，用巨大的手绘瞳孔直视观众，随后在鼻尖点了一下，留下一个可爱的、像蜡笔涂鸦般的“喵”字，为这段生活感十足的办公时光画上俏皮的句点。全程保持手绘的粗粝感，拒绝过度的3DCG光泽，让每一帧都充满纸笔摩擦的生动气息。\",\"negativePrompt\":\"bad video\",\"continuityFromPrev\":true,\"isStartFrame\":false,\"isEndFrame\":false,\"genImage\":{\"imageFile\":\"\",\"width\":0,\"height\":0},\"endImage\":null,\"taskType\":\"\",\"refs\":[]}],\"shots\":[{\"id\":\"shot0\",\"durationSec\":5,\"prompt\":\"猴子在快速奔跑，过程中裤子掉了，仍然在跑\",\"negativePrompt\":\"bad video\",\"continuityFromPrev\":false,\"startImage\":{\"imageFile\":\"0059.png\",\"width\":0,\"height\":0},\"endImage\":{\"imageFile\":\"0060.png\",\"width\":0,\"height\":0}},{\"id\":\"shot1\",\"durationSec\":5,\"prompt\":\"一个卡通猴子坐在岩石上给大家打招呼，说“你们好啊！”\",\"negativePrompt\":\"bad video\",\"continuityFromPrev\":true,\"startImage\":{\"imageFile\":\"0062.png\",\"width\":0,\"height\":0},\"endImage\":null},{\"id\":\"msjtg4886omng\",\"durationSec\":5,\"prompt\":\"动漫风格，一个美女从房间走出去，剩下空挡的房间\",\"negativePrompt\":\"bad video\",\"continuityFromPrev\":true,\"startImage\":null,\"endImage\":{\"imageFile\":\"Anima_00392_.png\",\"width\":0,\"height\":0}},{\"id\":\"msjvfxck73qcc\",\"durationSec\":15,\"prompt\":\"15秒，16:9横版视频。将实拍的办公室办公场景与手绘发光动画融合的影像。0-3秒：实拍镜头中，一只真实的人手在粗糙木纹桌面上随意滑动，指尖轻点，仿佛唤醒了潜伏在空气中的光影；一只由蜡笔质感构成的橘猫从画面右侧探出头，眼神清澈却带着几分呆萌，与周围略显模糊的电脑屏幕形成虚实交错的质感。3-6秒：橘猫突然向前一扑，身体在空气中拉长变形，蜡笔线条随之断裂又重组，它撞向桌角时激起一圈彩色的粉笔晕染，仿佛实体撞进了二维的画布里。6-10秒：镜头微微滞后半拍，橘猫顺势滚落至桌下，实拍背景中隐约可见的办公椅腿与手绘的猫身形成景深对比，猫在阴影里打了个滚，尾巴像根彩色铅笔一样在阴影中扫出长长的轨迹。10-13秒：光影开始流动，橘猫身上的蜡笔纹理逐渐晕染成一片柔和的粉彩，它伸了个懒腰，前爪悬空抓挠着空气，指尖滴落出几滴发光的颜料，像是从现实世界渗漏出的色彩。13-15秒：画面空间整体微微上提，仿佛猫把视角拉高，它猛地跳向镜头，用巨大的手绘瞳孔直视观众，随后在鼻尖点了一下，留下一个可爱的、像蜡笔涂鸦般的“喵”字，为这段生活感十足的办公时光画上俏皮的句点。全程保持手绘的粗粝感，拒绝过度的3DCG光泽，让每一帧都充满纸笔摩擦的生动气息。\",\"negativePrompt\":\"bad video\",\"continuityFromPrev\":true,\"startImage\":null,\"endImage\":null}],\"runSelectEnabled\":false,\"runSelection\":[],\"gen\":{\"defaultFrameCount\":124},\"liveTaePreview\":true,\"keyframes\":[{\"id\":\"shot0_s\",\"imageFile\":\"0059.png\",\"width\":0,\"height\":0,\"start\":0,\"length\":62,\"frameCount\":62,\"durationSec\":5,\"prompt\":\"猴子在快速奔跑，过程中裤子掉了，仍然在跑\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":false},{\"id\":\"shot0_e\",\"imageFile\":\"0060.png\",\"width\":0,\"height\":0,\"start\":62,\"length\":62,\"frameCount\":62,\"durationSec\":5,\"prompt\":\"\",\"negativePrompt\":\"bad video\",\"isStartFrame\":false,\"isEndFrame\":true},{\"id\":\"shot1\",\"imageFile\":\"0062.png\",\"width\":0,\"height\":0,\"start\":124,\"length\":124,\"frameCount\":124,\"durationSec\":5,\"prompt\":\"一个卡通猴子坐在岩石上给大家打招呼，说“你们好啊！”\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":false},{\"id\":\"msjtg4886omng\",\"imageFile\":\"Anima_00392_.png\",\"width\":0,\"height\":0,\"start\":248,\"length\":124,\"frameCount\":124,\"durationSec\":5,\"prompt\":\"动漫风格，一个美女从房间走出去，剩下空挡的房间\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":true,\"endOnly\":true},{\"id\":\"msjvfxck73qcc\",\"imageFile\":\"\",\"width\":0,\"height\":0,\"start\":372,\"length\":362,\"frameCount\":362,\"durationSec\":15,\"prompt\":\"15秒，16:9横版视频。将实拍的办公室办公场景与手绘发光动画融合的影像。0-3秒：实拍镜头中，一只真实的人手在粗糙木纹桌面上随意滑动，指尖轻点，仿佛唤醒了潜伏在空气中的光影；一只由蜡笔质感构成的橘猫从画面右侧探出头，眼神清澈却带着几分呆萌，与周围略显模糊的电脑屏幕形成虚实交错的质感。3-6秒：橘猫突然向前一扑，身体在空气中拉长变形，蜡笔线条随之断裂又重组，它撞向桌角时激起一圈彩色的粉笔晕染，仿佛实体撞进了二维的画布里。6-10秒：镜头微微滞后半拍，橘猫顺势滚落至桌下，实拍背景中隐约可见的办公椅腿与手绘的猫身形成景深对比，猫在阴影里打了个滚，尾巴像根彩色铅笔一样在阴影中扫出长长的轨迹。10-13秒：光影开始流动，橘猫身上的蜡笔纹理逐渐晕染成一片柔和的粉彩，它伸了个懒腰，前爪悬空抓挠着空气，指尖滴落出几滴发光的颜料，像是从现实世界渗漏出的色彩。13-15秒：画面空间整体微微上提，仿佛猫把视角拉高，它猛地跳向镜头，用巨大的手绘瞳孔直视观众，随后在鼻尖点了一下，留下一个可爱的、像蜡笔涂鸦般的“喵”字，为这段生活感十足的办公时光画上俏皮的句点。全程保持手绘的粗粝感，拒绝过度的3DCG光泽，让每一帧都充满纸笔摩擦的生动气息。\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":false}],\"durationSec\":30,\"batchDetailMode\":\"solo\",\"externalGroupsWitness\":{\"v\":4,\"port\":\"i2v_groups\",\"source\":\"32:MiniMaxH3DirectorGroupsCombine\",\"nodes\":9,\"graph\":\"5e0114df\",\"facets\":{\"wiring\":\"c6826ab4\",\"prompt\":\"350ce8a0\",\"length\":\"a2f12165\",\"media\":\"7e291e8b\",\"other\":\"811c9dc5\",\"timeline\":\"296c1450\"},\"groups\":[{\"slot\":\"groups.group_0\",\"node\":\"23:MiniMaxH3DirectorGroupImageToVideo\",\"dur\":5,\"prompt\":\"47aa7bb0\",\"sub\":\"31638e23\",\"facets\":{\"wiring\":\"1a10c5d7\",\"prompt\":\"8755b916\",\"length\":\"e5e026be\",\"media\":\"81e33394\",\"other\":\"811c9dc5\"}},{\"slot\":\"groups.group_1\",\"node\":\"24:MiniMaxH3DirectorGroupImageToVideo\",\"dur\":5,\"prompt\":\"0d3bae53\",\"sub\":\"015e7421\",\"facets\":{\"wiring\":\"50c4e448\",\"prompt\":\"1dbb81b2\",\"length\":\"be2ab9f1\",\"media\":\"5bf9b9a7\",\"other\":\"811c9dc5\"}},{\"slot\":\"groups.group_2\",\"node\":\"35:MiniMaxH3DirectorGroupImageToVideo\",\"dur\":5,\"prompt\":\"bfdc987e\",\"sub\":\"e43f5882\",\"facets\":{\"wiring\":\"723ec360\",\"prompt\":\"da4aab0b\",\"length\":\"0676ca29\",\"media\":\"07567a58\",\"other\":\"811c9dc5\"}},{\"slot\":\"groups.group_3\",\"node\":\"31:MiniMaxH3DirectorGroupImageToVideo\",\"dur\":15,\"prompt\":\"e09856d5\",\"sub\":\"9cb728b2\",\"facets\":{\"wiring\":\"55deaac0\",\"prompt\":\"b1d934e8\",\"length\":\"717520bc\",\"media\":\"811c9dc5\",\"other\":\"811c9dc5\"}}],\"timeline\":\"296c1450\",\"fps\":24}}",
+      "bd_grp_advanced": "高级采样",
+      "steps": 25,
+      "sampler": "res_multistep",
+      "scheduler": "simple",
+      "shift_video": 12,
+      "shift_audio": 3,
+      "export_source_images": false,
+      "export_pre_face_refine": false,
+      "bd_grp_perf": false,
+      "clear_vram_between_segments": "",
+      "clear_vram_before_refine": false,
+      "clear_vram_before_face_refine": false,
+      "minimax_director_ui": "",
+      "model": [
+        "29",
+        0
+      ],
+      "video_vae": [
+        "3",
+        0
+      ],
+      "audio_vae": [
+        "4",
+        0
+      ],
+      "clip": [
+        "2",
+        0
+      ],
+      "i2v_groups": [
+        "32",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3Director",
+    "_meta": {
+      "title": "MiniMaxH3Director"
+    }
+  },
+  "6": {
+    "inputs": {
+      "fps": [
+        "5",
+        2
+      ],
+      "bit_depth": 8,
+      "images": [
+        "5",
+        0
+      ],
+      "audio": [
+        "5",
+        1
+      ]
+    },
+    "class_type": "CreateVideo",
+    "_meta": {
+      "title": "创建视频"
+    }
+  },
+  "7": {
+    "inputs": {
+      "filename_prefix": "video/MiniMaxH3_Director_external_i2v",
+      "format": "auto",
+      "codec": "auto",
+      "video": [
+        "6",
+        0
+      ]
+    },
+    "class_type": "SaveVideo",
+    "_meta": {
+      "title": "保存视频"
+    }
+  },
+  "8": {
+    "inputs": {
+      "source": [
+        "5",
+        5
+      ]
+    },
+    "class_type": "PreviewAny",
+    "_meta": {
+      "title": "Director 运行报告"
+    }
+  },
+  "9": {
+    "inputs": {
+      "source": [
+        "5",
+        2
+      ]
+    },
+    "class_type": "PreviewAny",
+    "_meta": {
+      "title": "fps"
+    }
+  },
+  "10": {
+    "inputs": {
+      "source": [
+        "5",
+        3
+      ]
+    },
+    "class_type": "PreviewAny",
+    "_meta": {
+      "title": "frame_count"
+    }
+  },
+  "18": {
+    "inputs": {
+      "image": "0059.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "19": {
+    "inputs": {
+      "image": "0060.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "20": {
+    "inputs": {
+      "image": "0062.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "23": {
+    "inputs": {
+      "prompt": "猴子在快速奔跑，过程中裤子掉了，仍然在跑",
+      "duration_sec": 5,
+      "first_frame": [
+        "18",
+        0
+      ],
+      "last_frame": [
+        "19",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupImageToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Director Group (Image to Video)"
+    }
+  },
+  "24": {
+    "inputs": {
+      "prompt": "一个卡通猴子坐在岩石上给大家打招呼，说“你们好啊！”",
+      "duration_sec": 5,
+      "first_frame": [
+        "20",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupImageToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Director Group (Image to Video)"
+    }
+  },
+  "28": {
+    "inputs": {
+      "sage_attention": "auto",
+      "allow_compile": false,
+      "model": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "PathchSageAttentionKJ",
+    "_meta": {
+      "title": "Patch Sage Attention KJ"
+    }
+  },
+  "29": {
+    "inputs": {
+      "model": [
+        "28",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3MemoryEfficientSageAttentionPatch",
+    "_meta": {
+      "title": "MiniMax H3 Memory Efficient Sage Attention Patch"
+    }
+  },
+  "30": {
+    "inputs": {
+      "image": "Anima_00392_.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "31": {
+    "inputs": {
+      "prompt": "15秒，16:9横版视频。将实拍的办公室办公场景与手绘发光动画融合的影像。0-3秒：实拍镜头中，一只真实的人手在粗糙木纹桌面上随意滑动，指尖轻点，仿佛唤醒了潜伏在空气中的光影；一只由蜡笔质感构成的橘猫从画面右侧探出头，眼神清澈却带着几分呆萌，与周围略显模糊的电脑屏幕形成虚实交错的质感。3-6秒：橘猫突然向前一扑，身体在空气中拉长变形，蜡笔线条随之断裂又重组，它撞向桌角时激起一圈彩色的粉笔晕染，仿佛实体撞进了二维的画布里。6-10秒：镜头微微滞后半拍，橘猫顺势滚落至桌下，实拍背景中隐约可见的办公椅腿与手绘的猫身形成景深对比，猫在阴影里打了个滚，尾巴像根彩色铅笔一样在阴影中扫出长长的轨迹。10-13秒：光影开始流动，橘猫身上的蜡笔纹理逐渐晕染成一片柔和的粉彩，它伸了个懒腰，前爪悬空抓挠着空气，指尖滴落出几滴发光的颜料，像是从现实世界渗漏出的色彩。13-15秒：画面空间整体微微上提，仿佛猫把视角拉高，它猛地跳向镜头，用巨大的手绘瞳孔直视观众，随后在鼻尖点了一下，留下一个可爱的、像蜡笔涂鸦般的“喵”字，为这段生活感十足的办公时光画上俏皮的句点。全程保持手绘的粗粝感，拒绝过度的3DCG光泽，让每一帧都充满纸笔摩擦的生动气息。\n",
+      "duration_sec": 15
+    },
+    "class_type": "MiniMaxH3DirectorGroupImageToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Director Group (Image to Video)"
+    }
+  },
+  "32": {
+    "inputs": {
+      "groups.group_0": [
+        "23",
+        0
+      ],
+      "groups.group_1": [
+        "24",
+        0
+      ],
+      "groups.group_2": [
+        "35",
+        0
+      ],
+      "groups.group_3": [
+        "31",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupsCombine",
+    "_meta": {
+      "title": "MiniMax H3 Director Groups Combine"
+    }
+  },
+  "35": {
+    "inputs": {
+      "prompt": "动漫风格，一个美女从房间走出去，剩下空挡的房间",
+      "duration_sec": 5,
+      "last_frame": [
+        "30",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupImageToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Director Group (Image to Video)"
+    }
+  }
+}

@@ -1,0 +1,146 @@
+.壳 {
+  width: 100%;
+  height: 100%;
+  background: #0a0f1a;
+}
+
+.壳-侧栏 {
+  background: linear-gradient(180deg, #0d1424 0%, #0b1220 100%);
+  border-right: 1px solid #1e293b;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 2;
+  transition: width 0.18s ease;
+}
+
+.壳-侧栏-覆盖 {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 220px !important;
+  z-index: 20;
+}
+
+.壳-遮罩 {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 15, 26, 0.55);
+  z-index: 15;
+}
+
+.壳-标题 {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #1e293b;
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.壳-标题字 {
+  color: #22c55e;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.壳-侧栏-窄 .壳-标题字 {
+  display: none;
+}
+
+.壳-菜单 {
+  border-right: none;
+}
+
+.壳-菜单.el-menu--collapse {
+  width: 64px;
+}
+
+/* 分组与新增四个一级项目之间的分隔线，见 docs/12 第 2 节侧边栏示意 */
+.壳-菜单分隔 {
+  height: 1px;
+  margin: 8px 12px;
+  background: #1e293b;
+}
+
+.壳-顶栏 {
+  background: linear-gradient(180deg, #0d1424 0%, #0b1220 100%);
+  border-bottom: 1px solid #1e293b;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.壳-顶栏左 {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.壳-路径 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.壳-折叠钮 {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #1e293b;
+  background: #1e293b;
+  color: #d1d5db;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 30px;
+}
+
+.壳-折叠钮:hover {
+  color: #22c55e;
+  border-color: #22c55e;
+}
+
+.壳-顶栏右 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.壳-用户 {
+  color: #d1d5db;
+}
+
+.壳-内容 {
+  background: #0a0f1a;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .壳-内容 {
+    padding: 12px 14px;
+  }
+
+  .壳-用户 {
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,74 @@
+.测试页 {
+  color: #d1d5db;
+}
+
+.页标题 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.表单卡 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 20px 20px 4px 20px;
+  margin-bottom: 16px;
+}
+
+.表格区 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.上传路径 {
+  color: #6b7280;
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.提示词工具 {
+  margin-bottom: 8px;
+}
+
+.提示词工具说明 {
+  margin-left: 8px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.尺寸分隔 {
+  display: inline-block;
+  margin: 0 8px;
+  color: #9ca3af;
+}
+
+.比例行 {
+  margin-top: 10px;
+}
+
+.比例钮 {
+  display: inline-block;
+  margin: 0 8px 8px 0;
+  padding: 4px 10px;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  color: #9ca3af;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.比例钮:hover {
+  border-color: #38bdf8;
+  color: #e5e7eb;
+}
+
+.比例钮.选中 {
+  border-color: #38bdf8;
+  background: #0b3a4a;
+  color: #7dd3fc;
+}

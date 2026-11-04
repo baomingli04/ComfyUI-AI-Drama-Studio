@@ -1,0 +1,169 @@
+/* 提示词资源库弹窗（深色科技感） */
+.资源库弹窗 {
+  background: #0d1424;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+}
+.资源库弹窗 .el-dialog__header {
+  border-bottom: 1px solid #1e293b;
+  padding: 14px 20px;
+}
+.资源库弹窗 .el-dialog__title {
+  color: #ffffff;
+  font-size: 15px;
+}
+.资源库弹窗 .el-dialog__headerbtn .el-dialog__close {
+  color: #9ca3af;
+}
+.资源库弹窗 .el-dialog__headerbtn .el-dialog__close:hover {
+  color: #ef4444;
+}
+.资源库弹窗 .el-dialog__body {
+  padding: 16px 20px;
+  color: #d1d5db;
+}
+.资源库弹窗 .el-dialog__footer {
+  border-top: 1px solid #1e293b;
+  padding: 12px 20px;
+}
+
+.资源库 {
+  display: flex;
+  gap: 16px;
+  min-height: 420px;
+}
+
+.资源库网格 {
+  flex: 0 0 520px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  align-content: start;
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.资源库卡 {
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0a0f1a;
+  transition: border-color 0.15s;
+}
+.资源库卡:hover {
+  border-color: #38bdf8;
+}
+.资源库卡.选中 {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 1px #22c55e inset;
+}
+
+.资源库图 {
+  display: block;
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
+  background: #111827;
+}
+
+.资源库卡信息 {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 6px;
+  font-size: 11px;
+  color: #6b7280;
+}
+.资源库作者 {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.资源库复制数 {
+  flex: 0 0 auto;
+  color: #22c55e;
+}
+
+.资源库详情 {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  background: #0a0f1a;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.资源库详情头 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.资源库详情标题 {
+  font-weight: 600;
+  color: #ffffff;
+}
+.资源库详情头 .el-button {
+  margin-left: auto;
+}
+
+.资源库预览 {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  background: #111827;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.资源库字段 {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+.资源库字段 b {
+  color: #7dd3fc;
+  font-weight: 600;
+}
+.资源库文本 {
+  color: #d1d5db;
+  white-space: pre-wrap;
+}
+
+.资源库详情空 {
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.资源库底 .el-pagination {
+  padding: 0;
+  color: #d1d5db;
+}
+.资源库底 .el-pagination button:disabled,
+.资源库底 .el-pagination .btn-next,
+.资源库底 .el-pagination .btn-prev {
+  background: transparent;
+  color: #9ca3af;
+}
+.资源库底 .el-pager li {
+  background: transparent;
+  color: #9ca3af;
+}
+.资源库底 .el-pager li.active {
+  color: #22c55e;
+}
+.资源库底 .el-pagination__total,
+.资源库底 .el-pagination__jump {
+  color: #9ca3af;
+}
+.资源库底 .el-pagination__editor.el-input .el-input__inner {
+  background: #0a0f1a;
+  border-color: #334155;
+  color: #d1d5db;
+}

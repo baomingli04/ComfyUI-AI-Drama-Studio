@@ -1,0 +1,108 @@
+.测试页 {
+  color: #d1d5db;
+}
+
+.页标题 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.卡片 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 20px 20px 8px 20px;
+  margin-bottom: 16px;
+}
+
+.卡片标题 {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 14px;
+}
+
+.灰字 {
+  color: #6b7280;
+  margin-left: 8px;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.行内标签 {
+  color: #d1d5db;
+  font-size: 13px;
+  margin: 0 10px 0 18px;
+}
+
+.窄选 {
+  width: 130px;
+}
+
+.来源行 {
+  margin-bottom: 12px;
+  line-height: 32px;
+}
+
+.波形区 {
+  margin-bottom: 12px;
+}
+
+.波形 {
+  width: 100%;
+  height: 170px;
+  display: block;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  cursor: crosshair;
+}
+
+.波形提示 {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.播放行 {
+  margin-bottom: 12px;
+  line-height: 32px;
+}
+
+.隐藏音频 {
+  display: none;
+}
+
+.导出行 {
+  margin: 14px 0 10px 0;
+  line-height: 32px;
+}
+
+.结果区 {
+  border-top: 1px solid #1e293b;
+  padding-top: 12px;
+  margin-bottom: 10px;
+}
+
+.结果行 {
+  line-height: 34px;
+  margin-bottom: 8px;
+}
+
+.结果播放器 {
+  vertical-align: middle;
+  margin-left: 10px;
+  height: 32px;
+}
+
+.下载链接 {
+  color: #22c55e;
+  font-size: 13px;
+  margin-left: 12px;
+  text-decoration: none;
+}
+
+.下载链接:hover {
+  color: #2fd970;
+}

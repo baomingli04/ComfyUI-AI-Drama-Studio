@@ -1,0 +1,302 @@
+/* 剧本卡：一集剧本的完整展示。色板跟 .创作模块 的变量走，变量缺失时用兜底值。 */
+.剧本卡 {
+  background: var(--卡片, #151e32);
+  border: 1px solid var(--描边, #1e293b);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--字, #e2e8f0);
+}
+
+/* ---------- 卡头 ---------- */
+.剧本卡 .卡头 {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--描边, #1e293b);
+}
+.剧本卡 .头左 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  flex: 1;
+}
+.剧本卡 .头右 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.剧本卡 .集号 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--主, #22c55e);
+  background: var(--主浅, rgba(34, 197, 94, 0.12));
+  border-radius: 6px;
+  padding: 1px 8px;
+}
+.剧本卡 .标题 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--字, #e2e8f0);
+}
+.剧本卡 .态 {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--描边亮, #334155);
+  color: var(--字弱, #64748b);
+  white-space: nowrap;
+}
+.剧本卡 .态.待 { color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); }
+.剧本卡 .态.复核 { color: var(--主, #22c55e); border-color: rgba(34, 197, 94, 0.4); }
+.剧本卡 .幕 {
+  font-size: 11px;
+  color: var(--字弱, #64748b);
+}
+
+/* ---------- 目录合同 ---------- */
+.剧本卡 .合同 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--卡片二, #0f172a);
+  border: 1px solid var(--描边, #1e293b);
+}
+.剧本卡 .合同签 {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--主, #22c55e);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  border-radius: 4px;
+  padding: 0 5px;
+}
+.剧本卡 .合同文 {
+  flex: 1 1 320px;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--字次, #94a3b8);
+}
+.剧本卡 .合同点 {
+  font-size: 11px;
+  color: var(--字弱, #64748b);
+  white-space: nowrap;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 体检条 ---------- */
+.剧本卡 .体检 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--字弱, #64748b);
+}
+.剧本卡 .检.好 { color: #22c55e; }
+.剧本卡 .检.差 { color: #f87171; }
+
+/* ---------- 合同对照 ---------- */
+.剧本卡 .对照 {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--描边亮, #334155);
+  border-radius: 0 8px 8px 0;
+  background: rgba(15, 23, 42, 0.55);
+}
+.剧本卡 .对照行 {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.剧本卡 .对照行 .k {
+  flex: 0 0 68px;
+  color: var(--字弱, #64748b);
+}
+.剧本卡 .对照行 .v {
+  flex: 1;
+  min-width: 0;
+  color: var(--字次, #94a3b8);
+}
+
+/* ---------- 未生成 ---------- */
+.剧本卡 .未生成 {
+  margin-top: 16px;
+  padding: 32px 16px;
+  text-align: center;
+  border: 1px dashed var(--描边亮, #334155);
+  border-radius: 10px;
+}
+.剧本卡 .未题 { font-size: 14px; color: var(--字, #e2e8f0); }
+.剧本卡 .未文 {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--字弱, #64748b);
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------- 正文 ---------- */
+.剧本卡 .正文区 { margin-top: 16px; }
+.剧本卡 .区签 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.剧本卡 .区名 { font-size: 14px; font-weight: 600; color: var(--字, #e2e8f0); }
+.剧本卡 .区注 { font-size: 11px; color: var(--字弱, #64748b); }
+
+.剧本卡 .场卡 {
+  border: 1px solid var(--描边, #1e293b);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: var(--卡片二, #0f172a);
+}
+.剧本卡 .场头 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--描边, #1e293b);
+}
+.剧本卡 .场号 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--主, #22c55e);
+}
+.剧本卡 .场地 { font-size: 12px; color: var(--字次, #94a3b8); }
+.剧本卡 .场附 {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--字次, #94a3b8);
+}
+.剧本卡 .场附 .附k {
+  color: var(--字弱, #64748b);
+  margin-right: 8px;
+}
+.剧本卡 .场文 {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 2;
+  color: var(--字, #e2e8f0);
+}
+.剧本卡 .场文 .动 { color: var(--字次, #94a3b8); }
+.剧本卡 .场文 .台 { color: var(--字, #e2e8f0); }
+.剧本卡 .原文本 {
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--卡片二, #0f172a);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 2;
+  color: var(--字次, #94a3b8);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ---------- 五个档案块 ---------- */
+.剧本卡 .档案区 {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--描边, #1e293b);
+}
+.剧本卡 .档案卡 {
+  border: 1px solid var(--描边, #1e293b);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.剧本卡 .档案头 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: rgba(15, 23, 42, 0.6);
+  user-select: none;
+}
+.剧本卡 .档案头:hover { background: rgba(30, 41, 59, 0.7); }
+.剧本卡 .档案名 { font-size: 13px; font-weight: 600; color: var(--字, #e2e8f0); }
+.剧本卡 .档案注 { font-size: 11px; color: var(--字弱, #64748b); }
+.剧本卡 .档案数 {
+  font-size: 11px;
+  color: var(--字弱, #64748b);
+  border: 1px solid var(--描边, #1e293b);
+  border-radius: 999px;
+  padding: 0 6px;
+}
+.剧本卡 .档案头 i { color: var(--字弱, #64748b); font-size: 12px; }
+.剧本卡 .档案体 { padding: 12px; }
+
+.剧本卡 .档格 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+}
+.剧本卡 .档项 {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  min-width: 0;
+}
+.剧本卡 .档键 {
+  flex: 0 0 68px;
+  color: var(--字弱, #64748b);
+}
+.剧本卡 .档值 {
+  flex: 1;
+  min-width: 0;
+  color: var(--字次, #94a3b8);
+  word-break: break-word;
+}
+.剧本卡 .档值.空 { color: #475569; }
+
+.剧本卡 .行动 {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--字次, #94a3b8);
+}
+.剧本卡 .行动 .序号 {
+  flex: 0 0 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 4px;
+  background: var(--主浅, rgba(34, 197, 94, 0.12));
+  color: var(--主, #22c55e);
+  font-size: 11px;
+  margin-top: 2px;
+}
+.剧本卡 .档案空,
+.剧本卡 .档案余 {
+  font-size: 12px;
+  color: var(--字弱, #64748b);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+.剧本卡 .档案余 { margin-top: 8px; }
+
+@media (max-width: 1100px) {
+  .剧本卡 .档格 { grid-template-columns: minmax(0, 1fr); }
+}

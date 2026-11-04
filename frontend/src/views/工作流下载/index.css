@@ -1,0 +1,23 @@
+.工作流页 {
+  color: #d1d5db;
+}
+
+.页标题 {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  padding-left: 12px;
+  border-left: 3px solid #22c55e;
+}
+
+.表格卡 {
+  padding: 12px;
+}
+
+.表格头 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}

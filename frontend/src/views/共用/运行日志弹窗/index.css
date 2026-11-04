@@ -1,0 +1,14 @@
+.日志框 {
+  background: #0a0f1a;
+  color: #d1d5db;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 12px;
+  max-height: 480px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+}

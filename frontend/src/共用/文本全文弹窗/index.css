@@ -1,0 +1,62 @@
+.全文弹窗 {
+  background: #0d1424;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+}
+.全文弹窗 .el-dialog__header {
+  display: none;
+}
+.全文弹窗 .el-dialog__body {
+  padding: 0;
+}
+.全文容器 {
+  color: #d1d5db;
+}
+.全文头 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #1e293b;
+}
+.全文标题 {
+  font-weight: 600;
+  color: #ffffff;
+}
+.全文字数 {
+  font-size: 12px;
+  color: #6b7280;
+}
+.全文关闭 {
+  margin-left: auto;
+  cursor: pointer;
+  font-size: 18px;
+  color: #d1d5db;
+}
+.全文关闭:hover {
+  color: #ef4444;
+}
+.全文主体 {
+  padding: 16px 18px;
+  max-height: 58vh;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #d1d5db;
+  white-space: pre-wrap;
+  word-break: break-all;
+  user-select: text;
+  cursor: text;
+}
+.全文底 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-top: 1px solid #1e293b;
+}
+.全文提示 {
+  font-size: 12px;
+  color: #6b7280;
+}

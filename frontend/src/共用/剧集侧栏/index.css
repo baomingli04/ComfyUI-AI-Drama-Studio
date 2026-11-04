@@ -1,0 +1,211 @@
+/* 剧集工作台二级侧栏 + 它的两列布局。
+   只作用于 /video/* 的集内页面（关卡详情 / 剧本编辑 / 资产清单 / 美术资产 / 拆分分镜）。
+   和「壳」的一级侧栏是两层不同的东西：壳在左，这里紧贴内容区再往右一层。
+   类名统一带「剧集」前缀，避免和存量页面撞。 */
+
+/* ---------- 两列布局 ---------- */
+.剧集布局 {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.剧集主体 {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- 侧栏本体 ---------- */
+.剧集侧栏 {
+  width: 176px;
+  flex: 0 0 176px;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  background: var(--卡片);
+  border: 1px solid var(--描边);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* 头：剧名 / 集号 / 集名 / 进度 */
+.剧集侧栏 .侧栏头 {
+  padding: 14px 14px 12px;
+  background: var(--卡片二);
+  border-bottom: 1px solid var(--描边);
+}
+.剧集侧栏 .侧栏剧名 {
+  font-size: 11px;
+  color: var(--字弱);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.剧集侧栏 .侧栏集号 {
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--字);
+  letter-spacing: .5px;
+}
+.剧集侧栏 .侧栏集名 {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--字次);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.剧集侧栏 .侧栏进度 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.剧集侧栏 .侧栏进度轨 {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--描边);
+  overflow: hidden;
+}
+.剧集侧栏 .侧栏进度轨 i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--主);
+  transition: width .2s;
+}
+.剧集侧栏 .侧栏进度字 {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--字弱);
+}
+
+/* 竖排 4 项 */
+.剧集侧栏 .侧栏列 {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+}
+.剧集侧栏 .侧栏项 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 8px 9px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--字次);
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.剧集侧栏 .侧栏项:hover { background: var(--卡片二); color: var(--字); }
+.剧集侧栏 .侧栏项.当前 { background: var(--主浅); color: var(--字); }
+.剧集侧栏 .侧栏项.当前::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--主);
+}
+.剧集侧栏 .项号 {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: var(--描边);
+  color: var(--字弱);
+}
+.剧集侧栏 .侧栏项.当前 .项号 { background: var(--主); color: #06210f; font-weight: 700; }
+.剧集侧栏 .侧栏项.完成 .项号 { background: var(--主浅); color: var(--主); }
+.剧集侧栏 .项文 {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.剧集侧栏 .项名 { font-size: 13px; line-height: 1.45; }
+.剧集侧栏 .侧栏项.当前 .项名 { font-weight: 600; }
+.剧集侧栏 .项标 {
+  font-size: 11px;
+  color: var(--字弱);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.剧集侧栏 .项箭 {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--字弱);
+  opacity: 0;
+  transition: opacity .15s;
+}
+.剧集侧栏 .侧栏项:hover .项箭,
+.剧集侧栏 .侧栏项.当前 .项箭 { opacity: 1; }
+
+/* 尾：切集 */
+.剧集侧栏 .侧栏尾 {
+  margin-top: auto;
+  padding: 10px;
+  border-top: 1px solid var(--描边);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.剧集侧栏 .侧栏切 { display: flex; gap: 6px; }
+.剧集侧栏 .侧栏切 .el-button {
+  flex: 1;
+  margin: 0 !important;
+  padding: 7px 4px;
+  font-size: 12px;
+}
+.剧集侧栏 .侧栏回 {
+  width: 100%;
+  padding: 4px 0 !important;
+  font-size: 12px;
+  color: var(--字弱) !important;
+}
+.剧集侧栏 .侧栏回:hover { color: var(--主) !important; }
+
+/* ---------- 窄屏 ---------- */
+@media (max-width: 1180px) {
+  .剧集侧栏 { width: 158px; flex-basis: 158px; }
+  .剧集侧栏 .侧栏集号 { font-size: 16px; }
+}
+
+@media (max-width: 900px) {
+  .剧集布局 { flex-direction: column; }
+  .剧集侧栏 {
+    position: static;
+    width: 100%;
+    flex: 0 0 auto;
+  }
+  .剧集侧栏 .侧栏列 {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .剧集侧栏 .侧栏项 {
+    width: calc(50% - 3px);
+    padding: 8px 10px;
+  }
+  .剧集侧栏 .侧栏项.当前::before { top: auto; bottom: 0; left: 10px; right: 10px; width: auto; height: 2px; }
+}

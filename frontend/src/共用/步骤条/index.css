@@ -1,0 +1,13 @@
+/* 只在 模块主题.css 的 .创作模块 .步骤条 之上补可点击相关样式，
+   不动圆圈/文字/连线的颜色体系，避免和全局主题规则打架。 */
+.步.可点 {
+  cursor: pointer;
+  user-select: none;
+  border-radius: 8px;
+  padding: 2px 6px;
+  margin: 0 -6px;
+  transition: background .15s;
+}
+.步.可点:hover { background: var(--卡片二); }
+.步.可点:active .圈 { transform: scale(.94); }
+.步.可点 .圈 { transition: transform .1s; }

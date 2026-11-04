@@ -1,0 +1,344 @@
+{
+  "1": {
+    "inputs": {
+      "unet_name": "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "MiniMax H3 UNET (fl2va)"
+    }
+  },
+  "2": {
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+      "type": "minimax",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "CLIP (minimax / Qwen3-VL)"
+    }
+  },
+  "3": {
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Video VAE"
+    }
+  },
+  "4": {
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Audio VAE"
+    }
+  },
+  "5": {
+    "inputs": {
+      "task_type": "r2v — 参考主体生视频(Reference to Video)",
+      "global_prompt": "",
+      "bd_grp_sample": "采样设置",
+      "cfg": 1,
+      "seed": 666,
+      "frame_rate": 24,
+      "width": 864,
+      "height": 480,
+      "ref_max_size": 864,
+      "total_frames": 1210,
+      "timeline_data": "{\"version\":5,\"editMode\":\"segment\",\"timelineMode\":\"prompt_batch\",\"totalFrames\":1210,\"frameRate\":24,\"width\":864,\"height\":480,\"refMaxSize\":864,\"output\":{\"mode\":\"fixed\",\"aspectRatio\":\"16:9 (宽屏)\",\"megapixels\":0.4,\"multiple\":32,\"longEdge\":864,\"width\":864,\"height\":480,\"maxExportFrames\":0,\"exportMode\":\"all\",\"audioMode\":\"generate\",\"exportSourceImages\":false,\"exportPreFaceRefine\":false,\"refImageSize\":\"match\",\"continuityEnabled\":false,\"continuityOverlapFrames\":5,\"continuityMode\":\"guide\",\"continuityRedraw\":0.1,\"continuityKeepTail\":true},\"videoClips\":[],\"video\":{\"fileName\":\"\",\"videoFile\":\"\",\"subfolder\":\"\",\"type\":\"input\",\"frames\":[],\"frameMap\":[],\"sourceFrameCount\":124,\"deletedSourceRanges\":[]},\"global\":{\"taskType\":\"r2v — 参考主体生视频(Reference to Video)\",\"prompt\":\"\",\"refs\":[],\"referenceVideo\":{\"videoFile\":\"\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},\"continuousReference\":false,\"genImage\":{\"imageFile\":\"\"},\"refAudios\":[],\"refVideos\":[],\"commonEnabled\":false,\"commonCollapsed\":false},\"segments\":[{\"id\":\"msjwsk4s1y247\",\"start\":0,\"length\":243,\"frameCount\":243,\"durationSec\":10,\"prompt\":\"主体定义:\\n<Picture 1> 是男孩主角，展现正面、侧面与背面的三视图，棕色乱发，身穿带火箭贴布的牛仔外套，卡其工装裤配红白帆布鞋，背景为温馨书房。\\n<Picture 2> 是宠物狗主角，同样呈现正侧背三视角，深棕卷毛，佩戴蓝色项圈与胸背带，身旁散落骨头与小黄鸭，背景呼应书房。\\n<Subject 1> 锁定为 <Picture 1> 中的男孩，特征为蓬松短发、标志性火箭夹克。\\n<Subject 2> 锁定为 <Picture 2> 中的棕狗，特征为垂耳、厚实毛发与蓝色背带。\\n\\n摘要:\\n基于双主角三视图参考的 3D 动画短片，聚焦男孩与爱犬在书房内的互动瞬间，采用 C4D 渲染质感，光影温暖，强调角色清晰的剪影与 SSS 肌肤质感，构建充满童趣的开场画面。\\n\\n保留分析:\\n保留 <Picture 1> 中男孩的蓬松发量与红色鞋底的细节，确保角色在运动中不失其生动的面部表情；同时保留 <Picture 2> 中狗狗的垂耳形态与项圈上的骨牌吊坠，维持两者在相同书房环境下的空间连贯性，避免比例失调。\\n\\n详细描述:\\n[Shot 1] 镜头推近至男孩与狗狗的半身互动，背景虚化突出主体。男孩 <Subject 1> 正侧身回头，牛仔外套上的火箭贴布在暖光下微微反光；狗狗 <Subject 2> 抬头仰望，深棕色毛发在 C4D 渲染下呈现细腻的绒毛感。地面投射着柔和的窗户光斑，地板上的小黄鸭作为前景点缀。画面顶部保留 <Picture 1> 中的空间纵深感，书架与玩具模糊在后方，营造沉浸式 3D 空间。\\n\\n整体声景:\\n环境音以温暖的木地板吱呀声开场，混合着铅笔在纸上沙沙的摩擦声。背景里隐约传来一只小鸭子被踩到的“啪嗒”轻响，随后是男孩轻快的脚步声与狗狗急促的呼吸声，构建出充满生活气息的午后书房氛围。\\n\\n非叙事配乐:\\n轻快活泼的钢琴与木琴合奏，节奏明快如心跳。低音弦乐铺垫出 C4D 特有的厚实质感，旋律在男孩与狗狗的视线交汇时推高，随后缓缓落下，为 10 秒的短镜头留出呼吸感，强化情感连接。\\n\\n画面广告文案:\\nLeo & Milo: 3D\",\"negativePrompt\":\"bad video\",\"taskType\":\"\",\"refs\":[{\"index\":0,\"imageFile\":\"C__Users_Administrator_Downloads_Gemini_Generated_Image_yhwnv2yhwnv2yhwn.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},{\"index\":1,\"imageFile\":\"C__Users_Administrator_Downloads_Gemini_Generated_Image_skjq82skjq82skjq.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"}],\"refAudios\":[],\"refVideos\":[],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"startImage\":null,\"endImage\":null,\"continuityFromPrev\":false,\"refImageSize\":\"match\"},{\"id\":\"msjx2r2q7ljok\",\"start\":243,\"length\":243,\"frameCount\":243,\"durationSec\":10,\"prompt\":\"subject_definitions:\\n<Subject 1> is the sleek, brushed aluminum smartphone in <Picture 1>, featuring a titanium-grade frame, a large OLED screen with a dynamic blue-to-pink gradient, and a pill-shaped cutout at the top.\\n<Picture 1> is the primary visual anchor for the 9:16 aspect ratio shot, defining the product's hero angle and the specific gradient hue on the display.\\n<Subject 2> is the clean, minimalist typography on the device screen, displaying the text \\\"MiniMax H3\\\" in a modern sans-serif font against the deep gradient background.\\n<Subject 3> is the subtle, high-end interface status bar in the top-right corner of the screen, showing signal strength and a battery icon in white.\\n<Audio 1> is the crisp, tech-forward audio track that establishes a premium, digital presence, blending soft plucks with a rhythmic noise bed to match the 100 BPM tempo.\\n\\nsummary:\\n[reference generation + audio reference] The target video is a premium, 9:16 vertical product launch film showcasing <Subject 1>, a sleek smartphone. The sequence opens from the iconic hero angle defined by <Picture 1>, emphasizing the device's clean composition and premium lighting. The screen displays <Subject 2>, the product name, in a bold, single-line arrangement. The sequence utilizes <Audio 1> as a rhythmic foundation, driving the pacing of the reveal.\\n\\nretention_analysis:\\n<Subject 1> (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the brushed aluminum frame, pill cutout, and the specific blue-to-pink gradient are retained.\\n<Picture 1> (appears in [Shot 1] as hero angle): fully_preserved - the exact isometric angle and composition are used as the opening keyframe.\\n<Subject 2> (appears in [Shot 1] as main hero): fully_preserved - the text \\\"MiniMax H3\\\" remains the focal point, centered and dominant.\\n<Subject 3> (appears in [Shot 1] top-right): fully_preserved - the status bar details provide a sense of active, living technology.\\n<Audio 1>: reference - its crisp, 100 BPM rhythm guides the visual flow and provides a digital, energetic undercurrent.\\n\\ndetailed_description:\\nThe target video is a minimalist, Apple-style product reveal in a 9:16 vertical format, characterized by clean composition and premium lighting.\\n[Shot 1] The scene opens in a tight, isometric hero shot that matches <Picture 1>, presenting <Subject 1>, the sleek smartphone, floating against a soft, neutral gradient background. The device is angled to showcase its thin profile and brushed metal finish. The screen is alive with <Subject 2>, the text \\\"MiniMax H3\\\" displayed in crisp white typography, centered diagonally across the display. The gradient background transitions smoothly from a deep electric blue on the left to a vibrant magenta on the right. In the top-right corner, <Subject 3>, a delicate status bar showing signal strength and a battery icon, confirms the device's active state. <Audio 1> begins with a soft, digital pluck that sets a premium tone.\\n[Shot 2] At 00:03.000, the shot cuts to a tighter, macro close-up of the screen's center, where <Subject 2> dominates the frame. The text \\\"MiniMax H3\\\" is now larger and more immersive, filling the gradient void. The lighting remains restrained and high-contrast, emphasizing the pixel-perfect clarity. The camera performs a subtle, slow push-in, drawing the viewer deeper into the display. The brushed aluminum frame glimmers with a soft sheen, catching the light.\\n[Shot 3] At 00:06.000, the shot cuts to a final, stable composition that serves as the \\\"brake\\\" and closing hold. The phone settles into a perfect, balanced angle, allowing the audience to absorb the brand identity. The screen gradient deepens slightly, creating a moment of visual weight. The text remains sharp and legible. The overall composition feels resolved and expensive, perfectly aligned with the white-tech aesthetic.\\n\\noverall_soundscape:\\nA crisp, high-fidelity digital room tone that mimics the sound of a premium OLED display, with a subtle low-end hum that matches the brushed metal texture of the frame.\\n\\nnon_diegetic_music:\\n<Audio 1> is the rhythmic, 100 BPM score driving the visual sequence. It features a clean, synthesized pluck that hits on the beat, layered over a textured noise bed that adds depth without clutter. The mix is wide and airy, ensuring the music supports the visual hero without overpowering the in-frame typography.\",\"negativePrompt\":\"\",\"taskType\":\"\",\"refs\":[{\"index\":0,\"imageFile\":\"ComfyUI_00278_.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"}],\"refAudios\":[],\"refVideos\":[],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"startImage\":null,\"endImage\":null,\"continuityFromPrev\":true,\"refImageSize\":\"match\"},{\"id\":\"msjx2r2qebjcv\",\"start\":486,\"length\":362,\"frameCount\":362,\"durationSec\":15,\"prompt\":\"<Picture 1> 中深褐长发与紫瞳的女性 g1，身着深蓝色高开叉丝缎长裙，搭配金色刺绣细节与高跟；<Picture 2> 中浅金卷发与蓝瞳的女性 g2，身着米白色深 V 高开叉礼服，饰有红色心形胸针与垂坠耳环。\\n\\n0–2s：16:9 日系动漫风格游戏主菜单居中呈现，g1 与 g2 以半身剪影悬浮于画面正中，左上角竖排显示 PLAYER 1 与 PLAYER 2 身份卡，PLAYER 1上面是g1的头像，PLAYER 2上面是g2的头像，右侧垂直排列菜单项，底部横贯红色警示装饰条，视觉中心悬浮“CONTINUE”字样，整体配色控制在深蓝、米白、金、紫、红五色之内。\\n\\n2–4s：镜头微推聚焦 g1，其左臂从画面左侧滑入，轻盈如爪般勾住虚拟空间，衣袖与裙摆随动作泛起光泽涟漪，背景轻微光晕扩散，强化“轻快抓握”的装备感。\\n\\n4–7s：画面重心右移，g2 的右臂自右侧重重压下，拳锋饱满如重锤，带动裙摆与发丝微颤，米白裙面泛起涟漪，红色胸针随呼吸轻晃，形成与 g1 的“轻重对位”。\\n\\n7–8.5s：双影短暂重叠于中央，UI 层弹出半透明“CONFIRM CONFIG”字样，红蓝两色在白色底纹上短暂交融，底部警示条由红转橙，预示世界即将重构。\\n\\n8.5–10s：背景如液态般流动，从平面剪影转为立体纵深感，g1 与 g2 身形拉长并融入微光粒子，左下角浮现“LOADING”字样，字体纤细如手写，与动漫质感和谐共存。\\n\\n10–15s：二人正式踏入世界，镜头拉远呈第三人称视角，g1 左爪轻抬引导，g2 右拳低蓄待击，发丝与裙摆在空中舒展，底部装饰条化作地面光带，红色警示转为呼吸节奏，画面定格于“READY”微光闪现，余韵悠长。\",\"negativePrompt\":\"\",\"taskType\":\"\",\"refs\":[{\"index\":0,\"imageFile\":\"krea2_identity_edit_00057_.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},{\"index\":1,\"imageFile\":\"krea2_identity_edit_00058_.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"}],\"refAudios\":[],\"refVideos\":[],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"startImage\":null,\"endImage\":null,\"continuityFromPrev\":true,\"refImageSize\":\"match\"},{\"id\":\"msjx2r2qcvwlw\",\"start\":848,\"length\":362,\"frameCount\":362,\"durationSec\":15,\"prompt\":\"- 参考视频，将视频开头出现的易拉罐饮料替换为可口可乐；背景中原本发光的“全家”便利店招牌修改为“互惠”招牌；视频结尾塑料袋中的所有零食也统一替换为可口可乐易拉罐，最后结尾人物的台词从“买了一些小零食”变成了“买了一堆可乐”\",\"negativePrompt\":\"\",\"taskType\":\"\",\"refs\":[],\"refAudios\":[],\"refVideos\":[{\"index\":0,\"videoFile\":\"d3ffa21f26fa_00_参考视频_JsoJbGI9Vo_seedance2-1780052267763.mp4\",\"fileName\":\"d3ffa21f26fa_00_参考视频_JsoJbGI9Vo_seedance2-1780052267763.mp4\",\"type\":\"input\",\"subfolder\":\"\",\"pairedAudioFile\":\"\",\"previewImageFile\":\"\",\"previewImageUrl\":\"\",\"linked\":true}],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"startImage\":null,\"endImage\":null,\"continuityFromPrev\":true,\"refImageSize\":\"match\"}],\"shots\":[{\"id\":\"shot0\",\"durationSec\":5,\"prompt\":\"猴子在快速奔跑，过程中裤子掉了，仍然在跑\",\"negativePrompt\":\"bad video\",\"startImage\":null,\"endImage\":null}],\"runSelectEnabled\":true,\"runSelection\":[0,1,2],\"gen\":{\"defaultFrameCount\":124},\"liveTaePreview\":true,\"keyframes\":[{\"id\":\"shot0\",\"imageFile\":\"\",\"width\":0,\"height\":0,\"start\":0,\"length\":124,\"frameCount\":124,\"durationSec\":5,\"prompt\":\"猴子在快速奔跑，过程中裤子掉了，仍然在跑\",\"negativePrompt\":\"bad video\",\"isStartFrame\":true,\"isEndFrame\":false}],\"durationSec\":5,\"batchDetailMode\":\"solo\",\"batchWorkspaces\":{\"r2v\":{\"selectedIndex\":0,\"editMode\":\"segment\",\"runSelectEnabled\":true,\"runSelection\":[0,1,2],\"segments\":[{\"id\":\"msjwsk4s1y247\",\"start\":0,\"length\":243,\"frameCount\":243,\"durationSec\":10,\"prompt\":\"主体定义:\\n<Picture 1> 是男孩主角，展现正面、侧面与背面的三视图，棕色乱发，身穿带火箭贴布的牛仔外套，卡其工装裤配红白帆布鞋，背景为温馨书房。\\n<Picture 2> 是宠物狗主角，同样呈现正侧背三视角，深棕卷毛，佩戴蓝色项圈与胸背带，身旁散落骨头与小黄鸭，背景呼应书房。\\n<Subject 1> 锁定为 <Picture 1> 中的男孩，特征为蓬松短发、标志性火箭夹克。\\n<Subject 2> 锁定为 <Picture 2> 中的棕狗，特征为垂耳、厚实毛发与蓝色背带。\\n\\n摘要:\\n基于双主角三视图参考的 3D 动画短片，聚焦男孩与爱犬在书房内的互动瞬间，采用 C4D 渲染质感，光影温暖，强调角色清晰的剪影与 SSS 肌肤质感，构建充满童趣的开场画面。\\n\\n保留分析:\\n保留 <Picture 1> 中男孩的蓬松发量与红色鞋底的细节，确保角色在运动中不失其生动的面部表情；同时保留 <Picture 2> 中狗狗的垂耳形态与项圈上的骨牌吊坠，维持两者在相同书房环境下的空间连贯性，避免比例失调。\\n\\n详细描述:\\n[Shot 1] 镜头推近至男孩与狗狗的半身互动，背景虚化突出主体。男孩 <Subject 1> 正侧身回头，牛仔外套上的火箭贴布在暖光下微微反光；狗狗 <Subject 2> 抬头仰望，深棕色毛发在 C4D 渲染下呈现细腻的绒毛感。地面投射着柔和的窗户光斑，地板上的小黄鸭作为前景点缀。画面顶部保留 <Picture 1> 中的空间纵深感，书架与玩具模糊在后方，营造沉浸式 3D 空间。\\n\\n整体声景:\\n环境音以温暖的木地板吱呀声开场，混合着铅笔在纸上沙沙的摩擦声。背景里隐约传来一只小鸭子被踩到的“啪嗒”轻响，随后是男孩轻快的脚步声与狗狗急促的呼吸声，构建出充满生活气息的午后书房氛围。\\n\\n非叙事配乐:\\n轻快活泼的钢琴与木琴合奏，节奏明快如心跳。低音弦乐铺垫出 C4D 特有的厚实质感，旋律在男孩与狗狗的视线交汇时推高，随后缓缓落下，为 10 秒的短镜头留出呼吸感，强化情感连接。\\n\\n画面广告文案:\\nLeo & Milo: 3D\",\"negativePrompt\":\"bad video\",\"taskType\":\"\",\"refs\":[{\"index\":0,\"imageFile\":\"C__Users_Administrator_Downloads_Gemini_Generated_Image_yhwnv2yhwnv2yhwn.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},{\"index\":1,\"imageFile\":\"C__Users_Administrator_Downloads_Gemini_Generated_Image_skjq82skjq82skjq.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"}],\"refAudios\":[],\"refVideos\":[],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"previewFps\":24,\"frameRate\":24,\"externalNodeId\":\"37\",\"imageFile\":\"\",\"refImageSize\":\"match\",\"_videoFrameCount\":243},{\"id\":\"msjx2r2q7ljok\",\"start\":243,\"length\":243,\"frameCount\":243,\"durationSec\":10,\"prompt\":\"subject_definitions:\\n<Subject 1> is the sleek, brushed aluminum smartphone in <Picture 1>, featuring a titanium-grade frame, a large OLED screen with a dynamic blue-to-pink gradient, and a pill-shaped cutout at the top.\\n<Picture 1> is the primary visual anchor for the 9:16 aspect ratio shot, defining the product's hero angle and the specific gradient hue on the display.\\n<Subject 2> is the clean, minimalist typography on the device screen, displaying the text \\\"MiniMax H3\\\" in a modern sans-serif font against the deep gradient background.\\n<Subject 3> is the subtle, high-end interface status bar in the top-right corner of the screen, showing signal strength and a battery icon in white.\\n<Audio 1> is the crisp, tech-forward audio track that establishes a premium, digital presence, blending soft plucks with a rhythmic noise bed to match the 100 BPM tempo.\\n\\nsummary:\\n[reference generation + audio reference] The target video is a premium, 9:16 vertical product launch film showcasing <Subject 1>, a sleek smartphone. The sequence opens from the iconic hero angle defined by <Picture 1>, emphasizing the device's clean composition and premium lighting. The screen displays <Subject 2>, the product name, in a bold, single-line arrangement. The sequence utilizes <Audio 1> as a rhythmic foundation, driving the pacing of the reveal.\\n\\nretention_analysis:\\n<Subject 1> (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the brushed aluminum frame, pill cutout, and the specific blue-to-pink gradient are retained.\\n<Picture 1> (appears in [Shot 1] as hero angle): fully_preserved - the exact isometric angle and composition are used as the opening keyframe.\\n<Subject 2> (appears in [Shot 1] as main hero): fully_preserved - the text \\\"MiniMax H3\\\" remains the focal point, centered and dominant.\\n<Subject 3> (appears in [Shot 1] top-right): fully_preserved - the status bar details provide a sense of active, living technology.\\n<Audio 1>: reference - its crisp, 100 BPM rhythm guides the visual flow and provides a digital, energetic undercurrent.\\n\\ndetailed_description:\\nThe target video is a minimalist, Apple-style product reveal in a 9:16 vertical format, characterized by clean composition and premium lighting.\\n[Shot 1] The scene opens in a tight, isometric hero shot that matches <Picture 1>, presenting <Subject 1>, the sleek smartphone, floating against a soft, neutral gradient background. The device is angled to showcase its thin profile and brushed metal finish. The screen is alive with <Subject 2>, the text \\\"MiniMax H3\\\" displayed in crisp white typography, centered diagonally across the display. The gradient background transitions smoothly from a deep electric blue on the left to a vibrant magenta on the right. In the top-right corner, <Subject 3>, a delicate status bar showing signal strength and a battery icon, confirms the device's active state. <Audio 1> begins with a soft, digital pluck that sets a premium tone.\\n[Shot 2] At 00:03.000, the shot cuts to a tighter, macro close-up of the screen's center, where <Subject 2> dominates the frame. The text \\\"MiniMax H3\\\" is now larger and more immersive, filling the gradient void. The lighting remains restrained and high-contrast, emphasizing the pixel-perfect clarity. The camera performs a subtle, slow push-in, drawing the viewer deeper into the display. The brushed aluminum frame glimmers with a soft sheen, catching the light.\\n[Shot 3] At 00:06.000, the shot cuts to a final, stable composition that serves as the \\\"brake\\\" and closing hold. The phone settles into a perfect, balanced angle, allowing the audience to absorb the brand identity. The screen gradient deepens slightly, creating a moment of visual weight. The text remains sharp and legible. The overall composition feels resolved and expensive, perfectly aligned with the white-tech aesthetic.\\n\\noverall_soundscape:\\nA crisp, high-fidelity digital room tone that mimics the sound of a premium OLED display, with a subtle low-end hum that matches the brushed metal texture of the frame.\\n\\nnon_diegetic_music:\\n<Audio 1> is the rhythmic, 100 BPM score driving the visual sequence. It features a clean, synthesized pluck that hits on the beat, layered over a textured noise bed that adds depth without clutter. The mix is wide and airy, ensuring the music supports the visual hero without overpowering the in-frame typography.\",\"negativePrompt\":\"\",\"taskType\":\"\",\"refs\":[{\"index\":0,\"imageFile\":\"ComfyUI_00278_.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"}],\"refAudios\":[],\"refVideos\":[],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"previewFps\":24,\"frameRate\":24,\"externalNodeId\":\"38\",\"imageFile\":\"\",\"refImageSize\":\"match\",\"_videoFrameCount\":243},{\"id\":\"msjx2r2qebjcv\",\"start\":486,\"length\":362,\"frameCount\":362,\"durationSec\":15,\"prompt\":\"<Picture 1> 中深褐长发与紫瞳的女性 g1，身着深蓝色高开叉丝缎长裙，搭配金色刺绣细节与高跟；<Picture 2> 中浅金卷发与蓝瞳的女性 g2，身着米白色深 V 高开叉礼服，饰有红色心形胸针与垂坠耳环。\\n\\n0–2s：16:9 日系动漫风格游戏主菜单居中呈现，g1 与 g2 以半身剪影悬浮于画面正中，左上角竖排显示 PLAYER 1 与 PLAYER 2 身份卡，PLAYER 1上面是g1的头像，PLAYER 2上面是g2的头像，右侧垂直排列菜单项，底部横贯红色警示装饰条，视觉中心悬浮“CONTINUE”字样，整体配色控制在深蓝、米白、金、紫、红五色之内。\\n\\n2–4s：镜头微推聚焦 g1，其左臂从画面左侧滑入，轻盈如爪般勾住虚拟空间，衣袖与裙摆随动作泛起光泽涟漪，背景轻微光晕扩散，强化“轻快抓握”的装备感。\\n\\n4–7s：画面重心右移，g2 的右臂自右侧重重压下，拳锋饱满如重锤，带动裙摆与发丝微颤，米白裙面泛起涟漪，红色胸针随呼吸轻晃，形成与 g1 的“轻重对位”。\\n\\n7–8.5s：双影短暂重叠于中央，UI 层弹出半透明“CONFIRM CONFIG”字样，红蓝两色在白色底纹上短暂交融，底部警示条由红转橙，预示世界即将重构。\\n\\n8.5–10s：背景如液态般流动，从平面剪影转为立体纵深感，g1 与 g2 身形拉长并融入微光粒子，左下角浮现“LOADING”字样，字体纤细如手写，与动漫质感和谐共存。\\n\\n10–15s：二人正式踏入世界，镜头拉远呈第三人称视角，g1 左爪轻抬引导，g2 右拳低蓄待击，发丝与裙摆在空中舒展，底部装饰条化作地面光带，红色警示转为呼吸节奏，画面定格于“READY”微光闪现，余韵悠长。\",\"negativePrompt\":\"\",\"taskType\":\"\",\"refs\":[{\"index\":0,\"imageFile\":\"krea2_identity_edit_00057_.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"},{\"index\":1,\"imageFile\":\"krea2_identity_edit_00058_.png\",\"fileName\":\"\",\"type\":\"input\",\"subfolder\":\"\"}],\"refAudios\":[],\"refVideos\":[],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"previewFps\":24,\"frameRate\":24,\"externalNodeId\":\"39\",\"imageFile\":\"\",\"refImageSize\":\"match\",\"_videoFrameCount\":362},{\"id\":\"msjx2r2qcvwlw\",\"start\":848,\"length\":362,\"frameCount\":362,\"durationSec\":15,\"prompt\":\"- 参考视频，将视频开头出现的易拉罐饮料替换为可口可乐；背景中原本发光的“全家”便利店招牌修改为“互惠”招牌；视频结尾塑料袋中的所有零食也统一替换为可口可乐易拉罐，最后结尾人物的台词从“买了一些小零食”变成了“买了一堆可乐”\",\"negativePrompt\":\"\",\"taskType\":\"\",\"refs\":[],\"refAudios\":[],\"refVideos\":[{\"index\":0,\"videoFile\":\"d3ffa21f26fa_00_参考视频_JsoJbGI9Vo_seedance2-1780052267763.mp4\",\"fileName\":\"d3ffa21f26fa_00_参考视频_JsoJbGI9Vo_seedance2-1780052267763.mp4\",\"type\":\"input\",\"subfolder\":\"\",\"pairedAudioFile\":\"\",\"previewImageFile\":\"\",\"previewImageUrl\":\"\",\"linked\":true}],\"genImage\":{\"imageFile\":\"\",\"fileName\":\"\"},\"previewFps\":24,\"frameRate\":24,\"externalNodeId\":\"42\",\"imageFile\":\"\",\"refImageSize\":\"match\",\"_videoFrameCount\":362}],\"globalCommon\":{\"commonEnabled\":false,\"commonCollapsed\":false,\"prompt\":\"\",\"refs\":[],\"refAudios\":[],\"refVideos\":[]}}},\"externalGroupsWitness\":{\"v\":4,\"port\":\"r2v_groups\",\"source\":\"32:MiniMaxH3DirectorGroupsCombine\",\"nodes\":11,\"graph\":\"f22dce05\",\"facets\":{\"wiring\":\"35eb0ef7\",\"prompt\":\"f6a3128b\",\"length\":\"0dbc6c80\",\"media\":\"49ca0f74\",\"other\":\"811c9dc5\",\"timeline\":\"4308a850\"},\"groups\":[{\"slot\":\"groups.group_0\",\"node\":\"37:MiniMaxH3DirectorGroupReferenceToVideo\",\"dur\":10,\"prompt\":\"7a5d5b65\",\"sub\":\"f9af5ced\",\"facets\":{\"wiring\":\"8626d76b\",\"prompt\":\"607bde42\",\"length\":\"524b82cb\",\"media\":\"31881a44\",\"other\":\"811c9dc5\"}},{\"slot\":\"groups.group_1\",\"node\":\"38:MiniMaxH3DirectorGroupReferenceToVideo\",\"dur\":10,\"prompt\":\"50e70b43\",\"sub\":\"589ca5bb\",\"facets\":{\"wiring\":\"f73bc35d\",\"prompt\":\"c63c6f93\",\"length\":\"b7639c64\",\"media\":\"22dd5037\",\"other\":\"811c9dc5\"}},{\"slot\":\"groups.group_2\",\"node\":\"39:MiniMaxH3DirectorGroupReferenceToVideo\",\"dur\":15,\"prompt\":\"52a4ba19\",\"sub\":\"ebcb92de\",\"facets\":{\"wiring\":\"d11d097d\",\"prompt\":\"94e38bb0\",\"length\":\"aff420f8\",\"media\":\"5944cc6e\",\"other\":\"811c9dc5\"}},{\"slot\":\"groups.group_3\",\"node\":\"42:MiniMaxH3DirectorGroupReferenceToVideo\",\"dur\":15,\"prompt\":\"8ed7fb4c\",\"sub\":\"995b1124\",\"facets\":{\"wiring\":\"a4d2d477\",\"prompt\":\"ad3c8075\",\"length\":\"4d310a60\",\"media\":\"7de7f726\",\"other\":\"811c9dc5\"}}],\"timeline\":\"4308a850\",\"fps\":24,\"sel\":{\"on\":true,\"idx\":[0,1,2]}}}",
+      "bd_grp_advanced": "高级采样",
+      "steps": 25,
+      "sampler": "res_multistep",
+      "scheduler": "simple",
+      "shift_video": 12,
+      "shift_audio": 3,
+      "export_source_images": false,
+      "export_pre_face_refine": false,
+      "bd_grp_perf": false,
+      "clear_vram_between_segments": "",
+      "clear_vram_before_refine": false,
+      "clear_vram_before_face_refine": false,
+      "minimax_director_ui": "",
+      "model": [
+        "29",
+        0
+      ],
+      "video_vae": [
+        "3",
+        0
+      ],
+      "audio_vae": [
+        "4",
+        0
+      ],
+      "clip": [
+        "2",
+        0
+      ],
+      "r2v_groups": [
+        "32",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3Director",
+    "_meta": {
+      "title": "MiniMaxH3Director"
+    }
+  },
+  "6": {
+    "inputs": {
+      "fps": [
+        "5",
+        2
+      ],
+      "bit_depth": 8,
+      "images": [
+        "5",
+        0
+      ],
+      "audio": [
+        "5",
+        1
+      ]
+    },
+    "class_type": "CreateVideo",
+    "_meta": {
+      "title": "创建视频"
+    }
+  },
+  "7": {
+    "inputs": {
+      "filename_prefix": "video/MiniMaxH3_Director_external_r2v",
+      "format": "auto",
+      "codec": "auto",
+      "video": [
+        "6",
+        0
+      ]
+    },
+    "class_type": "SaveVideo",
+    "_meta": {
+      "title": "保存视频"
+    }
+  },
+  "8": {
+    "inputs": {
+      "source": [
+        "5",
+        5
+      ]
+    },
+    "class_type": "PreviewAny",
+    "_meta": {
+      "title": "Director 运行报告"
+    }
+  },
+  "9": {
+    "inputs": {
+      "source": [
+        "5",
+        2
+      ]
+    },
+    "class_type": "PreviewAny",
+    "_meta": {
+      "title": "fps"
+    }
+  },
+  "10": {
+    "inputs": {
+      "source": [
+        "5",
+        3
+      ]
+    },
+    "class_type": "PreviewAny",
+    "_meta": {
+      "title": "frame_count"
+    }
+  },
+  "18": {
+    "inputs": {
+      "image": "C__Users_Administrator_Downloads_Gemini_Generated_Image_yhwnv2yhwnv2yhwn.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "19": {
+    "inputs": {
+      "image": "C__Users_Administrator_Downloads_Gemini_Generated_Image_skjq82skjq82skjq.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "20": {
+    "inputs": {
+      "image": "ComfyUI_00278_.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "28": {
+    "inputs": {
+      "sage_attention": "auto",
+      "allow_compile": false,
+      "model": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "PathchSageAttentionKJ",
+    "_meta": {
+      "title": "Patch Sage Attention KJ"
+    }
+  },
+  "29": {
+    "inputs": {
+      "model": [
+        "28",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3MemoryEfficientSageAttentionPatch",
+    "_meta": {
+      "title": "MiniMax H3 Memory Efficient Sage Attention Patch"
+    }
+  },
+  "32": {
+    "inputs": {
+      "groups.group_0": [
+        "37",
+        0
+      ],
+      "groups.group_1": [
+        "38",
+        0
+      ],
+      "groups.group_2": [
+        "39",
+        0
+      ],
+      "groups.group_3": [
+        "42",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupsCombine",
+    "_meta": {
+      "title": "MiniMax H3 Director Groups Combine"
+    }
+  },
+  "37": {
+    "inputs": {
+      "prompt": "主体定义:\n<Picture 1> 是男孩主角，展现正面、侧面与背面的三视图，棕色乱发，身穿带火箭贴布的牛仔外套，卡其工装裤配红白帆布鞋，背景为温馨书房。\n<Picture 2> 是宠物狗主角，同样呈现正侧背三视角，深棕卷毛，佩戴蓝色项圈与胸背带，身旁散落骨头与小黄鸭，背景呼应书房。\n<Subject 1> 锁定为 <Picture 1> 中的男孩，特征为蓬松短发、标志性火箭夹克。\n<Subject 2> 锁定为 <Picture 2> 中的棕狗，特征为垂耳、厚实毛发与蓝色背带。\n\n摘要:\n基于双主角三视图参考的 3D 动画短片，聚焦男孩与爱犬在书房内的互动瞬间，采用 C4D 渲染质感，光影温暖，强调角色清晰的剪影与 SSS 肌肤质感，构建充满童趣的开场画面。\n\n保留分析:\n保留 <Picture 1> 中男孩的蓬松发量与红色鞋底的细节，确保角色在运动中不失其生动的面部表情；同时保留 <Picture 2> 中狗狗的垂耳形态与项圈上的骨牌吊坠，维持两者在相同书房环境下的空间连贯性，避免比例失调。\n\n详细描述:\n[Shot 1] 镜头推近至男孩与狗狗的半身互动，背景虚化突出主体。男孩 <Subject 1> 正侧身回头，牛仔外套上的火箭贴布在暖光下微微反光；狗狗 <Subject 2> 抬头仰望，深棕色毛发在 C4D 渲染下呈现细腻的绒毛感。地面投射着柔和的窗户光斑，地板上的小黄鸭作为前景点缀。画面顶部保留 <Picture 1> 中的空间纵深感，书架与玩具模糊在后方，营造沉浸式 3D 空间。\n\n整体声景:\n环境音以温暖的木地板吱呀声开场，混合着铅笔在纸上沙沙的摩擦声。背景里隐约传来一只小鸭子被踩到的“啪嗒”轻响，随后是男孩轻快的脚步声与狗狗急促的呼吸声，构建出充满生活气息的午后书房氛围。\n\n非叙事配乐:\n轻快活泼的钢琴与木琴合奏，节奏明快如心跳。低音弦乐铺垫出 C4D 特有的厚实质感，旋律在男孩与狗狗的视线交汇时推高，随后缓缓落下，为 10 秒的短镜头留出呼吸感，强化情感连接。\n\n画面广告文案:\nLeo & Milo: 3D",
+      "duration_sec": 10,
+      "ref_image_size": "match",
+      "ref_images.ref_image_0": [
+        "18",
+        0
+      ],
+      "ref_images.ref_image_1": [
+        "19",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupReferenceToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Director Group (Reference to Video)"
+    }
+  },
+  "38": {
+    "inputs": {
+      "prompt": "subject_definitions:\n<Subject 1> is the sleek, brushed aluminum smartphone in <Picture 1>, featuring a titanium-grade frame, a large OLED screen with a dynamic blue-to-pink gradient, and a pill-shaped cutout at the top.\n<Picture 1> is the primary visual anchor for the 9:16 aspect ratio shot, defining the product's hero angle and the specific gradient hue on the display.\n<Subject 2> is the clean, minimalist typography on the device screen, displaying the text \"MiniMax H3\" in a modern sans-serif font against the deep gradient background.\n<Subject 3> is the subtle, high-end interface status bar in the top-right corner of the screen, showing signal strength and a battery icon in white.\n<Audio 1> is the crisp, tech-forward audio track that establishes a premium, digital presence, blending soft plucks with a rhythmic noise bed to match the 100 BPM tempo.\n\nsummary:\n[reference generation + audio reference] The target video is a premium, 9:16 vertical product launch film showcasing <Subject 1>, a sleek smartphone. The sequence opens from the iconic hero angle defined by <Picture 1>, emphasizing the device's clean composition and premium lighting. The screen displays <Subject 2>, the product name, in a bold, single-line arrangement. The sequence utilizes <Audio 1> as a rhythmic foundation, driving the pacing of the reveal.\n\nretention_analysis:\n<Subject 1> (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the brushed aluminum frame, pill cutout, and the specific blue-to-pink gradient are retained.\n<Picture 1> (appears in [Shot 1] as hero angle): fully_preserved - the exact isometric angle and composition are used as the opening keyframe.\n<Subject 2> (appears in [Shot 1] as main hero): fully_preserved - the text \"MiniMax H3\" remains the focal point, centered and dominant.\n<Subject 3> (appears in [Shot 1] top-right): fully_preserved - the status bar details provide a sense of active, living technology.\n<Audio 1>: reference - its crisp, 100 BPM rhythm guides the visual flow and provides a digital, energetic undercurrent.\n\ndetailed_description:\nThe target video is a minimalist, Apple-style product reveal in a 9:16 vertical format, characterized by clean composition and premium lighting.\n[Shot 1] The scene opens in a tight, isometric hero shot that matches <Picture 1>, presenting <Subject 1>, the sleek smartphone, floating against a soft, neutral gradient background. The device is angled to showcase its thin profile and brushed metal finish. The screen is alive with <Subject 2>, the text \"MiniMax H3\" displayed in crisp white typography, centered diagonally across the display. The gradient background transitions smoothly from a deep electric blue on the left to a vibrant magenta on the right. In the top-right corner, <Subject 3>, a delicate status bar showing signal strength and a battery icon, confirms the device's active state. <Audio 1> begins with a soft, digital pluck that sets a premium tone.\n[Shot 2] At 00:03.000, the shot cuts to a tighter, macro close-up of the screen's center, where <Subject 2> dominates the frame. The text \"MiniMax H3\" is now larger and more immersive, filling the gradient void. The lighting remains restrained and high-contrast, emphasizing the pixel-perfect clarity. The camera performs a subtle, slow push-in, drawing the viewer deeper into the display. The brushed aluminum frame glimmers with a soft sheen, catching the light.\n[Shot 3] At 00:06.000, the shot cuts to a final, stable composition that serves as the \"brake\" and closing hold. The phone settles into a perfect, balanced angle, allowing the audience to absorb the brand identity. The screen gradient deepens slightly, creating a moment of visual weight. The text remains sharp and legible. The overall composition feels resolved and expensive, perfectly aligned with the white-tech aesthetic.\n\noverall_soundscape:\nA crisp, high-fidelity digital room tone that mimics the sound of a premium OLED display, with a subtle low-end hum that matches the brushed metal texture of the frame.\n\nnon_diegetic_music:\n<Audio 1> is the rhythmic, 100 BPM score driving the visual sequence. It features a clean, synthesized pluck that hits on the beat, layered over a textured noise bed that adds depth without clutter. The mix is wide and airy, ensuring the music supports the visual hero without overpowering the in-frame typography.\n",
+      "duration_sec": 10,
+      "ref_image_size": "match",
+      "ref_images.ref_image_0": [
+        "20",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupReferenceToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Director Group (Reference to Video)"
+    }
+  },
+  "39": {
+    "inputs": {
+      "prompt": "<Picture 1> 中深褐长发与紫瞳的女性 g1，身着深蓝色高开叉丝缎长裙，搭配金色刺绣细节与高跟；<Picture 2> 中浅金卷发与蓝瞳的女性 g2，身着米白色深 V 高开叉礼服，饰有红色心形胸针与垂坠耳环。\n\n0–2s：16:9 日系动漫风格游戏主菜单居中呈现，g1 与 g2 以半身剪影悬浮于画面正中，左上角竖排显示 PLAYER 1 与 PLAYER 2 身份卡，PLAYER 1上面是g1的头像，PLAYER 2上面是g2的头像，右侧垂直排列菜单项，底部横贯红色警示装饰条，视觉中心悬浮“CONTINUE”字样，整体配色控制在深蓝、米白、金、紫、红五色之内。\n\n2–4s：镜头微推聚焦 g1，其左臂从画面左侧滑入，轻盈如爪般勾住虚拟空间，衣袖与裙摆随动作泛起光泽涟漪，背景轻微光晕扩散，强化“轻快抓握”的装备感。\n\n4–7s：画面重心右移，g2 的右臂自右侧重重压下，拳锋饱满如重锤，带动裙摆与发丝微颤，米白裙面泛起涟漪，红色胸针随呼吸轻晃，形成与 g1 的“轻重对位”。\n\n7–8.5s：双影短暂重叠于中央，UI 层弹出半透明“CONFIRM CONFIG”字样，红蓝两色在白色底纹上短暂交融，底部警示条由红转橙，预示世界即将重构。\n\n8.5–10s：背景如液态般流动，从平面剪影转为立体纵深感，g1 与 g2 身形拉长并融入微光粒子，左下角浮现“LOADING”字样，字体纤细如手写，与动漫质感和谐共存。\n\n10–15s：二人正式踏入世界，镜头拉远呈第三人称视角，g1 左爪轻抬引导，g2 右拳低蓄待击，发丝与裙摆在空中舒展，底部装饰条化作地面光带，红色警示转为呼吸节奏，画面定格于“READY”微光闪现，余韵悠长。",
+      "duration_sec": 15,
+      "ref_image_size": "match",
+      "ref_images.ref_image_0": [
+        "40",
+        0
+      ],
+      "ref_images.ref_image_1": [
+        "41",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupReferenceToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Director Group (Reference to Video)"
+    }
+  },
+  "40": {
+    "inputs": {
+      "image": "krea2_identity_edit_00057_.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "41": {
+    "inputs": {
+      "image": "krea2_identity_edit_00058_.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "42": {
+    "inputs": {
+      "prompt": "- 参考视频，将视频开头出现的易拉罐饮料替换为可口可乐；背景中原本发光的“全家”便利店招牌修改为“互惠”招牌；视频结尾塑料袋中的所有零食也统一替换为可口可乐易拉罐，最后结尾人物的台词从“买了一些小零食”变成了“买了一堆可乐”",
+      "duration_sec": 15,
+      "ref_image_size": "match",
+      "ref_videos.ref_video_0": [
+        "45",
+        0
+      ]
+    },
+    "class_type": "MiniMaxH3DirectorGroupReferenceToVideo",
+    "_meta": {
+      "title": "MiniMax H3 Director Group (Reference to Video)"
+    }
+  },
+  "45": {
+    "inputs": {
+      "video": "d3ffa21f26fa_00_参考视频_JsoJbGI9Vo_seedance2-1780052267763.mp4",
+      "force_rate": 0,
+      "custom_width": 0,
+      "custom_height": 0,
+      "frame_load_cap": 0,
+      "skip_first_frames": 0,
+      "select_every_nth": 1,
+      "format": "AnimateDiff"
+    },
+    "class_type": "VHS_LoadVideo",
+    "_meta": {
+      "title": "Load Video (Upload) 🎥🅥🅗🅢"
+    }
+  }
+}

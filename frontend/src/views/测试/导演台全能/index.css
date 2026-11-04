@@ -1,0 +1,121 @@
+.测试页 {
+  color: #d1d5db;
+}
+
+.页标题 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.表单卡 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 20px 20px 4px 20px;
+  margin-bottom: 16px;
+}
+
+.表格区 {
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.上传路径 {
+  color: #6b7280;
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+/* 缩略图外边距走全局主题的 .测试页 .表单缩略（margin: 6px 0 0 0），这里不重复定义。
+   全局规则里有一条重要警告：不要给这个组件设 display，理由见那里的注释。 */
+
+/* Element 的 el-upload 外面多包了一层无类名的 block div，会把后面的提示文字、
+   「清空」按钮挤到下一行。本页把这层改成 inline-block，让「按钮 + 缩略图 + 提示 + 清空」排成一行。 */
+.上传控件 {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ---- 分组：把一长列表单切成「模式 / 素材 / 提示词 / 画面 / 参数」五段 ---- */
+.分组 + .分组 {
+  border-top: 1px dashed #1e293b;
+  margin-top: 2px;
+  padding-top: 14px;
+}
+
+.分组标题 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+  letter-spacing: 1px;
+  margin: 0 0 12px 2px;
+}
+
+.分组标题::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+  background: #22c55e;
+}
+
+/* ---- 两列：短参数并排，省一半纵向长度 ---- */
+.两列 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+}
+
+.两列 > .el-form-item {
+  width: calc(50% - 8px);
+  min-width: 320px;
+}
+
+@media (max-width: 900px) {
+  .两列 > .el-form-item {
+    width: 100%;
+  }
+}
+
+/* ---- 说明 / 只读值 ---- */
+.说明块 {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.说明块.弱 {
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.底膜 {
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.7;
+  background: #0a0f1a;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 6px 10px;
+  display: inline-block;
+}
+
+.只读值 {
+  color: #e2e8f0;
+  font-size: 13px;
+}
+
+.警告 {
+  color: #e6a23c;
+}
+
+.提交行 {
+  padding: 6px 0 16px 0;
+}

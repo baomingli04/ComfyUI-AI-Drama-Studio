@@ -1,0 +1,112 @@
+/* 分页条：样式收在 .分页条 下，跟随深色主题 */
+.分页条 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-top: 12px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+}
+.分页条 .计数 {
+  font-size: 12px;
+  color: #64748b;
+}
+.分页条 .右 {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.分页条 .页钮 {
+  min-width: 28px;
+  height: 26px;
+  line-height: 24px;
+  padding: 0 8px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid #1e293b;
+  background: #151e32;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+.分页条 .页钮:hover {
+  border-color: #334155;
+  color: #e2e8f0;
+}
+.分页条 .页钮.当 {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #06210f;
+  font-weight: 700;
+}
+.分页条 .页钮.省略 {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+.分页条 .页钮.禁用 {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.分页条 .隔 {
+  width: 1px;
+  height: 16px;
+  background: #1e293b;
+  margin: 0 6px;
+}
+.分页条 .每页选 {
+  width: 104px;
+}
+.分页条 .跳转 {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.分页条 .跳框 {
+  width: 44px;
+  height: 26px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid #1e293b;
+  background: #151e32;
+  color: #e2e8f0;
+  font-size: 12px;
+  outline: none;
+}
+.分页条 .跳框:focus {
+  border-color: #22c55e;
+}
+
+/* 紧凑模式：窄侧栏里只留页码 */
+.分页条.紧凑 {
+  padding: 8px 10px;
+  gap: 6px;
+  margin-top: 10px;
+  justify-content: center;
+}
+.分页条.紧凑 .计数 {
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+}
+.分页条.紧凑 .右 {
+  margin-left: 0;
+  justify-content: center;
+  gap: 3px;
+}
+.分页条.紧凑 .页钮 {
+  min-width: 24px;
+  height: 24px;
+  line-height: 22px;
+  padding: 0 5px;
+  font-size: 11px;
+}

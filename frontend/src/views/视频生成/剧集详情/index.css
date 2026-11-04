@@ -1,0 +1,89 @@
+/* 剧集详情（项目内分集列表） */
+.剧集详情 .区头 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.剧集详情 .区名 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--字);
+}
+.剧集详情 .计数 {
+  font-size: 12px;
+  color: var(--字弱);
+}
+
+.剧集详情 .集列表 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.剧集详情 .关卡 {
+  background: var(--卡片);
+  border: 1px solid var(--描边);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.剧集详情 .关卡:hover { border-color: var(--描边亮); }
+.剧集详情 .关卡.当前 { border-color: var(--主); background: var(--主浅); }
+.剧集详情 .关卡.完成 { border-color: var(--主浅); }
+
+.剧集详情 .关卡行 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+}
+
+.剧集详情 .集号 {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 8px;
+  background: var(--卡片二);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--字);
+}
+.剧集详情 .集号.亮 { background: var(--主); color: #06210f; }
+.剧集详情 .集号.绿 { background: var(--主浅); color: var(--主); }
+
+.剧集详情 .集信息 { flex: 1; min-width: 0; }
+.剧集详情 .集标题 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.剧集详情 .集副 { font-size: 12px; color: var(--字弱); }
+
+.剧集详情 .集进度 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 140px;
+}
+.剧集详情 .进度轨 {
+  width: 96px;
+  height: 4px;
+  background: var(--描边);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.剧集详情 .进度条 {
+  height: 100%;
+  background: var(--主);
+  border-radius: 999px;
+}
+.剧集详情 .进度字 { font-size: 12px; color: var(--字弱); }
+
+/* ---- 分页 ---- */
+.剧集详情 .分页行 {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 16px 4px;
+  border-top: 1px solid var(--描边);
+  margin-top: 6px;
+}

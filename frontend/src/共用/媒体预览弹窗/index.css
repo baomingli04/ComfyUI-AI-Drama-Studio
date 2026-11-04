@@ -1,0 +1,83 @@
+.预览弹窗 {
+  background: #0d1424;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+}
+.预览弹窗 .el-dialog__header {
+  display: none;
+}
+.预览弹窗 .el-dialog__body {
+  padding: 0;
+}
+.预览容器 {
+  color: #d1d5db;
+}
+.预览头 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #1e293b;
+}
+.预览名称 {
+  font-weight: 600;
+  color: #ffffff;
+}
+.预览计数 {
+  color: #22c55e;
+  font-size: 13px;
+}
+.预览关闭 {
+  margin-left: auto;
+  cursor: pointer;
+  font-size: 18px;
+  color: #d1d5db;
+}
+.预览关闭:hover {
+  color: #ef4444;
+}
+.预览主体 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+}
+.预览箭头 {
+  font-size: 34px;
+  color: #22c55e;
+  cursor: pointer;
+  flex: 0 0 auto;
+  user-select: none;
+}
+.预览箭头:hover {
+  color: #ffffff;
+}
+.预览箭头.禁用 {
+  opacity: 0.25;
+  cursor: default;
+}
+.预览画框 {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background: #0a0f1a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.预览图 {
+  max-width: 100%;
+  max-height: 68vh;
+  object-fit: contain;
+}
+.预览视频 {
+  max-width: 100%;
+  max-height: 68vh;
+  outline: none;
+}
+.预览音频 {
+  width: 80%;
+  outline: none;
+}

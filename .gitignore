@@ -1,0 +1,24 @@
+# ===== 依赖与构建产物 =====
+node_modules/
+dist/
+frontend/dist/
+四模块/dist/
+frontend/_preview/
+.venv/
+__pycache__/
+*.pyc
+
+# ===== 本地媒体资源与运行数据（生成/上传产物，不入库；ComfyUI 工作流保留） =====
+backend/资源/上传/
+backend/资源/产物/
+backend/资源/OpenMontage/
+backend/资源/技能/
+backend/资源/日志/
+
+# ===== 日志 / 临时 / 本地索引 =====
+*.log
+.codegraph/
+提交并等待_改动对照.patch
+
+# ===== 本地数据库导出（含样例业务数据，不随开源分发；建库用 表结构.sql） =====
+aicg.sql

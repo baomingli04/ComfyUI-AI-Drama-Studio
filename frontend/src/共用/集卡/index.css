@@ -1,0 +1,215 @@
+/* 集卡：全部收在 .集卡 下，避免和别的页面同名类打架 */
+.集卡 {
+  display: flex;
+  background: #151e32;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  transition: border-color 0.15s ease;
+}
+.集卡:hover {
+  border-color: #334155;
+}
+.集卡 .色条 {
+  width: 3px;
+  flex: 0 0 3px;
+}
+.集卡 .卡身 {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px 10px 12px;
+}
+
+.集卡 .行1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.集卡 .集号 {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: #06210f;
+  background: #22c55e;
+  border-radius: 5px;
+  padding: 1px 7px;
+}
+.集卡 .标题 {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: #e2e8f0;
+}
+
+.集卡 .旗 {
+  font-size: 10.5px;
+  line-height: 18px;
+  border-radius: 999px;
+  padding: 0 7px;
+  border: 1px solid;
+}
+.集卡 .旗.关键 {
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.12);
+}
+.集卡 .旗.卡点 {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.12);
+}
+.集卡 .旗.状态 {
+  color: #94a3b8;
+  border-color: #334155;
+  background: #1e293b;
+}
+.集卡 .旗.状态.完 {
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.12);
+}
+.集卡 .旗.状态.进 {
+  color: #eab308;
+  border-color: rgba(234, 179, 8, 0.4);
+  background: rgba(234, 179, 8, 0.12);
+}
+
+.集卡 .右 {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: #64748b;
+}
+.集卡 .展开钮 {
+  cursor: pointer;
+  color: #94a3b8;
+}
+.集卡 .展开钮:hover {
+  color: #22c55e;
+}
+
+.集卡 .概 {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #94a3b8;
+}
+
+.集卡 .四格 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 9px;
+}
+.集卡 .格 {
+  background: #0f172a;
+  border-radius: 7px;
+  padding: 6px 8px;
+  min-width: 0;
+}
+.集卡 .格键 {
+  font-size: 10px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+.集卡 .格值 {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #94a3b8;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.集卡 .摘要 {
+  margin-top: 5px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: #64748b;
+}
+.集卡 .摘要 .竖 {
+  color: #334155;
+  margin: 0 6px;
+}
+
+.集卡 .点行 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+.集卡 .点 {
+  font-size: 10px;
+  line-height: 16px;
+  border-radius: 4px;
+  padding: 0 6px;
+  border: 1px solid;
+  font-family: Consolas, 'Courier New', monospace;
+  cursor: default;
+}
+.集卡 .点.点-埋 {
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.4);
+  background: rgba(96, 165, 250, 0.12);
+}
+.集卡 .点.点-露 {
+  color: #a5b4fc;
+  border-color: rgba(129, 140, 248, 0.4);
+  background: rgba(129, 140, 248, 0.12);
+}
+.集卡 .点.点-压 {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.12);
+}
+.集卡 .点.点-兑 {
+  color: #86efac;
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.12);
+}
+.集卡 .点.点-假兑 {
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.12);
+}
+.集卡 .点.点-回收 {
+  color: #5eead4;
+  border-color: rgba(45, 212, 191, 0.4);
+  background: rgba(45, 212, 191, 0.12);
+}
+.集卡 .点.点-转 {
+  color: #d8b4fe;
+  border-color: rgba(192, 132, 252, 0.4);
+  background: rgba(192, 132, 252, 0.12);
+}
+.集卡 .点.加 {
+  color: #64748b;
+  border-style: dashed;
+  border-color: #334155;
+  cursor: pointer;
+  font-family: inherit;
+}
+.集卡 .点.加:hover {
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.55);
+}
+.集卡 .点.靠右 {
+  margin-left: auto;
+}
+
+/* 高亮：点折线 / 台账定位过来时闪一下 */
+.集卡.闪 {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+}
+
+@media (max-width: 1100px) {
+  .集卡 .四格 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

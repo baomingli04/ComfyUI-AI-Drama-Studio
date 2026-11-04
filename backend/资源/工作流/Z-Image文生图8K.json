@@ -1,0 +1,418 @@
+{
+  "3": {
+    "inputs": {
+      "seed": 1045502413679055,
+      "steps": 9,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "sgm_uniform",
+      "denoise": 1,
+      "model": [
+        "181",
+        0
+      ],
+      "positive": [
+        "121",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "54",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "",
+      "clip": [
+        "18",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码"
+    }
+  },
+  "11": {
+    "inputs": {
+      "shift": 3,
+      "sampling": "flow",
+      "model": [
+        "125",
+        0
+      ]
+    },
+    "class_type": "ModelSamplingAuraFlow",
+    "_meta": {
+      "title": "采样算法（AuraFlow）"
+    }
+  },
+  "17": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "加载VAE"
+    }
+  },
+  "18": {
+    "inputs": {
+      "clip_name": "qwen_3_4b.safetensors",
+      "type": "lumina2",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "加载CLIP"
+    }
+  },
+  "54": {
+    "inputs": {
+      "width": 1080,
+      "height": 1920,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "空Latent图像"
+    }
+  },
+  "121": {
+    "inputs": {
+      "text": [
+        "163",
+        0
+      ],
+      "clip": [
+        "18",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码"
+    }
+  },
+  "125": {
+    "inputs": {
+      "unet_name": "z_image_turbo_bf16.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "UNet加载器"
+    }
+  },
+  "130": {
+    "inputs": {
+      "width": [
+        "147",
+        0
+      ],
+      "height": [
+        "147",
+        1
+      ],
+      "interpolation": "lanczos",
+      "method": "stretch",
+      "condition": "always",
+      "multiple_of": 8,
+      "image": [
+        "151",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "🔧 Image Resize"
+    }
+  },
+  "133": {
+    "inputs": {
+      "upscale_method": "lanczos",
+      "scale_by": 0.3,
+      "image": [
+        "137",
+        0
+      ]
+    },
+    "class_type": "ImageScaleBy",
+    "_meta": {
+      "title": "缩放图像（比例）"
+    }
+  },
+  "134": {
+    "inputs": {
+      "width": [
+        "138",
+        0
+      ],
+      "height": [
+        "138",
+        1
+      ],
+      "interpolation": "lanczos",
+      "method": "stretch",
+      "condition": "always",
+      "multiple_of": 8,
+      "image": [
+        "135",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "🔧 Image Resize"
+    }
+  },
+  "135": {
+    "inputs": {
+      "seed": 2794489657,
+      "resolution": 1024,
+      "max_resolution": 0,
+      "batch_size": 1,
+      "uniform_batch_size": false,
+      "color_correction": "wavelet",
+      "temporal_overlap": 0,
+      "prepend_frames": 0,
+      "input_noise_scale": 0,
+      "latent_noise_scale": 0,
+      "offload_device": "cpu",
+      "enable_debug": false,
+      "image": [
+        "133",
+        0
+      ],
+      "dit": [
+        "152",
+        0
+      ],
+      "vae": [
+        "153",
+        0
+      ]
+    },
+    "class_type": "SeedVR2VideoUpscaler",
+    "_meta": {
+      "title": "SeedVR2 Video Upscaler (v2.5.24)"
+    }
+  },
+  "136": {
+    "inputs": {
+      "width_factor": 4,
+      "height_factor": 3,
+      "overlap_rate": 0.1,
+      "image": [
+        "130",
+        0
+      ]
+    },
+    "class_type": "TTP_Tile_image_size",
+    "_meta": {
+      "title": "TTP_瓦片图像尺寸"
+    }
+  },
+  "137": {
+    "inputs": {
+      "tile_width": [
+        "136",
+        0
+      ],
+      "tile_height": [
+        "136",
+        1
+      ],
+      "image": [
+        "130",
+        0
+      ]
+    },
+    "class_type": "TTP_Image_Tile_Batch",
+    "_meta": {
+      "title": "TTP_图像瓦片批处理"
+    }
+  },
+  "138": {
+    "inputs": {
+      "image": [
+        "137",
+        0
+      ]
+    },
+    "class_type": "GetImageSize+",
+    "_meta": {
+      "title": "🔧 Get Image Size"
+    }
+  },
+  "141": {
+    "inputs": {
+      "padding": 64,
+      "tiles": [
+        "134",
+        0
+      ],
+      "positions": [
+        "137",
+        1
+      ],
+      "original_size": [
+        "137",
+        2
+      ],
+      "grid_size": [
+        "137",
+        3
+      ]
+    },
+    "class_type": "TTP_Image_Assy",
+    "_meta": {
+      "title": "TTP_图像拼接/重组"
+    }
+  },
+  "147": {
+    "inputs": {
+      "image": [
+        "151",
+        0
+      ]
+    },
+    "class_type": "GetImageSize+",
+    "_meta": {
+      "title": "🔧 Get Image Size"
+    }
+  },
+  "151": {
+    "inputs": {
+      "upscale_method": "lanczos",
+      "scale_by": [
+        "178",
+        0
+      ],
+      "image": [
+        "171",
+        0
+      ]
+    },
+    "class_type": "ImageScaleBy",
+    "_meta": {
+      "title": "缩放图像（比例）"
+    }
+  },
+  "152": {
+    "inputs": {
+      "model": "seedvr2_ema_3b_fp16.safetensors",
+      "device": "cuda:0",
+      "blocks_to_swap": 36,
+      "swap_io_components": false,
+      "offload_device": "cpu",
+      "cache_model": "sdpa",
+      "attention_mode": "sdpa"
+    },
+    "class_type": "SeedVR2LoadDiTModel",
+    "_meta": {
+      "title": "SeedVR2 (Down)Load DiT Model"
+    }
+  },
+  "153": {
+    "inputs": {
+      "model": "ema_vae_fp16.safetensors",
+      "device": "cuda:0",
+      "encode_tiled": false,
+      "encode_tile_size": 256,
+      "encode_tile_overlap": 32,
+      "decode_tiled": false,
+      "decode_tile_size": 256,
+      "decode_tile_overlap": 32,
+      "tile_debug": "false",
+      "offload_device": "none",
+      "cache_model": false
+    },
+    "class_type": "SeedVR2LoadVAEModel",
+    "_meta": {
+      "title": "SeedVR2 (Down)Load VAE Model"
+    }
+  },
+  "160": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "141",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  },
+  "163": {
+    "inputs": {
+      "text": "一个皮肤白皙、体格健壮的单身年轻女性形象被描绘成中特写，从右前方向下倾斜。她站在蓝天下的白沙上，左上角可见棕榈叶。她的头微微向右倾斜；眼睛是红棕色的，瞳孔睁大，嘴唇微微张开，露出上齿。长长的直金发向左飘过肩膀和胸部，系着两个黑色的猫耳发髻，上面系着深红色的缎带。她穿着一件栗色短款连帽衫，拉起露出躯干和乳沟；袖子宽松地垂在手臂上，袖口和下摆边缘有金线图案。下面是一个黑色的比基尼底部，前部中央面板有交叉的系带细节，通过臀部的金属垫圈固定。一条浓密蓬松的黑色尾巴从下背部向下延伸到右臀部，在那里，她的左手抓住靠近大腿的尖端，同时以直立姿势站立，双腿的重量均匀平衡。柔和的定向阳光源自左上角，在下巴下方和连帽衫褶皱下方投射出微妙的阴影，投射到腹部表面；镜面高光出现在前额、鼻梁、锁骨、乳头、腹部曲线和大腿上，表明以程式化的数字插图格式呈现的光滑光滑的皮肤纹理，缺乏逼真的纹理或2D动漫艺术惯例中典型的摄影景深模糊效果。"
+    },
+    "class_type": "Text Multiline",
+    "_meta": {
+      "title": "多行文本"
+    }
+  },
+  "171": {
+    "inputs": {
+      "samples": [
+        "3",
+        0
+      ],
+      "vae": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "177": {
+    "inputs": {
+      "images": [
+        "151",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "178": {
+    "inputs": {
+      "value": 4
+    },
+    "class_type": "PrimitiveFloat",
+    "_meta": {
+      "title": "倍数"
+    }
+  },
+  "181": {
+    "inputs": {
+      "lora_name": "Qwen 2511-Unblur-Anything.safetensors",
+      "strength_model": 0.3500000000000001,
+      "model": [
+        "11",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "LoRA加载器（仅模型）"
+    }
+  }
+}

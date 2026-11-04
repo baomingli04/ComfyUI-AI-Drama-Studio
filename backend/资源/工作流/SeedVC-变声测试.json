@@ -1,0 +1,56 @@
+{
+  "1": {
+    "inputs": {
+      "audio": "u1789548916684357900.wav"
+    },
+    "class_type": "LoadAudio",
+    "_meta": {
+      "title": "① 要变声的音频 (source)"
+    }
+  },
+  "2": {
+    "inputs": {
+      "audio": "u1789548916684357900.wav"
+    },
+    "class_type": "LoadAudio",
+    "_meta": {
+      "title": "② 音色参考 (ref)"
+    }
+  },
+  "3": {
+    "inputs": {
+      "steps": 30,
+      "speed": 1,
+      "inference_cfg_rate": 0.7,
+      "f0_condition": false,
+      "auto_f0_adjust": true,
+      "pitch_shift": 0,
+      "unload_model": true,
+      "source_audio": [
+        "1",
+        0
+      ],
+      "ref_audio": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "SeedVCRun",
+    "_meta": {
+      "title": "③ Seed-VC 变声"
+    }
+  },
+  "4": {
+    "inputs": {
+      "filename_prefix": "audio/变声结果",
+      "audio": [
+        "3",
+        0
+      ]
+    },
+    "class_type": "SaveAudio",
+    "_meta": {
+      "title": "④ 保存"
+    }
+  }
+}

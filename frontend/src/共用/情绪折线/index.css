@@ -1,0 +1,24 @@
+/* 情绪折线：样式全部收在 .情绪折线 里，避免和其它页面的 svg 打架 */
+.情绪折线 {
+  position: relative;
+}
+.情绪折线 .图 {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.情绪折线 .数据点 {
+  cursor: pointer;
+}
+.情绪折线 .数据点 circle:last-of-type {
+  transition: r 0.15s ease;
+}
+.情绪折线 .数据点:hover circle:last-of-type {
+  r: 6;
+}
+.情绪折线 .折线空 {
+  padding: 40px 0;
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+}

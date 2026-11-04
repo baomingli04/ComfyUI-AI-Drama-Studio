@@ -1,0 +1,40 @@
+{
+  "1": {
+    "inputs": {
+      "image": "火之国木叶村山崖全景与村落建筑景观_背景.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "2": {
+    "inputs": {
+      "mark": "doubao",
+      "inpaint": true,
+      "backend": "cv2",
+      "sensitivity": "auto",
+      "image": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "RAIWRemoveVisibleWatermark",
+    "_meta": {
+      "title": "Remove Visible Watermark (RAIW)"
+    }
+  },
+  "3": {
+    "inputs": {
+      "filename_prefix": "RAIW_Clean",
+      "images": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  }
+}
