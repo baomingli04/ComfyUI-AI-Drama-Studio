@@ -1,13 +1,17 @@
-# ComfyUI AI 漫剧本地运行系统（AICG Platform)
+# ComfyUI AI 漫剧本地运行系统（AICG Platform / AI Drama Studio)
 
 ![Local](https://img.shields.io/badge/运行方式-本地纯免费-success) ![ComfyUI](https://img.shields.io/badge/推理后端-ComfyUI-orange) ![Vue](https://img.shields.io/badge/前端-Vue2.7%20·%20Vue3-blue) ![Django](https://img.shields.io/badge/后端-Django%204.2%20·%20DRF-green)
 
 > **💰 本地纯免费**：整套系统跑在你自己的电脑上——数据存本机 MySQL、图和视频用本机 ComfyUI 出、成片用本机 FFmpeg 拼。**没有云服务、没有订阅、没有按张计费，生成多少都不花钱。**
 
-> 一套完全本地运行的 **AI 漫剧（短剧/漫剧）生产平台**：从一句话创意到成片，覆盖
-> **剧本创作 → 人物/资产设定 → 美术出图 → 分镜拆解 → 单镜生成视频 → 成片合成** 全流程。
+> 一套完全本地运行的 **AI 漫剧（短剧/漫剧/微短剧/AI 动画）生产平台**：从一句话创意到成片，覆盖
+> **AI 剧本创作 → 人物/资产设定 → 美术出图 → AI 分镜拆解 → 单镜生成视频（图生视频/文生视频/首尾帧/参考生视频）→ 一键合成成片** 全流程。
 > 视频与图片生成全部基于本机 **ComfyUI**，通过「技能（Skill）」机制封装 ComfyUI 工作流，
 > **技能自选、自由扩展**——把你的任何工作流包装成技能，就能在平台各页面直接调用。
+
+**English**: A 100% local-first, free & open-source AI drama / comic short-film studio. One-stop pipeline: AI screenplay writing → character design → art asset generation → AI storyboard → shot-by-shot video generation (image-to-video, text-to-video, first-last-frame, reference-to-video, video-to-video) → one-click FFmpeg film composing. All inference runs on your own ComfyUI; any workflow can be wrapped as a selectable "Skill" plugin. No cloud, no subscription, no per-image billing.
+
+**适合谁**：个人创作者 / 漫剧工作室 / AI 短剧团队 / 想把散装 ComfyUI 工作流管起来的人——只要你会装 ComfyUI，就能用这个平台把「写剧本 → 出图 → 出片」整条流水线跑起来。
 
 ---
 
@@ -172,6 +176,14 @@ npm run dev     # http://localhost:8081
 - `docs/01-项目文档.md` —— 项目总览
 - `docs/02-数据库文档.md` —— 数据库设计（21 张业务表字段级细则）
 - `docs/10-任务清单.md` —— 迭代记录（A~J 节：检查 → 修复 → 成片合成 → 资产库…）
+
+---
+
+## 🔍 关键词 / Keywords
+
+**中文**：AI 漫剧 · AI 短剧 · 微短剧 · AI 动画 · AI 漫画 · 竖屏短剧 · AI 视频生成 · 文生视频 · 图生视频 · 首尾帧生成 · 参考生视频 · 视频转视频 · AI 分镜 · 分镜生成 · AI 剧本创作 · AI 编剧 · 小说转短剧 · 人物一致性 · 角色一致性 · 美术资产 · AI 出图 · 音色合成 · AI 配音 · 一键成片 · 视频拼接 · ComfyUI 工作流 · 工作流编排 · 技能插件 · 本地部署 · 离线运行 · 免费开源 · 不花钱 · 拒绝按张计费 · 个人创作者 · 漫剧工作室 · Django · Vue · FFmpeg · MySQL
+
+**English**: AI drama · AI comic · AI animation · short drama · vertical video · AI video generation · text-to-video · image-to-video · first-last frame · reference-to-video · video-to-video · AI storyboard · AI screenplay · script writing · character consistency · art asset · voice cloning · TTS dubbing · one-click film composing · ComfyUI workflow · workflow orchestration · skill plugin · local-first · self-hosted · offline · free open source · no subscription · indie creator · Vue · Django · FFmpeg · MySQL
 
 ---
 
