@@ -226,6 +226,26 @@ export function 匹配资产(画面文本, 资产行们) {
   return 命中
 }
 
+/* 按画面文本里的【形态名】从资产的图们里选图：画面写了「李宝明【战斗装】」就优先挂战斗装那张
+   （图.形态 或 图.标注 命中形态名）。匹配顺序：当前图 → 全部图（含历史，画面点名了就给对形态）
+   → 没写形态或没匹配到 → 第一张当前图。返回图行（可能 null）。
+   替代"无脑取第一张当前图"——一人多套服装时镜头要挂对形态，否则人物不伦不类 */
+export function 选形态图(行, 画面文本) {
+  const 图们 = ((行 && 行.图们) || []).filter(function (g) { return g && g.url })
+  if (!图们.length) return null
+  const 当前们 = 图们.filter(function (g) { return (g.状态 || '当前') === '当前' })
+  const 文 = String(画面文本 || '')
+  const 配们 = 文.match(/【([^】]{1,20})】/g) || []
+  for (let i = 0; i < 配们.length; i++) {
+    const 名 = 配们[i].slice(1, -1).trim()
+    if (!名) continue
+    const 按名 = function (池) { return 池.filter(function (g) { return (g.形态 || '') === 名 || (g.标注 || '') === 名 })[0] }
+    const 命中 = 按名(当前们) || 按名(图们)
+    if (命中) return 命中
+  }
+  return 当前们[0] || 图们[0]
+}
+
 /* 提示词草稿：景别/运镜 + 画面 + 台词 */
 export function 提示词草稿(镜) {
   if (!镜) return ''

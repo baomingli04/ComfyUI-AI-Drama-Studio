@@ -33,6 +33,9 @@ def 提示词扩写(请求):
         需求 = (数据.get('需求') or '').strip()
         引用 = 数据.get('引用') or []
         声音模式 = (数据.get('声音模式') or 'dialogue_only').strip()
+        # 本镜分镜内容（导演台传来：镜号/场次/景别/运镜/画面/台词/时长）：
+        # 扩写必须忠于这镜要拍什么，用户需求只是额外强调，留空也能按分镜写
+        分镜 = (数据.get('分镜') or '').strip()
         # 用户在本页「扩写提示词配置」里写的规则：前端整段传来，原样插入，后端不改一个字
         附加规则 = (数据.get('附加规则') or '').strip()
 
@@ -40,8 +43,8 @@ def 提示词扩写(请求):
             raise ValueError('技能id 必填')
         if 模式 not in ('image', 'single_frame', 'multi_reference'):
             raise ValueError('模式只能是 image / single_frame / multi_reference')
-        if not 需求:
-            raise ValueError('需求（要扩写的内容）不能为空')
+        if not 需求 and not 分镜:
+            raise ValueError('需求（要扩写的内容）不能为空——没有分镜内容时必须写需求')
 
         实例 = 技能.objects.filter(id=技能id).first()
         if 实例 is None:
@@ -49,13 +52,52 @@ def 提示词扩写(请求):
 
         规范 = _读技能规范(实例.目录名, 模式)
 
-        # 统计素材引用（仅命名，不传文件给 LLM）
+        # 统计素材引用（仅命名，不传文件给 LLM）；引用项可带 说明（前端按 url 对回资产元数据：
+        # 人物图/场景图/道具图/音色是谁），让扩写 LLM 知道每张图是什么、外观以哪张为准
         图数 = sum(1 for r in 引用 if (r.get('类型') or '') == 'image')
         视频数 = sum(1 for r in 引用 if (r.get('类型') or '') == 'video')
         音频数 = sum(1 for r in 引用 if (r.get('类型') or '') == 'audio')
 
+        清单们 = []
+        图序 = 视序 = 音序 = 0
+        for r in 引用:
+            类 = (r.get('类型') or '').strip()
+            说 = (r.get('说明') or '').strip()
+            if 类 == 'image':
+                图序 += 1
+                清单们.append('@图%d%s' % (图序, (' = ' + 说) if 说 else ''))
+            elif 类 == 'video':
+                视序 += 1
+                清单们.append('@视频%d%s' % (视序, (' = ' + 说) if 说 else ''))
+            elif 类 == 'audio':
+                音序 += 1
+                清单们.append('@音频%d%s' % (音序, (' = ' + 说) if 说 else ''))
+        有说明 = any('=' in 行 for 行 in 清单们)
+        if 有说明:
+            素材文本 = (
+                '共 图片 %d 张、视频 %d 个、音频 %d 个，逐条如下：\n' % (图数, 视频数, 音频数)
+                + '\n'.join('- ' + 行 for 行 in 清单们)
+                + '\n\n素材用法（标签编号规则以模式规则为准）：\n'
+                '- 说明为「人物图」的（可带【形态】=该角色的某套定装）：该人物的长相、发型、发饰、身材、服装一律取自该图，'
+                '在提示词中用对应标签引用，不得用文字复述其外观特征；多个人物时先认清哪张图是谁，别串人。\n'
+                '- 说明为「场景图」的：空间布局、建筑陈设、时间光线以该图为准，正文只写镜头内的动态与光影变化。\n'
+                '- 说明为「道具图」的：物件外观材质以该图为准。\n'
+                '- 说明为「某角色 的音色」的音频：该角色开口说话时声音用它（对应音频标签），不另用文字描述音色。\n'
+                '- 说明为「类型未知」的：按用户需求里的描述理解其作用。'
+            )
+        else:
+            # 旧客户端/测试页只给数量不给说明：维持原口径
+            素材文本 = ('图片 %d 张（@图1..@图%d）、视频 %d 个（@视频1..@视频%d）、音频 %d 个（@音频1..@音频%d）。'
+                        % (图数, max(图数, 1), 视频数, max(视频数, 1), 音频数, max(音频数, 1)))
+
         模式规则, 替换规则 = _模式与替换规则(模式, 图数)
         声音规则 = _声音规则(声音模式) if 模式 != 'image' else ''
+
+        # 本镜分镜段：镜头要拍的内容（画面/台词/景别等），提示词必须忠于它；
+        # 用户需求是额外强调，两者都让模型看见
+        分镜段 = ''
+        if 分镜:
+            分镜段 = ('\n\n==== 本镜分镜（这镜要拍的内容，提示词必须忠于它，不得偏离或自行加戏）====\n' + 分镜)
 
         系统 = (
             '你是视频/图片生成提示词写手。严格按下面给定的规则写提示词，'
@@ -63,10 +105,9 @@ def 提示词扩写(请求):
             '==== 模式规则 ====\n' + 模式规则 + '\n\n'
             '==== 引用替换规则 ====\n' + 替换规则 + '\n\n'
             + 声音规则 + '\n\n'
-            '==== 素材清单 ====\n'
-            '图片 %d 张（@图1..@图%d）、视频 %d 个（@视频1..@视频%d）、音频 %d 个（@音频1..@音频%d）。\n\n'
-            '==== 技能规范 ====\n' + 规范
-        ) % (图数, max(图数, 1), 视频数, max(视频数, 1), 音频数, max(音频数, 1))
+            '==== 素材清单 ====\n' + 素材文本 + '\n\n'
+            '==== 技能规范 ====\n' + 规范 + 分镜段
+        )
 
         if 附加规则:
             系统 += ('\n\n==== 用户附加规则（最高优先级，与上文冲突时以本节为准）====\n'
@@ -74,7 +115,7 @@ def 提示词扩写(请求):
 
         提示词 = 调用LLM([
             {'role': 'system', 'content': 系统},
-            {'role': 'user', 'content': 需求},
+            {'role': 'user', 'content': 需求 or '按本镜分镜写提示词。'},
         ]).strip()
 
         # 硬替换兜底：输出残留 @引用 时按规则替换
@@ -91,29 +132,24 @@ def 提示词扩写(请求):
         )
 
 
-def _转义(文本):
-    """规范原文里可能出现裸 % （如 size%/tilt），而规范会被拼进 % 格式化字符串，
-    裸 % 会被当成占位符导致 TypeError。读取时先转义成 %%，格式化后还原为单个 %。"""
-    return 文本.replace('%', '%%')
-
 
 def _读技能规范(目录名, 模式):
     根 = settings.SKILL_DIR / 目录名
     parts = []
     技能md = 根 / 'SKILL.md'
     if 技能md.is_file():
-        parts.append(_转义(技能md.read_text(encoding='utf-8', errors='ignore')))
+        parts.append(技能md.read_text(encoding='utf-8', errors='ignore'))
     规范名 = 'ref-en.txt' if 模式 == 'multi_reference' else 'base-en.txt'
     规范文件 = 根 / 'references' / 规范名
     if 规范文件.is_file():
         parts.append('# 规范文件 ' + 规范名 + '\n'
-                     + _转义(规范文件.read_text(encoding='utf-8', errors='ignore')))
+                     + 规范文件.read_text(encoding='utf-8', errors='ignore'))
     else:
         for 名 in ('base-en.txt', 'ref-en.txt'):
             另 = 根 / 'references' / 名
             if 另.is_file():
                 parts.append('# 规范文件 ' + 名 + '\n'
-                             + _转义(另.read_text(encoding='utf-8', errors='ignore')))
+                             + 另.read_text(encoding='utf-8', errors='ignore'))
     if not parts:
         raise ValueError('技能 %s 没有可读取的规范（SKILL.md / references）' % 目录名)
     return '\n\n'.join(parts)

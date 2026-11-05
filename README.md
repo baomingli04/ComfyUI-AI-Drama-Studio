@@ -1,5 +1,7 @@
 # ComfyUI AI 漫剧本地运行系统（AICG Platform / AI Drama Studio)
 
+> **作者**：QQ 13288793 ｜ 微信 b13052782321
+
 ![Local](https://img.shields.io/badge/运行方式-本地纯免费-success) ![ComfyUI](https://img.shields.io/badge/推理后端-ComfyUI-orange) ![Vue](https://img.shields.io/badge/前端-Vue2.7%20·%20Vue3-blue) ![Django](https://img.shields.io/badge/后端-Django%204.2%20·%20DRF-green)
 
 > **💰 本地纯免费**：整套系统跑在你自己的电脑上——数据存本机 MySQL、图和视频用本机 ComfyUI 出、成片用本机 FFmpeg 拼。**没有云服务、没有订阅、没有按张计费，生成多少都不花钱。**

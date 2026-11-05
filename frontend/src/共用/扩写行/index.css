@@ -10,43 +10,106 @@
 .扩写需求 {
   flex: 1;
 }
-.配置区 {
-  width: 100%;
-  margin-top: 10px;
-  padding: 12px;
-  background: #0a0f1a;
+
+/* 扩写配置弹窗：深色卡片，与「技能生成弹窗」同一色板（docs/06 2.1）。
+   非 scoped：el-dialog 的外层节点靠 custom-class 命中，所以样式都收在 .扩写配置弹窗 下，
+   不用裸的 .弹窗头 这类通用名，避免和其他弹窗的样式互相覆盖 */
+.扩写配置弹窗 {
+  background: #0d1424;
   border: 1px solid #1e293b;
-  border-radius: 4px;
+  border-radius: 12px;
+  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
 }
-.配置提示 {
-  color: #94a3b8;
+.扩写配置弹窗 .el-dialog__header {
+  display: none;
+}
+.扩写配置弹窗 .el-dialog__body {
+  padding: 0;
+}
+.扩写配置弹窗 .弹窗头 {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #1e293b;
+}
+.扩写配置弹窗 .弹窗标题 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+.扩写配置弹窗 .弹窗副题 {
+  margin-top: 4px;
   font-size: 12px;
   line-height: 1.7;
-  margin-bottom: 10px;
+  color: #64748b;
+  word-break: break-all;
 }
-.配置按钮行 {
-  margin-top: 12px;
-  text-align: right;
-}
-.配置按钮 {
-  background: #1e293b;
-  color: #cbd5e1;
-  border: 1px solid #334155;
-  border-radius: 4px;
-  padding: 9px 18px;
-  margin-left: 10px;
+.扩写配置弹窗 .弹窗关闭 {
+  margin-left: auto;
+  font-size: 18px;
+  color: #94a3b8;
   cursor: pointer;
+  flex: 0 0 auto;
+}
+.扩写配置弹窗 .弹窗关闭:hover {
+  color: #ef4444;
+}
+.扩写配置弹窗 .弹窗体 {
+  padding: 18px 20px;
+}
+.扩写配置弹窗 .段注 {
+  margin-top: 6px;
   font-size: 12px;
+  color: #64748b;
 }
-.配置按钮:hover {
-  border-color: #475569;
+.扩写配置弹窗 .弹窗底 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid #1e293b;
+  background: #0f172a;
 }
-.配置按钮.主 {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #fff;
+.扩写配置弹窗 .底注 {
+  flex: 1;
+  font-size: 12px;
+  color: #64748b;
 }
-.配置按钮:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+
+/* 引入数据区块（只读，同 技能生成弹窗 里「引入数据」的深色卡片观感） */
+.扩写配置弹窗 .引入块 {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+}
+.扩写配置弹窗 .引入块题 {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+.扩写配置弹窗 .引入块题 i {
+  margin-right: 4px;
+  color: #22c55e;
+}
+.扩写配置弹窗 .引入块数 {
+  margin-left: 8px;
+  padding: 0 8px;
+  background: rgba(34, 197, 94, 0.12);
+  border-radius: 10px;
+  color: #22c55e;
+  font-size: 11px;
+}
+.扩写配置弹窗 .引入块单 {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #1e293b;
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.6;
+  word-break: break-all;
 }

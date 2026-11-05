@@ -510,6 +510,7 @@ export default {
       try {
         // 统一走任务链路（/api/任务/提交 → 文本回复 → 轮询），测试台任务列表可查、多个 AI 内容排队顺序执行
         const 文本 = await 提交AI任务({
+          技能id: this.扩写技能id,
           正向: 需求,
           系统: this.技能引导 || this.页规则
         })
