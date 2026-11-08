@@ -1,0 +1,65 @@
+{
+  "76": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "longest",
+      "scale_to_length": 1024,
+      "background_color": "#000000",
+      "image": [
+        "82",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "图层工具：按宽高比缩放 V2"
+    }
+  },
+  "82": {
+    "inputs": {
+      "image": "7136ab75dad8bef16f7e37b22a21e4b9.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "84": {
+    "inputs": {
+      "model_name": "Qwen3-VL-2B-Instruct",
+      "quantization": "None (FP16)",
+      "attention_mode": "auto",
+      "preset_prompt": "🖼️ Detailed Description",
+      "custom_prompt": "你是一位专业的AI绘画提示词反推专家。请仔细观察这张图片，反推出可用于AI绘画生图的提示词。要求：1) 用中文输出；2) 采用逗号分隔的短语（标签）风格，不要分段、不要编号、不要解释；3) 依次覆盖：主体身份与外貌（种族/性别/年龄/发型发色/五官/体型/肤色/年龄）、服装与配饰、动作与姿态、面部与身体方向、表情与情绪、场景与环境、光线与氛围、镜头与构图（景别/角度/焦距）、画质与风格。4) 忽略无法辨认的文字与水印。5) 只输出提示词本身。",
+      "max_tokens": 768,
+      "keep_model_loaded": true,
+      "seed": 302568340,
+      "image": [
+        "76",
+        0
+      ]
+    },
+    "class_type": "AILab_QwenVL",
+    "_meta": {
+      "title": "QwenVL"
+    }
+  },
+  "301": {
+    "inputs": {
+      "text_0": "小女孩,亚洲人,女孩,小学生,扎着高马尾,黑发,大眼睛,小巧的脸庞,纤细的身体,穿着白色吊带连体衣,双手自然垂下,微微低头看向地面,背景是黑色幕布,室内舞蹈教室,柔和均匀的灯光,明亮清晰的画面质感,写实风,中近景视角,平视拍摄,细节丰富,精致细腻,干净整洁",
+      "text": [
+        "84",
+        0
+      ]
+    },
+    "class_type": "ShowText|pysssss",
+    "_meta": {
+      "title": "反推结果·中文"
+    }
+  }
+}

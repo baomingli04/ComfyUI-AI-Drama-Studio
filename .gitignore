@@ -8,12 +8,14 @@ frontend/_preview/
 __pycache__/
 *.pyc
 
-# ===== 本地媒体资源与运行数据（生成/上传产物，不入库；ComfyUI 工作流保留） =====
+# ===== 本地媒体资源与运行数据（生成/上传产物，不入库） =====
+# 技能与 ComfyUI 工作流随库分发（平台运行必需）；pyc/__pycache__ 由上方全局规则排除
 backend/资源/上传/
 backend/资源/产物/
 backend/资源/OpenMontage/
-backend/资源/技能/
 backend/资源/日志/
+# 嵌套 git 仓库（text-to-image-prompt-optimizer 自带 .git，按 gitlink 处理，内容不入库）
+backend/资源/技能/text-to-image-prompt-optimizer/
 
 # ===== 日志 / 临时 / 本地索引 =====
 *.log

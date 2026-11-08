@@ -1,0 +1,156 @@
+{
+  "9": {
+    "inputs": {
+      "filename_prefix": "z-image",
+      "images": [
+        "65",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "保存图像"
+    }
+  },
+  "62": {
+    "inputs": {
+      "clip_name": "qwen_3_4b.safetensors",
+      "type": "lumina2",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "加载CLIP"
+    }
+  },
+  "63": {
+    "inputs": {
+      "vae_name": "ae.sft"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "加载VAE"
+    }
+  },
+  "64": {
+    "inputs": {
+      "text": "cartoon, anime, illustration, 2d, 3d render, cgi, game asset, painting, drawing, sketch, manga, anime style, character sheet, line art, low quality, blurry, deformed, extra limbs, bad anatomy, watermark, oversaturated, text, signature",
+      "clip": [
+        "62",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "【反向提示词】在这里输入"
+    }
+  },
+  "65": {
+    "inputs": {
+      "samples": [
+        "69",
+        0
+      ],
+      "vae": [
+        "63",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "66": {
+    "inputs": {
+      "unet_name": "z_image_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "UNet加载器"
+    }
+  },
+  "67": {
+    "inputs": {
+      "text": "8K超高清真实摄影，单反相机RAW直出，专业影棚布光，成年真人女性角色摄影造型参考板，纯白干净无影背景，黑色细实线把画面分割成四个独立照片模块，无杂物无文字水印。\n画面右侧占1/2区域为同一女性正面全身照片，站姿自然，完整入镜无裁切；左侧三个小照片模块从上到下依次为同一女性的正面胸像、半侧面胸像、背面胸像，平视机位，无透视变形，清晰展示发型与上半身360°造型。\n所有模块必须是同一位真实成年女性、同一次摄影拍摄、同一写实照片画风，左侧参考小图与右侧全身大图在颜值、发型、妆容、气质、服装上完全统一。皮肤纹理真实自然，毛孔可见，柔光均匀，无强烈阴影，极高画质，无损细节。\n女性五官精致立体，肌肤通透，气质清雅脱俗，明媚动人又带清冷高级感。严禁动漫、插画、线稿、二次元、设定稿、卡通、CG渲染、3D建模、绘画感、平面化，所有画面必须呈现真实皮肤质感与单反实拍照片质感。",
+      "clip": [
+        "62",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "【正向提示词】在这里输入"
+    }
+  },
+  "69": {
+    "inputs": {
+      "seed": 1068389525587956,
+      "steps": 25,
+      "cfg": 4,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1,
+      "model": [
+        "70",
+        0
+      ],
+      "positive": [
+        "67",
+        0
+      ],
+      "negative": [
+        "64",
+        0
+      ],
+      "latent_image": [
+        "81",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "70": {
+    "inputs": {
+      "shift": 3,
+      "model": [
+        "80",
+        0
+      ]
+    },
+    "class_type": "ModelSamplingAuraFlow",
+    "_meta": {
+      "title": "采样算法（AuraFlow）"
+    }
+  },
+  "80": {
+    "inputs": {
+      "lora_name": "Pornmaster_v1_000044700.safetensors",
+      "strength_model": 0,
+      "model": [
+        "66",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "【写实LoRA】Pornmaster_v1 (Z-Image 真人)"
+    }
+  },
+  "81": {
+    "inputs": {
+      "resolution": "1728x576 (3.0)",
+      "batch_size": 1,
+      "width_override": 1024,
+      "height_override": 512
+    },
+    "class_type": "SDXLEmptyLatentSizePicker+",
+    "_meta": {
+      "title": "🔧 Empty Latent Size Picker"
+    }
+  }
+}

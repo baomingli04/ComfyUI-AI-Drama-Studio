@@ -1,0 +1,2293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小说灵感生成器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#f5f6f8;color:#2c2c2c;padding:20px;min-height:100vh}
+.container{max-width:960px;margin:0 auto}
+h1{text-align:center;font-size:26px;margin-bottom:6px;color:#1a1a1a}
+.subtitle{text-align:center;font-size:13px;color:#888;margin-bottom:24px}
+
+/* Mode tabs */
+.mode-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.mode-tab{flex:1;min-width:160px;padding:14px 16px;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;transition:all .2s;background:#fff;text-align:center}
+.mode-tab:hover{border-color:#4a90d9;background:#f8fbff}
+.mode-tab.active{border-color:#4a90d9;background:#4a90d9;color:#fff}
+.mode-tab .mt-icon{font-size:22px;margin-bottom:4px}
+.mode-tab .mt-title{font-size:14px;font-weight:600}
+.mode-tab .mt-desc{font-size:11px;opacity:.7;margin-top:2px}
+
+/* Section card */
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-size:15px;font-weight:600;margin-bottom:12px;color:#333;display:flex;align-items:center;gap:6px}
+.card-title .required{color:#e74c3c;font-size:12px}
+
+/* Genre chips */
+.genre-grid{display:flex;flex-wrap:wrap;gap:8px}
+.genre-chip{padding:8px 14px;border:2px solid #e0e0e0;border-radius:20px;cursor:pointer;font-size:13px;transition:all .15s;background:#fff;user-select:none}
+.genre-chip:hover{border-color:#4a90d9}
+.genre-chip.active{border-color:#4a90d9;background:#e8f1fd;color:#1a5fa3;font-weight:600}
+
+/* Inputs */
+.input-group{margin-bottom:14px}
+.input-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#555}
+.input-group label .req{color:#e74c3c}
+.input-group input,.input-group textarea,.input-group select{width:100%;padding:10px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .15s}
+.input-group input:focus,.input-group textarea:focus,.input-group select:focus{outline:none;border-color:#4a90d9}
+.input-group textarea{resize:vertical;min-height:80px}
+.input-hint{font-size:11px;color:#999;margin-top:4px}
+
+/* Param row */
+.param-row{display:flex;gap:16px;flex-wrap:wrap}
+.param-item{flex:1;min-width:140px}
+.radio-group{display:flex;gap:8px}
+.radio-btn{flex:1;padding:8px 12px;border:2px solid #e0e0e0;border-radius:8px;text-align:center;cursor:pointer;font-size:13px;transition:all .15s;background:#fff;user-select:none}
+.radio-btn:hover{border-color:#4a90d9}
+.radio-btn.active{border-color:#4a90d9;background:#e8f1fd;color:#1a5fa3;font-weight:600}
+
+/* Toggle switch */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.toggle-row .t-label{font-size:13px;font-weight:600;color:#555}
+.switch{position:relative;display:inline-block;width:46px;height:24px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:24px;transition:.2s}
+.slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.switch input:checked + .slider{background:#4a90d9}
+.switch input:checked + .slider:before{transform:translateX(22px)}
+
+/* Generate button */
+.gen-btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;background:#4a90d9;color:#fff;margin-top:8px}
+.gen-btn:hover{background:#357abd}
+.gen-btn:disabled{background:#ccc;cursor:not-allowed}
+.gen-btn.generating{background:#357abd;opacity:.7}
+
+/* Results */
+.results-area{margin-top:20px}
+.result-item{background:#fff;border-radius:12px;padding:20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid #4a90d9}
+.result-item .ri-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.result-item .ri-tag{font-size:12px;padding:3px 10px;border-radius:12px;background:#e8f1fd;color:#1a5fa3;font-weight:600}
+.result-item .ri-actions{display:flex;gap:6px}
+.result-item .ri-actions button{padding:4px 10px;font-size:12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;background:#fff;color:#666;transition:all .15s}
+.result-item .ri-actions button:hover{background:#f5f5f5;border-color:#bbb}
+.result-item .ri-content{font-size:14px;line-height:1.8;color:#333;white-space:pre-wrap}
+.result-item .ri-content h3{font-size:16px;margin:10px 0 6px;color:#1a1a1a}
+.result-item .ri-content h4{font-size:14px;margin:8px 0 4px;color:#555}
+.result-item .ri-content strong{color:#1a1a1a}
+.result-item .ri-content em{color:#888;font-style:normal;font-size:13px}
+.result-item .ri-content blockquote{border-left:3px solid #4a90d9;padding-left:12px;margin:8px 0;color:#555;font-style:italic}
+.result-item .ri-content hr{border:none;border-top:1px solid #eee;margin:12px 0}
+.violation{background:#ffe0e0;color:#c0392b;padding:0 2px;border-radius:3px;font-weight:600}
+
+/* Audit report */
+.audit-report{background:#fff;border-radius:10px;padding:16px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.audit-report h3{font-size:14px;margin-bottom:8px}
+.audit-table{width:100%;font-size:13px;border-collapse:collapse}
+.audit-table th,.audit-table td{border:1px solid #eee;padding:6px 10px;text-align:left}
+.audit-table th{background:#f8f8f8}
+.score-wrap{margin-top:12px}
+.score-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px}
+.score-name{width:80px;flex-shrink:0}
+.score-track{flex:1;height:12px;background:#eee;border-radius:6px;overflow:hidden}
+.score-fill{height:100%;border-radius:6px;transition:width .3s}
+.score-val{width:44px;text-align:right;font-weight:600;flex-shrink:0}
+.score-note{font-size:12px;color:#888;margin-top:4px}
+.audit-legend{font-size:12px;color:#c0392b;margin-top:8px}
+
+/* History & Template */
+.ht-tabs{display:flex;gap:8px;margin-bottom:14px}
+.ht-tab{flex:1;padding:10px;border:2px solid #e0e0e0;border-radius:8px;text-align:center;cursor:pointer;font-size:13px;background:#fff;user-select:none}
+.ht-tab:hover{border-color:#4a90d9}
+.ht-tab.active{border-color:#4a90d9;background:#e8f1fd;color:#1a5fa3;font-weight:600}
+.ht-list{max-height:440px;overflow-y:auto}
+.ht-item{background:#fff;border:1px solid #eee;border-left:4px solid #4a90d9;border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.ht-item .ht-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px}
+.ht-item .ht-title{font-size:14px;font-weight:600;color:#333}
+.ht-item .ht-time{font-size:11px;color:#999;flex-shrink:0}
+.ht-item .ht-preview{font-size:12px;color:#888;line-height:1.6;max-height:50px;overflow:hidden}
+.ht-item .ht-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ht-item .ht-actions button{padding:4px 10px;font-size:12px;border:1px solid #ddd;border-radius:6px;cursor:pointer;background:#fff;color:#666;transition:all .15s}
+.ht-item .ht-actions button:hover{background:#f5f5f5;border-color:#bbb}
+.ht-empty{text-align:center;color:#999;font-size:13px;padding:30px}
+.template-name-input{width:100%;padding:10px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:10px}
+.template-name-input:focus{outline:none;border-color:#4a90d9}
+
+/* Pacing report */
+.pacing-report{background:#fff;border-radius:10px;padding:16px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid #9b59b6}
+.pacing-report h3{font-size:14px;margin-bottom:8px}
+.pacing-score{font-size:32px;font-weight:800;line-height:1.1}
+.pacing-check{font-size:13px;padding:6px 0;border-bottom:1px dashed #eee}
+.pacing-check .pass{color:#27ae60;font-weight:600}
+.pacing-check .fail{color:#e74c3c;font-weight:600}
+.pacing-advice{font-size:12px;color:#666;margin-top:4px;line-height:1.6}
+
+/* Traffic card */
+.traffic-card{background:#fff;border-radius:12px;padding:20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid #e67e22}
+.traffic-card .ri-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.traffic-card .ri-tag{font-size:12px;padding:3px 10px;border-radius:12px;background:#fdebd0;color:#a04000;font-weight:600}
+.traffic-card .ri-content{font-size:14px;line-height:1.8;color:#333;white-space:pre-wrap}
+
+/* Platform bar (global) */
+.platform-bar{background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.platform-bar .pb-label{font-size:13px;font-weight:600;color:#555;white-space:nowrap}
+.platform-bar .radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.platform-bar .radio-btn{padding:6px 14px;border:2px solid #e0e0e0;border-radius:20px;cursor:pointer;font-size:13px;transition:all .15s;background:#fff;user-select:none}
+.platform-bar .radio-btn:hover{border-color:#4a90d9}
+.platform-bar .radio-btn.active{border-color:#4a90d9;background:#e8f1fd;color:#1a5fa3;font-weight:600}
+
+/* Cover mockup */
+.cover-mockup{position:relative;width:200px;height:280px;border-radius:10px;padding:22px 18px;box-shadow:0 6px 18px rgba(0,0,0,.25);overflow:hidden;color:#fff;display:flex;flex-direction:column;justify-content:space-between}
+.cover-mockup .cm-tag{font-size:11px;opacity:.85;letter-spacing:1px}
+.cover-mockup .cm-title{font-size:24px;font-weight:800;line-height:1.25;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+.cover-mockup .cm-sub{font-size:12px;opacity:.9;line-height:1.5}
+.cover-mockup .cm-deco{position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12)}
+.cover-wrap{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.cover-prompt{font-size:12px;color:#666;background:#f7f7f7;border-radius:8px;padding:10px 12px;flex:1;min-width:240px;line-height:1.6}
+.cover-actions{margin-top:10px}
+.cover-actions button{padding:6px 14px;font-size:13px;border:1px solid #4a90d9;background:#4a90d9;color:#fff;border-radius:6px;cursor:pointer}
+.cover-actions button:hover{background:#357abd}
+
+/* Submission */
+.submission-card .ri-content table{width:100%;font-size:13px;border-collapse:collapse;margin-top:6px}
+.submission-card .ri-content th,.submission-card .ri-content td{border:1px solid #eee;padding:6px 8px;text-align:left;vertical-align:top}
+.submission-card .ri-content th{background:#f8f8f8}
+
+/* Newbook panel */
+.nb-note{font-size:12px;color:#888;margin-top:6px}
+
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;background:#333;color:#fff;border-radius:8px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* Hidden */
+.hidden{display:none!important}
+
+/* JS status indicator */
+.js-status{position:fixed;bottom:10px;left:10px;padding:4px 10px;border-radius:4px;font-size:11px;z-index:9999}
+
+/* Responsive */
+@media(max-width:640px){
+  .mode-tab{min-width:140px}
+  .param-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📖 小说灵感生成器</h1>
+  <p class="subtitle">选模式 → 选赛道 → 填信息 → 点生成（含合规审核 · 热门元素 · 引流文案 · 续写 · 历史存档 · 模板 · 节奏检查 · 平台风格 · 新书配套）</p>
+
+  <!-- Global Platform Style Bar -->
+  <div class="platform-bar">
+    <span class="pb-label">🎨 目标平台风格</span>
+    <div class="radio-group" id="platformSel">
+      <div class="radio-btn active" data-val="tongyong">通用</div>
+      <div class="radio-btn" data-val="fanqie">番茄</div>
+      <div class="radio-btn" data-val="qidian">起点</div>
+      <div class="radio-btn" data-val="jjwxc">晋江</div>
+      <div class="radio-btn" data-val="qimao">七猫</div>
+      <div class="radio-btn" data-val="zhihu">知乎</div>
+    </div>
+  </div>
+
+  <!-- Mode Tabs -->
+  <div class="mode-tabs" id="modeTabs">
+    <div class="mode-tab active" data-mode="inspiration">
+      <div class="mt-icon">💡</div>
+      <div class="mt-title">灵感综合生成</div>
+      <div class="mt-desc">故事大纲+角色+世界观</div>
+    </div>
+    <div class="mode-tab" data-mode="opening">
+      <div class="mt-icon">✍️</div>
+      <div class="mt-title">爽文开头生成</div>
+      <div class="mt-desc">多风格开头+引流文案</div>
+    </div>
+    <div class="mode-tab" data-mode="golden3">
+      <div class="mt-icon">🏆</div>
+      <div class="mt-title">黄金三章配套</div>
+      <div class="mt-desc">人设+世界观+三章爽点</div>
+    </div>
+    <div class="mode-tab" data-mode="bestseller">
+      <div class="mt-icon">🔥</div>
+      <div class="mt-title">爆款对标生成</div>
+      <div class="mt-desc">拆解爆款+同风格仿写</div>
+    </div>
+    <div class="mode-tab" data-mode="continue">
+      <div class="mt-icon">📝</div>
+      <div class="mt-title">章节续写</div>
+      <div class="mt-desc">粘贴章节+续写草案</div>
+    </div>
+    <div class="mode-tab" data-mode="history">
+      <div class="mt-icon">📚</div>
+      <div class="mt-title">历史·模板</div>
+      <div class="mt-desc">找回记录+套用模板</div>
+    </div>
+    <div class="mode-tab" data-mode="newbook">
+      <div class="mt-icon">📦</div>
+      <div class="mt-title">新书配套</div>
+      <div class="mt-desc">简介+封面+投稿</div>
+    </div>
+  </div>
+
+  <!-- ===== Mode 1: 灵感综合生成 ===== -->
+  <div id="panel-inspiration" class="mode-panel">
+    <div class="card">
+      <div class="card-title">选择题材赛道</div>
+      <div class="genre-grid" id="genreGrid-inspiration">
+        <div class="genre-chip" data-genre="zhuixu" data-mode="inspiration">🏢 都市赘婿/战神返乡</div>
+        <div class="genre-chip" data-genre="qiandao" data-mode="inspiration">⚔️ 玄幻签到/无敌流</div>
+        <div class="genre-chip" data-genre="moshi" data-mode="inspiration">🧟 末世囤货/异能</div>
+        <div class="genre-chip" data-genre="chuanshu" data-mode="inspiration">📚 穿书/快穿/反派</div>
+        <div class="genre-chip" data-genre="tianchong" data-mode="inspiration">💕 甜宠/追妻火葬场</div>
+        <div class="genre-chip" data-genre="niandai" data-mode="inspiration">🌾 年代文/种田</div>
+        <div class="genre-chip" data-genre="chongsheng" data-mode="inspiration">🔄 重生/穿越</div>
+        <div class="genre-chip" data-genre="xuanyi" data-mode="inspiration">🔍 悬疑/西幻</div>
+      </div>
+    </div>
+    <div class="card" id="subgenreCard-inspiration" style="display:none">
+      <div class="card-title">选择方向（可选，不选则自动分配）</div>
+      <div class="genre-grid" id="subgenreGrid-inspiration"></div>
+    </div>
+    <div class="card">
+      <div class="toggle-row">
+        <span class="t-label">🔥 植入热门元素（提升爆款概率）</span>
+        <label class="switch"><input type="checkbox" id="hotToggle-inspiration"><span class="slider"></span></label>
+      </div>
+      <div class="genre-grid" id="hotGrid-inspiration" style="display:none"></div>
+    </div>
+    <div class="card">
+      <div class="param-row">
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">生成数量</label>
+          <div class="radio-group" id="qty-inspiration" data-name="qty-inspiration">
+            <div class="radio-btn active" data-val="3">3个方向</div>
+            <div class="radio-btn" data-val="5">5个方向</div>
+          </div>
+        </div>
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">导出格式</label>
+          <div class="radio-group" id="fmt-inspiration" data-name="fmt-inspiration">
+            <div class="radio-btn active" data-val="display">页面展示</div>
+            <div class="radio-btn" data-val="md">下载MD</div>
+            <div class="radio-btn" data-val="copy">展示并复制</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="input-group">
+        <label>补充要求（可选）</label>
+        <textarea id="extra-inspiration" placeholder="比如：主角要女性、带空间金手指、偏轻松搞笑风格……"></textarea>
+      </div>
+    </div>
+    <button class="gen-btn" id="btn-inspiration">🚀 生成灵感方案</button>
+  </div>
+
+  <!-- ===== Mode 2: 爽文开头生成 ===== -->
+  <div id="panel-opening" class="mode-panel hidden">
+    <div class="card">
+      <div class="card-title">主角姓名 <span class="required">*必填</span></div>
+      <div class="input-group">
+        <input type="text" id="protagonistName" placeholder="比如：林安、苏晚、陈默……">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">选择题材赛道 <span class="required">*必选</span></div>
+      <div class="genre-grid" id="genreGrid-opening">
+        <div class="genre-chip" data-genre="zhuixu" data-mode="opening">🏢 都市赘婿/战神返乡</div>
+        <div class="genre-chip" data-genre="qiandao" data-mode="opening">⚔️ 玄幻签到/无敌流</div>
+        <div class="genre-chip" data-genre="moshi" data-mode="opening">🧟 末世囤货/异能</div>
+        <div class="genre-chip" data-genre="chuanshu" data-mode="opening">📚 穿书/快穿/反派</div>
+        <div class="genre-chip" data-genre="tianchong" data-mode="opening">💕 甜宠/追妻火葬场</div>
+        <div class="genre-chip" data-genre="niandai" data-mode="opening">🌾 年代文/种田</div>
+        <div class="genre-chip" data-genre="chongsheng" data-mode="opening">🔄 重生/穿越</div>
+        <div class="genre-chip" data-genre="xuanyi" data-mode="opening">🔍 悬疑/西幻</div>
+      </div>
+    </div>
+    <div class="card" id="subgenreCard-opening" style="display:none">
+      <div class="card-title">选择方向（可选）</div>
+      <div class="genre-grid" id="subgenreGrid-opening"></div>
+    </div>
+    <div class="card">
+      <div class="toggle-row">
+        <span class="t-label">🔥 植入热门元素（提升爆款概率）</span>
+        <label class="switch"><input type="checkbox" id="hotToggle-opening"><span class="slider"></span></label>
+      </div>
+      <div class="genre-grid" id="hotGrid-opening" style="display:none"></div>
+    </div>
+    <div class="card">
+      <div class="toggle-row">
+        <span class="t-label">📣 生成配套引流文案（小红书/抖音/快手）</span>
+        <label class="switch"><input type="checkbox" id="trafficToggle"><span class="slider"></span></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="param-row">
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">生成数量</label>
+          <div class="radio-group" id="qty-opening" data-name="qty-opening">
+            <div class="radio-btn active" data-val="3">3个开头</div>
+            <div class="radio-btn" data-val="5">5个开头</div>
+          </div>
+        </div>
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">单篇字数</label>
+          <div class="radio-group" id="wc-opening" data-name="wc-opening">
+            <div class="radio-btn active" data-val="100">~100字</div>
+            <div class="radio-btn" data-val="200">~200字</div>
+          </div>
+        </div>
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">导出格式</label>
+          <div class="radio-group" id="fmt-opening" data-name="fmt-opening">
+            <div class="radio-btn active" data-val="display">页面展示</div>
+            <div class="radio-btn" data-val="md">下载MD</div>
+            <div class="radio-btn" data-val="copy">展示并复制</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="input-group">
+        <label>补充要求（可选）</label>
+        <textarea id="extra-opening" placeholder="比如：开头风格偏悬念反转、配角有个嚣张情敌……"></textarea>
+      </div>
+    </div>
+    <button class="gen-btn" id="btn-opening" disabled>🚀 生成爽文开头</button>
+    <p id="openingHint" style="text-align:center;color:#e74c3c;font-size:13px;margin-top:8px">请填写主角姓名并选择赛道</p>
+  </div>
+
+  <!-- ===== Mode 3: 黄金三章配套 ===== -->
+  <div id="panel-golden3" class="mode-panel hidden">
+    <div class="card">
+      <div class="card-title">选择题材赛道 <span class="required">*必选</span></div>
+      <div class="genre-grid" id="genreGrid-golden3">
+        <div class="genre-chip" data-genre="zhuixu" data-mode="golden3">🏢 都市赘婿/战神返乡</div>
+        <div class="genre-chip" data-genre="qiandao" data-mode="golden3">⚔️ 玄幻签到/无敌流</div>
+        <div class="genre-chip" data-genre="moshi" data-mode="golden3">🧟 末世囤货/异能</div>
+        <div class="genre-chip" data-genre="chuanshu" data-mode="golden3">📚 穿书/快穿/反派</div>
+        <div class="genre-chip" data-genre="tianchong" data-mode="golden3">💕 甜宠/追妻火葬场</div>
+        <div class="genre-chip" data-genre="niandai" data-mode="golden3">🌾 年代文/种田</div>
+        <div class="genre-chip" data-genre="chongsheng" data-mode="golden3">🔄 重生/穿越</div>
+        <div class="genre-chip" data-genre="xuanyi" data-mode="golden3">🔍 悬疑/西幻</div>
+      </div>
+    </div>
+    <div class="card" id="subgenreCard-golden3" style="display:none">
+      <div class="card-title">选择方向（可选）</div>
+      <div class="genre-grid" id="subgenreGrid-golden3"></div>
+    </div>
+    <div class="card">
+      <div class="toggle-row">
+        <span class="t-label">🔥 植入热门元素（提升爆款概率）</span>
+        <label class="switch"><input type="checkbox" id="hotToggle-golden3"><span class="slider"></span></label>
+      </div>
+      <div class="genre-grid" id="hotGrid-golden3" style="display:none"></div>
+    </div>
+    <div class="card">
+      <div class="input-group">
+        <label>主角姓名（可选，不填自动生成）</label>
+        <input type="text" id="protagonistName3" placeholder="比如：沈舟、姜衍……">
+      </div>
+      <div class="input-group">
+        <label>补充要求（可选）</label>
+        <textarea id="extra-golden3" placeholder="比如：金手指设定偏好、CP方向、特殊世界观要求……"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="param-row">
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">导出格式</label>
+          <div class="radio-group" id="fmt-golden3" data-name="fmt-golden3">
+            <div class="radio-btn active" data-val="display">页面展示</div>
+            <div class="radio-btn" data-val="md">下载MD</div>
+            <div class="radio-btn" data-val="copy">展示并复制</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="gen-btn" id="btn-golden3" disabled>🚀 生成黄金三章框架</button>
+    <p id="golden3Hint" style="text-align:center;color:#e74c3c;font-size:13px;margin-top:8px">请选择题材赛道</p>
+  </div>
+
+  <!-- ===== Mode 4: 爆款对标生成 ===== -->
+  <div id="panel-bestseller" class="mode-panel hidden">
+    <div class="card">
+      <div class="card-title">粘贴爆款开头 / 输入书名 <span class="required">*必填</span></div>
+      <div class="input-group">
+        <textarea id="bestsellerInput" rows="6" placeholder="粘贴一段爆款网文开头，或者输入书名（如：赘婿归来、签到万年……）"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">选择赛道（可选，不选自动识别）</div>
+      <div class="genre-grid" id="genreGrid-bestseller">
+        <div class="genre-chip" data-genre="zhuixu" data-mode="bestseller">🏢 都市赘婿/战神返乡</div>
+        <div class="genre-chip" data-genre="qiandao" data-mode="bestseller">⚔️ 玄幻签到/无敌流</div>
+        <div class="genre-chip" data-genre="moshi" data-mode="bestseller">🧟 末世囤货/异能</div>
+        <div class="genre-chip" data-genre="chuanshu" data-mode="bestseller">📚 穿书/快穿/反派</div>
+        <div class="genre-chip" data-genre="tianchong" data-mode="bestseller">💕 甜宠/追妻火葬场</div>
+        <div class="genre-chip" data-genre="niandai" data-mode="bestseller">🌾 年代文/种田</div>
+        <div class="genre-chip" data-genre="chongsheng" data-mode="bestseller">🔄 重生/穿越</div>
+        <div class="genre-chip" data-genre="xuanyi" data-mode="bestseller">🔍 悬疑/西幻</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="toggle-row">
+        <span class="t-label">🔥 植入热门元素（提升爆款概率）</span>
+        <label class="switch"><input type="checkbox" id="hotToggle-bestseller"><span class="slider"></span></label>
+      </div>
+      <div class="genre-grid" id="hotGrid-bestseller" style="display:none"></div>
+    </div>
+    <div class="card">
+      <div class="param-row">
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">仿写数量</label>
+          <div class="radio-group" id="qty-bestseller" data-name="qty-bestseller">
+            <div class="radio-btn active" data-val="3">3个版本</div>
+            <div class="radio-btn" data-val="5">5个版本</div>
+          </div>
+        </div>
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">导出格式</label>
+          <div class="radio-group" id="fmt-bestseller" data-name="fmt-bestseller">
+            <div class="radio-btn active" data-val="display">页面展示</div>
+            <div class="radio-btn" data-val="md">下载MD</div>
+            <div class="radio-btn" data-val="copy">展示并复制</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="gen-btn" id="btn-bestseller" disabled>🚀 拆解并仿写</button>
+    <p id="bestsellerHint" style="text-align:center;color:#e74c3c;font-size:13px;margin-top:8px">请粘贴爆款开头或输入书名</p>
+  </div>
+
+  <!-- ===== Mode 5: 章节续写 ===== -->
+  <div id="panel-continue" class="mode-panel hidden">
+    <div class="card">
+      <div class="card-title">粘贴已有章节内容 <span class="required">*必填</span></div>
+      <div class="input-group">
+        <textarea id="chapterPaste" rows="7" placeholder="把写好的上一章（或片段）粘贴到这里。系统会读取它作为上下文，生成下一段续写草案（含冲突点+结尾钩子）。"></textarea>
+        <div class="input-hint">提示：纯前端模板续写会基于下方「赛道风格」生成结构草案，无法真正理解你粘贴的剧情。如需 AI 读懂原文续写，请用对话里的 skill 发送这段内容。</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">选择续写风格赛道 <span class="required">*必选</span></div>
+      <div class="genre-grid" id="genreGrid-continue">
+        <div class="genre-chip" data-genre="zhuixu" data-mode="continue">🏢 都市赘婿/战神返乡</div>
+        <div class="genre-chip" data-genre="qiandao" data-mode="continue">⚔️ 玄幻签到/无敌流</div>
+        <div class="genre-chip" data-genre="moshi" data-mode="continue">🧟 末世囤货/异能</div>
+        <div class="genre-chip" data-genre="chuanshu" data-mode="continue">📚 穿书/快穿/反派</div>
+        <div class="genre-chip" data-genre="tianchong" data-mode="continue">💕 甜宠/追妻火葬场</div>
+        <div class="genre-chip" data-genre="niandai" data-mode="continue">🌾 年代文/种田</div>
+        <div class="genre-chip" data-genre="chongsheng" data-mode="continue">🔄 重生/穿越</div>
+        <div class="genre-chip" data-genre="xuanyi" data-mode="continue">🔍 悬疑/西幻</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="param-row">
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">续写字数</label>
+          <div class="radio-group" id="wc-continue" data-name="wc-continue">
+            <div class="radio-btn active" data-val="1000">~1000字</div>
+            <div class="radio-btn" data-val="2000">~2000字</div>
+          </div>
+        </div>
+        <div class="param-item">
+          <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;color:#555">导出格式</label>
+          <div class="radio-group" id="fmt-continue" data-name="fmt-continue">
+            <div class="radio-btn active" data-val="display">页面展示</div>
+            <div class="radio-btn" data-val="md">下载MD</div>
+            <div class="radio-btn" data-val="copy">展示并复制</div>
+          </div>
+        </div>
+      </div>
+      <div class="toggle-row" style="margin-top:12px">
+        <span class="t-label">🔒 保持原有人设/世界观不变（不引入新设定）</span>
+        <label class="switch"><input type="checkbox" id="keepSetting"><span class="slider"></span></label>
+      </div>
+    </div>
+    <button class="gen-btn" id="btn-continue" disabled>🚀 生成续写草案</button>
+    <p id="continueHint" style="text-align:center;color:#e74c3c;font-size:13px;margin-top:8px">请粘贴章节内容并选择赛道</p>
+  </div>
+
+  <!-- ===== 历史 & 模板 ===== -->
+  <div id="panel-history" class="mode-panel hidden">
+    <div class="ht-tabs">
+      <div class="ht-tab active" data-ht="history">📜 生成历史</div>
+      <div class="ht-tab" data-ht="templates">💾 我的模板</div>
+    </div>
+    <div id="htHistoryPanel">
+      <div class="card">
+        <div class="card-title">📜 生成历史（自动保存，最多50条）</div>
+        <div class="ht-list" id="historyList"></div>
+      </div>
+    </div>
+    <div id="htTemplatePanel" class="hidden">
+      <div class="card">
+        <div class="card-title">💾 保存当前选择为模板</div>
+        <input class="template-name-input" id="templateName" placeholder="给这套参数起个名字，如：末世女主空间搞笑">
+        <button class="gen-btn" id="btnSaveTemplate" style="margin-top:0">💾 保存当前参数为模板</button>
+        <div class="input-hint">保存后，下次直接在「我的模板」里一键套用，不用重复选赛道/爽点/数量。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">💾 我的模板</div>
+        <div class="ht-list" id="templateList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 新书配套（简介+封面+投稿） ===== -->
+  <div id="panel-newbook" class="mode-panel hidden">
+    <div class="card">
+      <div class="input-group">
+        <label>书名（可选，不填自动生成）</label>
+        <input type="text" id="nbTitle" placeholder="比如：赘婿归来、签到万年、末世女皇……">
+      </div>
+      <div class="input-group">
+        <label>主角姓名（可选，不填自动生成）</label>
+        <input type="text" id="nbHero" placeholder="比如：林安、苏晚……">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">选择题材赛道 <span class="required">*必选</span></div>
+      <div class="genre-grid" id="genreGrid-newbook">
+        <div class="genre-chip" data-genre="zhuixu" data-mode="newbook">🏢 都市赘婿/战神返乡</div>
+        <div class="genre-chip" data-genre="qiandao" data-mode="newbook">⚔️ 玄幻签到/无敌流</div>
+        <div class="genre-chip" data-genre="moshi" data-mode="newbook">🧟 末世囤货/异能</div>
+        <div class="genre-chip" data-genre="chuanshu" data-mode="newbook">📚 穿书/快穿/反派</div>
+        <div class="genre-chip" data-genre="tianchong" data-mode="newbook">💕 甜宠/追妻火葬场</div>
+        <div class="genre-chip" data-genre="niandai" data-mode="newbook">🌾 年代文/种田</div>
+        <div class="genre-chip" data-genre="chongsheng" data-mode="newbook">🔄 重生/穿越</div>
+        <div class="genre-chip" data-genre="xuanyi" data-mode="newbook">🔍 悬疑/西幻</div>
+      </div>
+      <p class="nb-note">💡 上方「目标平台风格」会一并影响简介语气与投稿推荐。</p>
+    </div>
+    <div class="card" id="subgenreCard-newbook" style="display:none">
+      <div class="card-title">选择方向（可选）</div>
+      <div class="genre-grid" id="subgenreGrid-newbook"></div>
+    </div>
+    <div class="card">
+      <div class="input-group">
+        <label>核心卖点 / 一句话梗概（可选）</label>
+        <textarea id="nbSelling" placeholder="比如：主角隐藏身份被全家轻视，直到一场宴会揭露他是首富之子……"></textarea>
+      </div>
+    </div>
+    <button class="gen-btn" id="btn-newbook" disabled>🚀 生成新书配套（简介+封面+投稿）</button>
+    <p id="newbookHint" style="text-align:center;color:#e74c3c;font-size:13px;margin-top:8px">请选择题材赛道</p>
+  </div>
+
+  <!-- Results Area -->
+  <div class="results-area" id="resultsArea"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="js-status" id="jsStatus" style="background:#fff3cd;color:#856404">JS加载中…</div>
+
+<script>
+(function() {
+'use strict';
+
+// ============ DATA: 8大热门赛道 ============
+var GENRES = {
+  zhuixu: {
+    name: '都市赘婿/战神返乡', icon: '🏢',
+    template: '三年隐忍 → 当众打脸 → 丈母娘/妻子反差 → 身份揭露 → 实力碾压',
+    nodes: ['三年隐忍','当众打脸','丈母娘/妻子反差','身份揭露','实力碾压'],
+    maleLead: '隐忍型/低调王者/全能隐藏实力',
+    maleTag: '废婿→龙王/战神/神医/财阀少主',
+    femaleLead: '高冷傲娇→追悔莫及，或始终暗中信任男主的温柔型',
+    villain: '势利丈母娘、嚣张情敌、家族纨绔、商业对手',
+    goldenFinger: '隐藏身份（财阀/军中/医道传承）、神秘师父、战神血脉',
+    worldRule: '现代都市背景，暗藏地下势力格局。权力层级：豪门家族 > 商业集团 > 地下势力 > 普通人',
+    conflict: '主角隐藏身份的约束 vs 需要出手保护身边人的冲动',
+    variants: ['财阀少主隐藏身份','退役兵王回城','神医传人入赘','商战之王潜伏'],
+    openingStyles: ['悬念反转型','高燃冲突型','冷峻叙事型'],
+    g3c: {
+      ch1: '赘婿被全家羞辱 → 隐藏身份暗示 → 钩子：一个电话暴露身份冰山一角',
+      ch2: '丈母娘介绍"优秀女婿"候选人 → 主角被当空气 → 候选人挑衅 → 主角一句话让对方公司股价暴跌 → 钩子：女主看到全程',
+      ch3: '家族宴会 → 族长当众宣布主角"不配" → 主角真实身份揭露 → 全场跪 → 钩子：更大的家族找上门'
+    }
+  },
+  qiandao: {
+    name: '玄幻签到/无敌流', icon: '⚔️',
+    template: '低调签到 → 积累碾压 → 同辈震惊 → 长老折服 → 一拳秒杀',
+    nodes: ['低调签到','积累碾压','同辈震惊','长老折服','一拳秒杀'],
+    maleLead: '佛系/懒散/低调但无敌',
+    maleTag: '废柴弟子→签到万年→无敌至尊',
+    femaleLead: '宗门圣女/天才少女，被主角实力吸引',
+    villain: '嚣张师兄、天才对手、敌对宗门少主、远古封印魔物',
+    goldenFinger: '签到系统（签到地点越珍贵奖励越大）、无敌血脉、远古传承',
+    worldRule: '修炼体系：练气→筑基→金丹→元婴→化神→渡劫→大乘→飞升。宗门格局：圣地>大宗>中宗>小宗>散修',
+    conflict: '签到地点品级决定奖励品级（废墟→普通→稀有→传说→神话）',
+    variants: ['废墟签到获传承','宗门藏经阁签到','禁地签到得神功','万界签到系统'],
+    openingStyles: ['戏谑吐槽型','悬念反转型','冷峻叙事型'],
+    g3c: {
+      ch1: '废柴弟子被分到最差住处 → 签到系统激活 → 首次签到获奖励 → 钩子：发现住处竟是远古禁地',
+      ch2: '师兄抢夺资源 → 主角签到获得的功法碾压 → 师兄震惊 → 钩子：宗门大比公告',
+      ch3: '宗门大比 → 主角一招秒杀种子选手 → 长老折服 → 钩子：敌对宗门来袭'
+    }
+  },
+  moshi: {
+    name: '末世囤货/异能', icon: '🧟',
+    template: '重生预知 → 疯狂囤货 → 末世降临 → 异能觉醒 → 建立避难所',
+    nodes: ['重生预知','疯狂囤货','末世降临','异能觉醒','建立避难所'],
+    maleLead: '冷静理智/重生先知/异能觉醒者',
+    maleTag: '末世倒霉蛋→避难所领袖',
+    femaleLead: '前世战友/异能互补者/忠诚追随者',
+    villain: '前世仇人、掠夺者首领、人性泯灭的幸存者、变异体Boss',
+    goldenFinger: '重生记忆（知道物资点/异能觉醒点/安全路线）、空间能力（储物）、异能觉醒',
+    worldRule: '末世类型：丧尸/异变/天灾/外星入侵/灵气复苏变异。异能分级：F→E→D→C→B→A→S→SS→SSS。核心资源：食物/药品/武器/晶核',
+    conflict: '安全区等级：流浪者→小型据点→中型避难所→大型基地→军事要塞',
+    variants: ['丧尸末世+空间','天灾末世+预知','异变末世+异能','灵气复苏+囤积'],
+    openingStyles: ['倒叙震撼型','悬念反转型','高燃冲突型'],
+    g3c: {
+      ch1: '重生回到末世前30天 → 疯狂采购囤货 → 空间能力觉醒 → 钩子：倒计时7天',
+      ch2: '末世爆发 → 邻居求上门 → 主角冷漠拒绝 → 异能觉醒 → 钩子：变异体靠近',
+      ch3: '变异体围攻楼栋 → 主角异能全开碾压 → 建立第一个安全据点 → 钩子：军队残部求合作'
+    }
+  },
+  chuanshu: {
+    name: '穿书/快穿/反派', icon: '📚',
+    template: '穿书/进入副本 → 系统任务 → 偏离原剧情 → 改写角色命运 → 世界线重构',
+    nodes: ['穿书/进入副本','系统任务','偏离原剧情','改写角色命运','世界线重构'],
+    maleLead: '知道剧情的"读者"/任务执行者',
+    maleTag: '炮灰/路人→剧情改写者',
+    femaleLead: '原著反派/原著主角/被虐配角',
+    villain: '原著Boss、系统背后的操控者、其他穿书者',
+    goldenFinger: '剧情预知（知道原著走向）、快穿系统、任务奖励',
+    worldRule: '快穿结构：每个世界有独立设定（古代/现代/星际/末世等），系统统一管理。任务类型：攻略/逆袭/洗白/救赎/改变结局',
+    conflict: '偏离原著剧情程度越大，任务奖励越高，但世界崩坏风险也越大',
+    variants: ['穿成反派洗白','穿成炮灰逆袭','快穿攻略任务','穿成白月光救赎'],
+    openingStyles: ['戏谑吐槽型','倒叙震撼型','悬念反转型'],
+    g3c: {
+      ch1: '穿成炮灰/反派 → 系统发布任务 → 偏离原著第一步 → 钩子：原著主角出场',
+      ch2: '原著主角按剧情行动 → 主角提前截胡 → 剧情偏离 → 钩子：被偏离的角色产生自我意识',
+      ch3: '关键剧情节点 → 主角彻底改写走向 → 任务完成 → 钩子：系统背后的真相暗示'
+    }
+  },
+  tianchong: {
+    name: '甜宠/追妻火葬场', icon: '💕',
+    template: '男主高冷疏离 → 女主心冷离开 → 男主追悔 → 追妻火葬场 → 甜蜜HE',
+    nodes: ['男主高冷疏离','女主心冷离开','男主追悔','追妻火葬场','甜蜜HE'],
+    maleLead: '高冷/傲娇/占有欲强→追妻时卑微可怜',
+    maleTag: '总裁/影帝/将军→忠犬',
+    femaleLead: '隐忍→觉醒→决绝→心软',
+    femaleTag: '替身/原配/白月光→独立女性',
+    villain: '白月光/绿茶/心机配角、阻挠在一起的家族',
+    goldenFinger: '女主重生记忆（知道被辜负的结局，这次不再卑微）/读心术/情感系统',
+    worldRule: '背景可适配：现代都市/娱乐圈/古代宅斗/校园/职场。感情线是唯一主线，所有冲突服务于情感转折',
+    conflict: '情感节奏：虐（前30%）→ 追（中50%）→ 甜（后20%）',
+    variants: ['总裁追妻','影帝追妻','将军追妻','学神追妻'],
+    openingStyles: ['高燃冲突型','悬念反转型','冷峻叙事型'],
+    g3c: {
+      ch1: '女主在男主身边最后一天 → 默默离开 → 男主不以为意 → 钩子：男主发现女主真的走了',
+      ch2: '男主开始不习惯 → 调查女主去向 → 发现自己亏欠多少 → 钩子：女主身边出现新的人',
+      ch3: '男主追到女主面前 → 被冷漠拒绝 → 火葬场开始 → 钩子：女主隐藏的秘密'
+    }
+  },
+  niandai: {
+    name: '年代文/种田', icon: '🌾',
+    template: '穿越/重生到年代 → 利用现代知识搞钱 → 打脸极品亲戚 → 带领全家致富 → 时代赢家',
+    nodes: ['穿越到年代','利用现代知识搞钱','打脸极品亲戚','带领全家致富','时代赢家'],
+    maleLead: '勤劳聪明/会来事/有现代头脑',
+    maleTag: '农村青年/知青→时代弄潮儿',
+    femaleLead: '老实可靠的伴侣/一起创业的伙伴',
+    villain: '极品婆婆/大伯嫂/嫉妒的邻居/刁难的村干部',
+    goldenFinger: '现代知识（recipes/技术/商业思维）、空间（储物/种菜）、重生预知（知道时代机遇）',
+    worldRule: '时代背景：50-90年代中国农村/城镇，物资匮乏，票证制度。经济体系：工分→个体户→乡镇企业→下海经商',
+    conflict: '时代限制 vs 主角的现代思维。关键节点：包产到户、恢复高考、改革开放、下海潮',
+    variants: ['六零农村搞养殖','七零知青做生意','八零下海经商','年代空间种田'],
+    openingStyles: ['戏谑吐槽型','悬念反转型','冷峻叙事型'],
+    g3c: {
+      ch1: '穿越到六零/七零 → 家徒四壁 → 用现代知识做第一笔小生意 → 钩子：被极品亲戚盯上',
+      ch2: '极品亲戚闹事 → 主角用智慧和钱反击 → 全村震惊 → 钩子：更大的商机出现',
+      ch3: '扩大经营 → 带领全家致富 → 打脸所有看不起的人 → 钩子：时代机遇降临'
+    }
+  },
+  chongsheng: {
+    name: '重生/穿越', icon: '🔄',
+    template: '前世悲剧 → 重生/穿越 → 提前布局 → 改写命运 → 终极清算',
+    nodes: ['前世悲剧','重生/穿越','提前布局','改写命运','终极清算'],
+    maleLead: '带着前世记忆的复仇者/改命者',
+    maleTag: '受害者→幕后操盘手',
+    femaleLead: '前世错过的人/新盟友/前世敌人转盟友',
+    villain: '前世害主角的人、假白莲花、背叛者、新的敌人',
+    goldenFinger: '前世记忆（人事/事件/机遇）、重生时获得的异能/空间',
+    worldRule: '背景可适配：现代/古代/修仙/末世/星际。蝴蝶效应——主角的每个改变都会引发连锁反应',
+    conflict: '改变过大可能触发"时间修正"，前世记忆逐渐模糊',
+    variants: ['重生复仇','穿越改命','重生弥补遗憾','穿越成配角翻盘'],
+    openingStyles: ['倒叙震撼型','高燃冲突型','悬念反转型'],
+    g3c: {
+      ch1: '前世死亡瞬间 → 重生醒来 → 确认时间节点 → 钩子：前世仇人就在眼前',
+      ch2: '提前布局截胡 → 仇人计划落空 → 暗爽 → 钩子：蝴蝶效应引发新变数',
+      ch3: '关键事件改写 → 前世遗憾弥补 → 实力碾压 → 钩子：更大的阴谋浮出水面'
+    }
+  },
+  xuanyi: {
+    name: '悬疑/西幻', icon: '🔍',
+    template: '诡异事件 → 线索追寻 → 层层反转 → 真相揭露 → 更大谜团',
+    nodes: ['诡异事件','线索追寻','层层反转','真相揭露','更大谜团'],
+    maleLead: '天才推理者/异常事件调查员/身怀秘密的旅人',
+    maleTag: '顾问/探员/法师→真相揭露者',
+    femaleLead: '忠诚助手/能力互补者/身份可疑的盟友',
+    villain: '幕后操盘手、伪善权威、不可名状的存在、双面间谍',
+    goldenFinger: '特殊感知能力/前FBI profiler经验/魔法天赋/神秘血脉',
+    worldRule: '悬疑向：现代都市/封闭空间/历史悬案，核心是逻辑推理和线索链。西幻向：魔法体系（元素/符文/召唤）、种族（人/精灵/矮人/兽人/龙）、教廷与王权',
+    conflict: '每个线索必须合理，反转不能靠"机械降神"。氛围管理：悬疑感递进，每个反转都升级危机级别',
+    variants: ['都市连环案','密室推理','魔法学院悬疑','异世界冒险解谜'],
+    openingStyles: ['冷峻叙事型','悬念反转型','倒叙震撼型'],
+    g3c: {
+      ch1: '诡异案件发生 → 主角介入调查 → 发现不合常理的线索 → 钩子：第二条人命',
+      ch2: '深入调查 → 嫌疑人指向意想不到的人 → 反转 → 钩子：主角自身也陷入危险',
+      ch3: '真相初步揭露 → 但牵出更大谜团 → 危机升级 → 钩子：幕后组织的影子'
+    }
+  }
+};
+
+// ============ DATA: 开头风格模板 ============
+var OPENING_STYLES = {
+  '悬念反转型': { desc: '看似普通场景，最后一句翻转认知', formula: '日常描写 → 细节暗示 → 最后一句信息炸弹' },
+  '高燃冲突型': { desc: '开篇即冲突，第一句就是矛盾爆发点', formula: '冲突对话 → 群众反应 → 主角内心独白' },
+  '冷峻叙事型': { desc: '极简克制，信息密度高，暗藏锋芒', formula: '时间地点交代 → 行为描写 → 身份暗示' },
+  '戏谑吐槽型': { desc: '轻松幽默口吻，适合轻松向爽文', formula: '自嘲式独白 → 情况说明 → 反差转折' },
+  '倒叙震撼型': { desc: '从高潮/死亡/结局开场，再回溯', formula: '震撼场景 → 时间回溯 → 重新开始' }
+};
+
+// ============ DATA: 开头生成素材库 ============
+var OPENING_MATERIALS = {
+  zhuixu: {
+    scenes: ['家宴上被丈母娘当众奚落','送外卖到写字楼被前台无视','妻子公司年会被当成司机','小舅子结婚被安排在小孩桌','丈母娘给妻子介绍"优秀人选"'],
+    hints: ['口袋里的手机震了一下，屏幕上是一条银行到账短信——九位数','他接了个电话，对面恭敬地叫了声"少爷"','他帮人随手把了次脉，对方是省城最好的中医','他口袋里揣着的黑卡，全国只有七张'],
+    bombs: ['没人知道，这栋写字楼的开发商，是他名下的子公司','三天后，这家人求着退回来的就不止是一枚戒指了','而那个打电话来叫他"少爷"的人，刚刚登上了福布斯','他给妻子把脉时发现的症状，省人民医院三天后才能确诊'],
+    conflicts: ['"一个吃软饭的，也配坐在这里？"','"妹妹，你看看你嫁的什么玩意儿"','"这婚，我女儿必须离！"','"你一个月挣三千块，我儿子随便一顿饭就三万"']
+  },
+  qiandao: {
+    scenes: ['被分到宗门最偏僻的废墟住处','在藏经阁扫地时被师兄呼来喝去','宗门大比报名处，被同门嘲笑修为最低','去后勤领取月例，被告知废柴弟子没有资格'],
+    hints: ['眼前浮现一行金色文字：在废墟签到成功，获得：上古炼体诀','签到系统的面板上，他的修为栏写着"练气一层"，但奖励栏已经堆了九十九页','签到第一天获得的东西，他翻遍了宗门藏书阁都找不到记载'],
+    bombs: ['而这座"废墟"，在万年前的宗门典籍里叫——禁地遗址','签到满一百天后，他的实力已经超过了宗主','当他随手翻开签到奖励里的某本功法时，宗门长老桌上的茶杯碎了'],
+    conflicts: ['"一个连灵根都没有的废物，也配领取月例？"','"师弟，这住处可是你求来的，别怪师兄没提醒你"','"大比？他去了也是丢人"','"宗门养你三年，你为宗门做过什么？"']
+  },
+  moshi: {
+    scenes: ['从噩梦中惊醒，手机日期显示末世前30天','超市里推着第三车泡面结账，收银员看神经病一样看她','把最后一套房抵押贷款，全部买成药品和压缩饼干','末世倒计时第七天，她在天台清点空间里的物资'],
+    hints: ['掌心一热，一个半透明的空间入口在她眼前展开','前世的记忆告诉她，三天后这里会爆发出第一例变异','她知道隔壁药店地下室的那个箱子，里面装着异能觉醒剂'],
+    bombs: ['而此刻窗外，第一声爆炸响起——末世，提前了','收银员不知道，七天后她会跪在这扇门前求一瓶水','她看了一眼空间里堆满的物资，足够三千人活一年','而她前世的死法，是被身后这群人推出去挡变异体的'],
+    conflicts: ['"这女的疯了吧，买这么多泡面？"','"你说末世要来了？神经病！"','"求你开开门，我孩子三天没吃东西了！"','把物资交出来，我们可以让你活久一点']
+  },
+  chuanshu: {
+    scenes: ['睁眼发现自己躺在一本小说里，身份是第三章就死的炮灰','系统提示音在脑海响起：欢迎进入第47号世界','看着铜镜里自己的脸——原著里被男主灭满门的反派','快穿系统面板弹出：当前任务，让炮灰逆袭成主角'],
+    hints: ['系统面板显示：原著剧情偏离度0%，任务奖励：S级','她翻开原著记忆——这个角色在第三章被男主一剑杀了','系统提示：检测到原著主角将在三分钟后出场'],
+    bombs: ['而原著男主此刻正站在她门外，手里提着一把剑','原著里这个炮灰的死法，恰好是她改写命运的切入点','当她做出第一个偏离原著的选择时，系统面板上的"世界崩坏度"跳了一下'],
+    conflicts: ['"系统，你确定让我洗白这个杀人如麻的反派？"','攻略对象是原著男主？那个灭我满门的人？','"任务失败惩罚：魂飞魄散。好的，这任务很公平。"','"原著剧情不可更改——除非，你愿意付出代价。"']
+  },
+  tianchong: {
+    scenes: ['最后一次给男主送早餐，他没有像往常一样让她放门口——而是说"不用了"','离婚协议书上签字的那天，窗外下着大雨','她收拾行李离开住了三年的别墅，男主在开会没有回来','她把钥匙放在玄关，留了一张字条：我走了'],
+    hints: ['她摸了摸口袋里的确诊报告——癌症晚期，他不知道','她前世就是在这一天，被他的白月光害死的','她的手机里有一条没发出去的消息：我怀孕了'],
+    bombs: ['而三天后他翻到这张字条时，她已经换了城市和名字','他不知道，她走的那天，肚子里已经有了他的孩子','当他终于想起找她时，她的手机号已经变成了空号','而她在飞机上删掉了他所有的联系方式，一个没留'],
+    conflicts: ['"你以为你走了我会求你回来？"','"替身就该有替身的自觉。"','"她只是来住几天，你别多想。"','你不配待在他身边。']
+  },
+  niandai: {
+    scenes: ['睁眼发现自己躺在土坯房里，墙上贴着1965年的日历','生产队出工，她被分到最累的挑粪组','婆婆把全家仅有的两个鸡蛋给了小叔子家','大伯嫂又来借粮，这已经是这个月第三次了'],
+    hints: ['她脑子里有一整个现代养殖技术库','空间里种着二十世纪的改良稻种','她记得明年恢复高考，而她前世是985硕士'],
+    bombs: ['而全村人不知道，她刚才卖出去的那批鸡蛋，赚了别人三个月的工分','三个月后，她将成为全县第一个万元户','她用现代知识改良的种植法，让亩产翻了一倍——而此时全国还在为吃饱发愁'],
+    conflicts: ['"嫁到我们家来就得守规矩，一个女人家家的折腾什么？"','"借你点粮食怎么了？一家人还分你我？"','你一个女人家，懂什么种地？','"知青就是来镀金的，能干什么活？"']
+  },
+  chongsheng: {
+    scenes: ['刀子捅进后心的那一刻，她看见未婚夫和白莲花相视一笑','从十八层坠落的瞬间，她听到合伙人说"早该除掉她了"','死在手术台上时，她终于明白丈夫为什么要换她的药','被推下悬崖时，她最信任的师姐在身后微笑'],
+    hints: ['再睁眼，墙上的日历写着三年前——一切都还来得及','她摸了摸脖子上那条项链——前世她到死才知道这是定位器','重生回来的第一件事，她把前世害死她的人列了一张名单'],
+    bombs: ['而前世害死她的那个人，此刻正端着咖啡朝她走来','她看了一眼手机日期——距离前世破产还有182天','重生第一天，她做的第一件事是取消了和前世未婚夫的婚约','而她不知道的是，前世那个帮她收尸的陌生人，这一世会站在她身边'],
+    conflicts: ['"亲爱的，你怎么了？脸色这么差。"','你以为重生就能改变什么？','"这次我不会再给你机会了。"','"姐姐，你放心，我会替你照顾好他的。"']
+  },
+  xuanyi: {
+    scenes: ['凌晨三点接到报警电话，死者面带微笑，没有伤口','密室里发现第二具尸体时，门是从里面反锁的','法医报告显示死者的死亡时间，是他被发现的两小时后','失踪七天的女孩回来了，但她坚持说自己只离开了七分钟'],
+    hints: ['他的左眼能看到死者最后七秒的画面','她在现场捡到一枚不属于任何人的指纹','监控显示案发时段没有人进出，但现场多了一杯喝过的咖啡'],
+    bombs: ['而死者手机里最后一条消息发给了——他自己','密室的门从里面反锁，但钥匙在死者口袋里','第二具尸体的死亡时间，比第一具早了三天','她回来的那天，又有一个人失踪了'],
+    conflicts: ['"这不可能，门是从里面锁的。"','你确定你看到了什么？那个房间没有窗户。','"死者没有伤口，没有中毒，他是怎么死的？"','"七分钟？你失踪了整整七天。"']
+  }
+};
+
+// ============ DATA: 热门元素库 ============
+var HOT_ELEMENTS = {
+  guoyun:    { name:'国运',         line:'将主角突破与国运绑定，每一次成长都化作举国上下的气运加持，全民觉醒背景下他是那根定海神针' },
+  suanming:  { name:'算命/玄学',    line:'主角表面普通，实则一眼看穿他人命格，用玄学手段四两拨千斤，低调装逼' },
+  siheyuan:  { name:'四合院',       line:'把冲突舞台搬进一座大院，邻里极品天天作妖，主角用现代脑子反杀' },
+  xuanxue:   { name:'玄学大佬',     line:'主角被全网当成神棍，直到一次直播改命引爆热搜，全网求着改命' },
+  guize:     { name:'规则怪谈',     line:'主角误入一座规则之地，每一条规则背后都是生死陷阱，靠智商和冷静破局' },
+  keshu:     { name:'诡异修仙',     line:'修炼体系之下藏着不可名状的古老存在，主角在san值边缘疯狂试探' },
+  shenhao:   { name:'神豪/钞能力',  line:'主角随手一个转账就让对手破产，钞能力即正义，花钱碾压一切' },
+  duxin:     { name:'读心术',       line:'主角能听见身边人的真实想法，所有算计都变成透明的笑话' },
+  meishi:    { name:'年代美食',     line:'主角靠一手失传手艺在饥荒年代香飘十里，顺便带全家致富' },
+  zhibo:     { name:'重生+直播',    line:'主角重生后开直播"预言"未来，粉丝从嘲笑到跪着追更' }
+};
+var HOT_DEFAULT_KEYS = ['suanming','xuanxue','shenhao','duxin','zhibo','meishi'];
+
+// ============ DATA: 平台风格画像 ============
+var PLATFORMS = {
+  tongyong: { name:'通用', pace:'标准节奏', emphasis:'均衡呈现', tone:'中性文风', avoid:'无特殊限制', words:'兼顾各平台通用写法' },
+  fanqie: { name:'番茄小说', pace:'短章节、高频钩子、前3章必出核心爽点', emphasis:'爽点直给、对话口语化、减少冗长描写', tone:'网感强、快节奏、直白', avoid:'避免大段环境/心理描写拖慢节奏；节奏拖沓会被算法降权', words:'每章1000-1500字、每300字一个小钩子' },
+  qidian: { name:'起点中文网', pace:'中速、可稍长、重设定铺陈', emphasis:'世界观严谨、文笔讲究、升级体系清晰', tone:'偏精致、有信息密度的网文质感', avoid:'避免开局信息轰炸；设定需自洽，读者考据严格', words:'前3章完成世界观与金手指铺垫，每章1500-2500字' },
+  jjwxc: { name:'晋江文学城', pace:'情感慢热、情绪流优先', emphasis:'感情线/人物关系驱动、心理刻画细腻', tone:'细腻、情绪流、女性视角', avoid:'先审后发、分级严格；避免大尺度与违规题材', words:'以人物情感推进，每章1200-2000字，重日常与互动' },
+  qimao: { name:'七猫小说', pace:'快节奏、爽点密集', emphasis:'直给爽文、套路清晰、易读', tone:'直白、爽感强', avoid:'开篇必须快；避免铺垫过长；对标短平快爽文', words:'每章800-1200字，开篇即冲突，爽点连续' },
+  zhihu: { name:'知乎（盐选/故事）', pace:'开篇强冲突、先抛悬念或反差，中段故事化叙述，结尾留钩子', emphasis:'故事性强、强人设、悬疑/反转/真实感，回答体叙述', tone:'知乎体：口语化、代入感强、理性与情绪交织，可带谢邀式开场', avoid:'避免平铺直叙流水账；避免硬广感；纯爽文套路易水土不服，需真实细节与反转', words:'单篇800-3000字故事体，开篇3句内抓人，结尾留讨论空间' }
+};
+
+// ============ DATA: 投稿渠道 ============
+var SUBMISSION = {
+  fanqie:  { name:'番茄小说', stars:3, pay:'免费阅读+广告分成 / 全勤奖', audience:'下沉市场、碎片阅读、男频爽文&女频甜宠均强', req:'首章数据驱动，正文建议≥10万字起投，开篇必须抓人', channel:'番茄作家助手 APP / 番茄小说网作家专区（线上自助签约）', fit:['zhuixu','qiandao','moshi','chuanshu','chongsheng','tianchong'] },
+  qidian:  { name:'起点中文网', stars:2, pay:'VIP 订阅+打赏+分成', audience:'男频主场，重世界观/文笔/逻辑', req:'千字质量门槛高，VIP 上架，建议完成大纲再开书', channel:'起点作家专区 / 阅文作家助手（线上申请）', fit:['qiandao','xuanyi','chongsheng','moshi'] },
+  jjwxc:   { name:'晋江文学城', stars:3, pay:'VIP 分成+包月', audience:'女频绝对主场（言情/纯爱/无CP）', req:'先审后发、分级制度严格，题材合规要求高', channel:'晋江文学城写作网后台（线上申请）', fit:['tianchong','chuanshu','niandai'] },
+  qimao:   { name:'七猫小说', stars:2, pay:'免费+广告分成', audience:'偏男频爽文、下沉、免费阅读用户', req:'快节奏、爽点密，开篇必须快', channel:'七猫作家后台（线上申请）', fit:['zhuixu','qiandao','tianchong','niandai','moshi'] },
+  feilu:   { name:'飞卢小说', stars:1, pay:'分成+爆更奖励', audience:'快节奏脑洞、系统流、同人', req:'日更量大（常要求日更万字），脑洞新颖', channel:'飞卢作家后台（线上申请）', fit:['qiandao','chuanshu','moshi'] },
+  zhihu:   { name:'知乎（盐选/故事）', stars:1, pay:'盐选专栏分成 / 内容付费 / 回答引流', audience:'高知、年轻、重逻辑与故事性的读者，悬疑/脑洞/现实向偏好强', req:'强故事性+真实细节，适合短篇/中篇连载，盐选需过审', channel:'知乎创作者中心 / 盐选专栏后台（线上申请）', fit:['xuanyi','chongsheng','zhuixu','niandai','chuanshu'] }
+};
+
+// ============ DATA: 封面配色（按赛道） ============
+var COVER_COLORS = {
+  zhuixu:   { bg:'linear-gradient(135deg,#1a2a6c,#2a5298,#b21f1f)', tag:'都市 · 男频' },
+  qiandao:  { bg:'linear-gradient(135deg,#0f2027,#203a43,#2c5364)', tag:'玄幻 · 修仙' },
+  moshi:    { bg:'linear-gradient(135deg,#232526,#414345,#8e0e00)', tag:'末世 · 异能' },
+  chuanshu: { bg:'linear-gradient(135deg,#42275a,#734b6d,#bdc3c7)', tag:'穿书 · 快穿' },
+  tianchong:{ bg:'linear-gradient(135deg,#ff9a9e,#fecfef,#fad0c4)', tag:'甜宠 · 言情', dark:false },
+  niandai:  { bg:'linear-gradient(135deg,#3a1c71,#d76d77,#ffaf7b)', tag:'年代 · 种田' },
+  chongsheng:{ bg:'linear-gradient(135deg,#000428,#004e92,#000428)', tag:'重生 · 穿越' },
+  xuanyi:   { bg:'linear-gradient(135deg,#16222a,#3a6073,#0f0c29)', tag:'悬疑 · 西幻' }
+};
+
+// ============ DATA: 模式名称 & 节奏检查词库 ============
+var MODE_NAMES = {
+  inspiration: '灵感综合', opening: '爽文开头', golden3: '黄金三章',
+  bestseller: '爆款对标', continue: '章节续写'
+};
+
+var PACING = {
+  conflictWords: ['冲突','打脸','碾压','震惊','逆袭','对峙','挑衅','羞辱','嘲讽','危机','威胁','背叛','阴谋','厮杀','反杀','秒杀','压迫','敌意','仇','逼','战','斗','怒','绝境','屈辱','轻视','刁难','落魄','被否','唾弃'],
+  hookWords: ['？','?','悬念','钩子','突然','竟然','竟','浮现','降临','出现','然而','却','神秘','未知','危机','埋伏','转折','反转','秘密','真相','幕后','更大的','下一章','未完','待续','究竟','是什么','谁能想到','原来','消失','逼近'],
+  coolWords: ['打脸','碾压','震惊','逆袭','爽','反转','秒杀','跪','身份揭露','惊艳','吊打','完胜','封神','燃','高光','爽感','虐','甜','火葬场','护短','装逼','爆发','逆天','无敌','霸气','强势','扬眉吐气','狠狠','教训','解气','跪下','臣服','折服']
+};
+
+// ============ DATA: 角色名字库 ============
+var SURNAMES = ['沈','林','苏','陈','陆','顾','江','叶','秦','萧','楚','凌','夜','慕','白','墨','云','风','寒','温'];
+var GIVEN_NAMES_M = ['渡','渊','衍','寒','霆','珩','瑾','昀','越','珏','凛','烬','辞','琛','砚','舟','屿'];
+var GIVEN_NAMES_F = ['晚','宁','若','瑶','曦','月','棠','槿','念','微','泠','姝','锦','璃','眠','笙','鸢','薇','洛','栀'];
+
+function randomName(isFemale) {
+  var s = SURNAMES[Math.floor(Math.random()*SURNAMES.length)];
+  var pool = isFemale ? GIVEN_NAMES_F : GIVEN_NAMES_M;
+  var g = pool[Math.floor(Math.random()*pool.length)];
+  return s + g;
+}
+
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function pickN(arr, n) {
+  var shuffled = arr.slice().sort(function(){return Math.random()-0.5;});
+  return shuffled.slice(0, Math.min(n, arr.length));
+}
+
+// ============ DATA: 敏感词库（含七猫）============
+var SENSITIVE_WORDS = [
+  { word: '自杀', type: '违法行为', suggestion: '结束了一切/坠入黑暗', fanqie:'禁', qidian:'禁', jjwxc:'禁', qimao:'禁' },
+  { word: '杀了', type: '暴力血腥', suggestion: '解决了/除掉了', fanqie:'限', qidian:'允许', jjwxc:'禁', qimao:'限' },
+  { word: '血流成河', type: '暴力血腥', suggestion: '一片殷红/满地狼藉', fanqie:'限', qidian:'限', jjwxc:'禁', qimao:'限' },
+  { word: '做爱', type: '色情低俗', suggestion: '一夜无话/天亮后', fanqie:'禁', qidian:'禁', jjwxc:'禁', qimao:'禁' },
+  { word: '毒品', type: '违法行为', suggestion: '迷幻散/禁药', fanqie:'禁', qidian:'禁', jjwxc:'禁', qimao:'禁' },
+  { word: '抢劫', type: '违法行为', suggestion: '搜刮/获取物资', fanqie:'限', qidian:'限', jjwxc:'禁', qimao:'限' },
+  { word: '赌博', type: '违法行为', suggestion: '押注/博弈', fanqie:'限', qidian:'限', jjwxc:'禁', qimao:'限' },
+  { word: '强奸', type: '色情低俗', suggestion: '侵犯/伤害（尽量避免提及）', fanqie:'禁', qidian:'禁', jjwxc:'禁', qimao:'禁' },
+  { word: '杀人', type: '暴力血腥', suggestion: '解决/让他消失', fanqie:'限', qidian:'允许', jjwxc:'禁', qimao:'限' },
+  { word: '血腥', type: '暴力血腥', suggestion: '一片狼藉/惨烈', fanqie:'限', qidian:'限', jjwxc:'禁', qimao:'限' },
+  { word: '分尸', type: '暴力血腥', suggestion: '（完全避免）', fanqie:'禁', qidian:'禁', jjwxc:'禁', qimao:'禁' },
+  { word: '嫖娼', type: '色情低俗', suggestion: '（完全避免）', fanqie:'禁', qidian:'禁', jjwxc:'禁', qimao:'禁' },
+  { word: '贩毒', type: '违法行为', suggestion: '（完全避免）', fanqie:'禁', qidian:'禁', jjwxc:'禁', qimao:'禁' },
+  { word: '枪杀', type: '暴力血腥', suggestion: '解决/击倒', fanqie:'限', qidian:'限', jjwxc:'禁', qimao:'限' }
+];
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function auditContent(text) {
+  var issues = [];
+  SENSITIVE_WORDS.forEach(function(sw) {
+    if (text.indexOf(sw.word) !== -1) issues.push(sw);
+  });
+  return { hasIssue: issues.length > 0, issues: issues };
+}
+
+// 计算四平台过审概率评分
+function calcScores(text) {
+  var s = { fanqie: 98, qidian: 98, jjwxc: 98, qimao: 98 };
+  var pen = {
+    '色情低俗':   { fanqie:25, qidian:25, jjwxc:30, qimao:25 },
+    '暴力血腥':   { fanqie:8,  qidian:6,  jjwxc:12, qimao:8 },
+    '违法行为':   { fanqie:15, qidian:15, jjwxc:18, qimao:15 },
+    '价值观导向': { fanqie:5,  qidian:5,  jjwxc:5,  qimao:5 },
+    '政治敏感':   { fanqie:40, qidian:40, jjwxc:40, qimao:40 }
+  };
+  SENSITIVE_WORDS.forEach(function(sw) {
+    if (text.indexOf(sw.word) !== -1) {
+      var p = pen[sw.type];
+      if (p) {
+        s.fanqie -= p.fanqie; s.qidian -= p.qidian; s.jjwxc -= p.jjwxc; s.qimao -= p.qimao;
+      }
+    }
+  });
+  Object.keys(s).forEach(function(k){ s[k] = Math.max(5, Math.min(99, s[k])); });
+  return s;
+}
+
+function buildAuditReport(text) {
+  var result = auditContent(text);
+  var hasIssue = result.hasIssue;
+  var issues = result.issues;
+  var scores = calcScores(text);
+
+  var html = '<div class="audit-report"><h3>📋 敏感词检查报告（番茄 / 起点 / 晋江 / 七猫）</h3><table class="audit-table"><tr><th>检查项</th><th>状态</th><th>详情</th></tr>';
+
+  var categories = [
+    { name: '政治敏感', words: issues.filter(function(i){return i.type==='政治敏感';}) },
+    { name: '色情低俗', words: issues.filter(function(i){return i.type==='色情低俗';}) },
+    { name: '暴力血腥', words: issues.filter(function(i){return i.type==='暴力血腥';}) },
+    { name: '违法行为', words: issues.filter(function(i){return i.type==='违法行为';}) },
+    { name: '价值观导向', words: [] }
+  ];
+
+  categories.forEach(function(cat) {
+    if (cat.words.length > 0) {
+      var detail = cat.words.map(function(w){return '"' + w.word + '"建议替换为"' + w.suggestion + '"（番茄:' + w.fanqie + '/起点:' + w.qidian + '/晋江:' + w.jjwxc + '/七猫:' + w.qimao + '）';}).join('；');
+      html += '<tr><td>' + cat.name + '</td><td>⚠️ 注意</td><td>' + detail + '</td></tr>';
+    } else {
+      html += '<tr><td>' + cat.name + '</td><td>✅ 通过</td><td>未发现违规内容</td></tr>';
+    }
+  });
+
+  // 评分条
+  function scoreRow(name, val) {
+    var color = val >= 90 ? '#27ae60' : (val >= 70 ? '#f39c12' : '#e74c3c');
+    var zone = val >= 90 ? '绿区·安全' : (val >= 70 ? '黄区·需留意' : '红区·必改');
+    return '<div class="score-row"><span class="score-name">' + name + '</span><div class="score-track"><div class="score-fill" style="width:' + val + '%;background:' + color + '"></div></div><span class="score-val" style="color:' + color + '">' + val + '</span></div>';
+  }
+  html += '</table><div class="score-wrap"><div style="font-size:13px;font-weight:600;margin-bottom:6px">过审概率评分</div>';
+  html += scoreRow('番茄小说', scores.fanqie);
+  html += scoreRow('起点中文网', scores.qidian);
+  html += scoreRow('晋江文学城', scores.jjwxc);
+  html += scoreRow('七猫小说', scores.qimao);
+  html += '<div class="score-note">≥90 绿区可直接投稿；70–89 黄区建议替换标红处；<70 红区必须修改后再投。</div>';
+
+  // 推荐平台
+  var best = '起点中文网';
+  var bestVal = -1;
+  [['番茄小说',scores.fanqie],['起点中文网',scores.qidian],['晋江文学城',scores.jjwxc],['七猫小说',scores.qimao]].forEach(function(p){
+    if (p[1] > bestVal) { bestVal = p[1]; best = p[0]; }
+  });
+  html += '<p style="margin-top:8px;font-size:13px">推荐首发平台：<strong>' + best + '</strong>（评分最高）</p></div>';
+  html += '<div class="audit-legend">⚠️ 红色高亮＝命中敏感词，请按建议替换后再投稿。</div></div>';
+  return html;
+}
+
+// 对渲染后的 HTML 标红敏感词
+function highlightViolations(html) {
+  // 长词优先，避免子串误嵌
+  var sorted = SENSITIVE_WORDS.slice().sort(function(a,b){ return b.word.length - a.word.length; });
+  sorted.forEach(function(sw) {
+    var re = new RegExp(escapeRegExp(sw.word), 'g');
+    html = html.replace(re, '<mark class="violation">' + sw.word + '</mark>');
+  });
+  return html;
+}
+
+// ============ STATE ============
+var currentMode = 'inspiration';
+var selectedGenres = { inspiration: null, opening: null, golden3: null, bestseller: null, continue: null, newbook: null };
+var selectedSubGenres = { inspiration: null, opening: null, golden3: null, bestseller: null, continue: null, newbook: null };
+var hotEnabled = { inspiration:false, opening:false, golden3:false, bestseller:false };
+var hotSel = { inspiration:[], opening:[], golden3:[], bestseller:[] };
+var currentResults = [];
+
+// ============ DOM READY ============
+document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+  var jsStatus = document.getElementById('jsStatus');
+  if (jsStatus) {
+    jsStatus.textContent = 'JS已加载 ✓';
+    jsStatus.style.background = '#d4edda';
+    jsStatus.style.color = '#155724';
+  }
+
+  // Mode tab switching
+  var modeTabs = document.querySelectorAll('.mode-tab');
+  modeTabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var mode = tab.getAttribute('data-mode');
+      switchMode(mode);
+    });
+  });
+
+  // Genre chip selection - event delegation
+  var genreGrids = document.querySelectorAll('[id^="genreGrid-"]');
+  genreGrids.forEach(function(grid) {
+    grid.addEventListener('click', function(e) {
+      var chip = e.target.closest('.genre-chip');
+      if (!chip) return;
+      var genreKey = chip.getAttribute('data-genre');
+      var mode = chip.getAttribute('data-mode');
+      if (genreKey && mode) selectGenre(genreKey, mode);
+    });
+  });
+
+  // Sub-genre selection - event delegation
+  var subGrids = document.querySelectorAll('[id^="subgenreGrid-"]');
+  subGrids.forEach(function(grid) {
+    grid.addEventListener('click', function(e) {
+      var chip = e.target.closest('.genre-chip');
+      if (!chip) return;
+      var mode = grid.id.replace('subgenreGrid-', '');
+      var val = chip.getAttribute('data-subval');
+      selectSubGenre(val, mode, chip);
+    });
+  });
+
+  // Radio button selection - event delegation
+  var radioGroups = document.querySelectorAll('.radio-group');
+  radioGroups.forEach(function(group) {
+    group.addEventListener('click', function(e) {
+      var btn = e.target.closest('.radio-btn');
+      if (!btn) return;
+      var siblings = group.querySelectorAll('.radio-btn');
+      siblings.forEach(function(s){ s.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+  });
+
+  // Hot elements init
+  initHotElements();
+
+  // Input listeners
+  var protName = document.getElementById('protagonistName');
+  if (protName) protName.addEventListener('input', checkOpeningReady);
+
+  var bestsellerInput = document.getElementById('bestsellerInput');
+  if (bestsellerInput) bestsellerInput.addEventListener('input', checkBestsellerReady);
+
+  var chapterPaste = document.getElementById('chapterPaste');
+  if (chapterPaste) chapterPaste.addEventListener('input', checkContinueReady);
+
+  // Generate buttons
+  var btnInsp = document.getElementById('btn-inspiration');
+  if (btnInsp) btnInsp.addEventListener('click', generateInspiration);
+
+  var btnOpen = document.getElementById('btn-opening');
+  if (btnOpen) btnOpen.addEventListener('click', generateOpening);
+
+  var btnG3 = document.getElementById('btn-golden3');
+  if (btnG3) btnG3.addEventListener('click', generateGolden3);
+
+  var btnBest = document.getElementById('btn-bestseller');
+  if (btnBest) btnBest.addEventListener('click', generateBestseller);
+
+  var btnCont = document.getElementById('btn-continue');
+  if (btnCont) btnCont.addEventListener('click', generateContinuation);
+
+  var btnNB = document.getElementById('btn-newbook');
+  if (btnNB) btnNB.addEventListener('click', generateNewBook);
+
+  // 历史·模板 tab 切换
+  var htTabs = document.querySelectorAll('.ht-tab');
+  htTabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      htTabs.forEach(function(t){ t.classList.remove('active'); });
+      tab.classList.add('active');
+      var which = tab.getAttribute('data-ht');
+      var hp = document.getElementById('htHistoryPanel');
+      var tp = document.getElementById('htTemplatePanel');
+      if (hp) hp.classList.toggle('hidden', which !== 'history');
+      if (tp) tp.classList.toggle('hidden', which !== 'templates');
+    });
+  });
+
+  // 保存模板
+  var btnSave = document.getElementById('btnSaveTemplate');
+  if (btnSave) btnSave.addEventListener('click', saveTemplate);
+
+  setTimeout(function() {
+    if (jsStatus) jsStatus.style.display = 'none';
+  }, 3000);
+}
+
+function initHotElements() {
+  ['inspiration','opening','golden3','bestseller'].forEach(function(mode) {
+    var grid = document.getElementById('hotGrid-' + mode);
+    if (!grid) return;
+    var html = '';
+    Object.keys(HOT_ELEMENTS).forEach(function(k) {
+      html += '<div class="genre-chip" data-hot="' + k + '">' + HOT_ELEMENTS[k].name + '</div>';
+    });
+    grid.innerHTML = html;
+    grid.addEventListener('click', function(e) {
+      var chip = e.target.closest('.genre-chip');
+      if (!chip) return;
+      chip.classList.toggle('active');
+      var k = chip.getAttribute('data-hot');
+      var idx = hotSel[mode].indexOf(k);
+      if (idx === -1) hotSel[mode].push(k); else hotSel[mode].splice(idx, 1);
+    });
+    var tgl = document.getElementById('hotToggle-' + mode);
+    if (tgl) {
+      tgl.addEventListener('change', function() {
+        hotEnabled[mode] = tgl.checked;
+        grid.style.display = tgl.checked ? 'flex' : 'none';
+        if (!tgl.checked) {
+          hotSel[mode] = [];
+          grid.querySelectorAll('.genre-chip').forEach(function(c){ c.classList.remove('active'); });
+        }
+      });
+    }
+  });
+}
+
+function getHotKeys(mode) {
+  if (!hotEnabled[mode]) return [];
+  var keys = hotSel[mode];
+  if (!keys || keys.length === 0) return HOT_DEFAULT_KEYS.slice();
+  return keys;
+}
+
+function buildHotNote(keys) {
+  var blocks = keys.map(function(k) {
+    var e = HOT_ELEMENTS[k];
+    if (!e) return '';
+    return '### 🔥 热门元素植入：【' + e.name + '】\n本方案已融合当前热门元素【' + e.name + '】。\n**融合方式**：' + e.line + '。\n**自检**：已包裹进赛道爽点结构、与主角金手指自洽、保留原赛道核心冲突。';
+  });
+  return blocks.join('\n\n---\n\n');
+}
+
+function selectGenre(key, mode) {
+  selectedGenres[mode] = key;
+  selectedSubGenres[mode] = null;
+  var chips = document.querySelectorAll('#genreGrid-' + mode + ' .genre-chip');
+  chips.forEach(function(c) {
+    if (c.getAttribute('data-genre') === key) c.classList.add('active');
+    else c.classList.remove('active');
+  });
+  var subCard = document.getElementById('subgenreCard-' + mode);
+  var subGrid = document.getElementById('subgenreGrid-' + mode);
+  if (subCard && subGrid) {
+    var g = GENRES[key];
+    var html = '';
+    g.variants.forEach(function(v) {
+      html += '<div class="genre-chip" data-subval="' + v + '">' + v + '</div>';
+    });
+    html += '<div class="genre-chip" data-subval="random">🔀 随机分配</div>';
+    subGrid.innerHTML = html;
+    subCard.style.display = 'block';
+  }
+  if (mode === 'opening') checkOpeningReady();
+  if (mode === 'golden3') checkGolden3Ready();
+  if (mode === 'continue') checkContinueReady();
+  if (mode === 'newbook') checkNewbookReady();
+}
+
+function selectSubGenre(val, mode, chipEl) {
+  selectedSubGenres[mode] = val;
+  var subGrid = document.getElementById('subgenreGrid-' + mode);
+  if (subGrid) {
+    var chips = subGrid.querySelectorAll('.genre-chip');
+    chips.forEach(function(c){ c.classList.remove('active'); });
+    chipEl.classList.add('active');
+  }
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(function(t) {
+    t.classList.toggle('active', t.getAttribute('data-mode') === mode);
+  });
+  document.querySelectorAll('.mode-panel').forEach(function(p) {
+    p.classList.add('hidden');
+  });
+  var panel = document.getElementById('panel-' + mode);
+  if (panel) panel.classList.remove('hidden');
+  var resultsArea = document.getElementById('resultsArea');
+  if (resultsArea) resultsArea.innerHTML = '';
+  if (mode === 'history') { renderHistory(); renderTemplates(); }
+}
+
+function getRadioValue(groupId) {
+  var active = document.querySelector('#' + groupId + ' .radio-btn.active');
+  return active ? active.getAttribute('data-val') : null;
+}
+
+function checkOpeningReady() {
+  var nameEl = document.getElementById('protagonistName');
+  var name = nameEl ? nameEl.value.trim() : '';
+  var genre = selectedGenres.opening;
+  var ready = name && genre;
+  var btn = document.getElementById('btn-opening');
+  var hint = document.getElementById('openingHint');
+  if (btn) btn.disabled = !ready;
+  if (hint) hint.style.display = ready ? 'none' : 'block';
+}
+
+function checkGolden3Ready() {
+  var genre = selectedGenres.golden3;
+  var ready = !!genre;
+  var btn = document.getElementById('btn-golden3');
+  var hint = document.getElementById('golden3Hint');
+  if (btn) btn.disabled = !ready;
+  if (hint) hint.style.display = ready ? 'none' : 'block';
+}
+
+function checkBestsellerReady() {
+  var inputEl = document.getElementById('bestsellerInput');
+  var input = inputEl ? inputEl.value.trim() : '';
+  var ready = input.length > 0;
+  var btn = document.getElementById('btn-bestseller');
+  var hint = document.getElementById('bestsellerHint');
+  if (btn) btn.disabled = !ready;
+  if (hint) hint.style.display = ready ? 'none' : 'block';
+}
+
+function checkContinueReady() {
+  var pasteEl = document.getElementById('chapterPaste');
+  var paste = pasteEl ? pasteEl.value.trim() : '';
+  var genre = selectedGenres.continue;
+  var ready = paste.length > 0 && genre;
+  var btn = document.getElementById('btn-continue');
+  var hint = document.getElementById('continueHint');
+  if (btn) btn.disabled = !ready;
+  if (hint) hint.style.display = ready ? 'none' : 'block';
+}
+
+function checkNewbookReady() {
+  var genre = selectedGenres.newbook;
+  var ready = !!genre;
+  var btn = document.getElementById('btn-newbook');
+  var hint = document.getElementById('newbookHint');
+  if (btn) btn.disabled = !ready;
+  if (hint) hint.style.display = ready ? 'none' : 'block';
+}
+
+function getPlatform() {
+  var v = getRadioValue('platformSel');
+  return (v && PLATFORMS[v]) ? v : 'tongyong';
+}
+
+function buildPlatformNote() {
+  var key = getPlatform();
+  if (key === 'tongyong') return '';
+  var p = PLATFORMS[key];
+  return '### 🎨 平台风格适配卡（' + p.name + '）\n' +
+    '- **节奏偏好**：' + p.pace + '\n' +
+    '- **内容侧重**：' + p.emphasis + '\n' +
+    '- **文风语气**：' + p.tone + '\n' +
+    '- **避坑要点**：' + p.avoid + '\n' +
+    '- **配套建议**：' + p.words + '；配合「🎯 爽点节奏检查」使用效果更佳。';
+}
+
+// 简介三版（短/中/长，平台语气）
+function buildSynopsis(g, heroName, title, selling, platform) {
+  var p = PLATFORMS[platform] || PLATFORMS.tongyong;
+  var hook = selling && selling.trim() ? selling.trim() : (g.template.split('→')[0] + g.template.split('→')[1]);
+  var shortT;
+  var midT;
+  if (platform === 'zhihu') {
+    var scene = (g.worldRule.split('。')[0] || '现场');
+    shortT = '谢邀，人在' + scene + '，刚经历完' + heroName + '这件事。一句话：' + hook + '——听着像爽文，但这是真实发生过的反转。';
+    midT = '《' + title + '》' + g.name + '。' + heroName + g.maleLead.split('/')[0] + '，' + g.conflict + '。当' + hook + '的矛盾爆发，他手握' + g.goldenFinger.split('、')[0] + '，从' + g.nodes[0] + '一路打到' + g.nodes[4] + '。我不评价对错，只把过程讲清楚——每一个细节都是真的，反转在你看到最后一句话时才揭晓。';
+  } else {
+    shortT = title + '：' + g.maleTag.split('→')[0] + heroName + '，' + hook + '，一路逆袭碾压。';
+    midT = '《' + title + '》' + g.name + '。' + heroName + g.maleLead.split('/')[0] + '，' + g.conflict + '。当' + hook + '的矛盾爆发，他手握' + g.goldenFinger.split('、')[0] + '，从' + g.nodes[0] + '一路打到' + g.nodes[4] + '。' + (platform === 'jjwxc' ? '情感与成长交织，' : '') + '爽点密集、节奏明快。';
+  }
+  var longT = '《' + title + '》——一部' + g.name + '。\n主角' + heroName + '，' + g.maleLead + '，开局即' + g.nodes[0] + '。他拥有' + g.goldenFinger + '，却在' + g.worldRule.split('。')[0] + '的格局中步履维艰。\n当' + g.villain.split('、')[0] + '步步紧逼，' + heroName + '被迫踏入' + g.nodes[1] + '。从' + g.nodes[2] + '到' + g.nodes[3] + '，每一次反击都伴随着身份与真相的揭露，直到' + g.nodes[4] + '的终极爆发，彻底改写整个世界的格局。\n' + p.tone + '，' + p.emphasis + '。';
+  return '### 📝 小说简介（三版 · 适配' + p.name + '）\n\n**① 短简介（~150字，投放入口/信息流）**\n' + shortT + '\n\n**② 中简介（~300字，作品页简介）**\n' + midT + '\n\n**③ 长简介（~500字，详情页/签推）**\n' + longT;
+}
+
+// 封面：CSS 预览 + ImageGen 提示词
+function buildCover(g, heroName, title, platform) {
+  var c = COVER_COLORS[g && g.name ? coverKeyByGenre(g.name) : 'zhuixu'] || COVER_COLORS.zhuixu;
+  var p = PLATFORMS[platform] || PLATFORMS.tongyong;
+  var color = c.bg;
+  var textColor = c.dark ? '#2c2c2c' : '#fff';
+  var prompt = '小说封面设计，题材：' + (g ? g.name : '网文') + '，书名《' + title + '》。视觉风格：' + p.tone + '，' + (g ? g.worldRule.split('。')[0] : '奇幻氛围') + '。主角' + heroName + '。色调：' + (c.dark ? '明亮清新' : '深邃电影感') + '，构图有张力，电影感，高清8k，不要任何文字logo或书名水印。';
+  var mockup = '<div class="cover-wrap">' +
+    '<div class="cover-mockup" style="background:' + color + ';color:' + textColor + '">' +
+      '<div class="cm-deco"></div>' +
+      '<div class="cm-tag">' + (c.tag || '网文') + '</div>' +
+      '<div class="cm-title">' + esc(title) + '</div>' +
+      '<div class="cm-sub">著 · ' + esc(heroName) + '<br>' + (g ? g.name : '原创作品') + '</div>' +
+    '</div>' +
+    '<div style="flex:1;min-width:240px">' +
+      '<div class="cover-prompt"><strong>🎨 AI 封面提示词（复制后发给巴迪即可生成真实封面）：</strong><br>' + esc(prompt) + '</div>' +
+      '<div class="cover-actions"><button data-coverprompt="1">📋 复制封面提示词</button></div>' +
+      '<div class="nb-note" style="margin-top:8px">提示：纯前端只能预览排版效果，真实 AI 封面由对话里的「小说灵感生成器」skill 调用图像生成完成。</div>' +
+    '</div>' +
+  '</div>';
+  return { mockup: mockup, prompt: prompt };
+}
+
+function coverKeyByGenre(name) {
+  var keys = Object.keys(GENRES);
+  for (var i = 0; i < keys.length; i++) if (GENRES[keys[i]].name === name) return keys[i];
+  return 'zhuixu';
+}
+
+// 投稿渠道推荐
+function buildSubmission(genreKey, platform) {
+  var ranked = Object.keys(SUBMISSION).map(function(k) {
+    var s = SUBMISSION[k];
+    var fit = s.fit.indexOf(genreKey) !== -1;
+    var stars = fit ? s.stars + 1 : s.stars;
+    return { s: s, stars: stars, fit: fit };
+  }).sort(function(a, b) { return b.stars - a.stars; });
+
+  var p = PLATFORMS[platform] || PLATFORMS.tongyong;
+  var md = '### 📮 投稿渠道推荐（基于：' + (GENRES[genreKey] ? GENRES[genreKey].name : '自定义') + ' + 目标平台：' + p.name + '）\n\n';
+  md += '| 平台 | 匹配度 | 付费模式 | 核心受众 | 投稿要求 | 官方渠道 |\n|------|--------|----------|----------|----------|----------|\n';
+  ranked.forEach(function(r) {
+    var starStr = '';
+    for (var i = 0; i < 3; i++) starStr += (i < r.stars ? '★' : '☆');
+    md += '| ' + r.s.name + ' | ' + starStr + ' | ' + r.s.pay + ' | ' + r.s.audience + ' | ' + r.s.req + ' | ' + r.s.channel + ' |\n';
+  });
+  md += '\n💡 **变现提示**\n- 免费平台（番茄/七猫）靠「全勤+分成」，适合日更稳定、开篇抓人的爽文\n- 付费平台（起点/晋江）靠「订阅+打赏」，适合设定扎实、有长线读者粘性\n- 飞卢适合脑洞快更，靠爆更奖励\n- 知乎靠「盐选分成+内容付费+回答引流」，适合强故事性、悬疑/脑洞/现实向短中篇，以知乎体叙述引流\n\n⚠️ 编辑联系方式均以各平台官方作家后台为准，本工具不提供具体私人联系方式，谨防诈骗。';
+  return md;
+}
+
+// ============ GENERATION: 新书配套 ============
+function generateNewBook() {
+  var genre = selectedGenres.newbook;
+  if (!genre) return;
+  var g = GENRES[genre];
+  var titleEl = document.getElementById('nbTitle');
+  var heroEl = document.getElementById('nbHero');
+  var sellEl = document.getElementById('nbSelling');
+  var title = titleEl ? titleEl.value.trim() : '';
+  var hero = heroEl ? heroEl.value.trim() : '';
+  var selling = sellEl ? sellEl.value.trim() : '';
+  if (!hero) hero = randomName(Math.random() > 0.5);
+  if (!title) title = genTitle(g, hero);
+  var platform = getPlatform();
+
+  var results = [];
+
+  // 简介
+  var syn = buildSynopsis(g, hero, title, selling, platform);
+  results.push({ tag: '📝 小说简介', content: syn });
+
+  // 封面
+  var cover = buildCover(g, hero, title, platform);
+  results.push({ tag: '🖼 小说封面', content: cover.mockup, isCover: true, coverPrompt: cover.prompt });
+
+  // 投稿渠道
+  var sub = buildSubmission(genre, platform);
+  results.push({ tag: '📮 投稿渠道', content: sub, isSubmission: true });
+
+  var fullMD = '# ' + g.name + ' - 新书配套\n书名：《' + title + '》 主角：' + hero + ' 目标平台：' + (PLATFORMS[platform] ? PLATFORMS[platform].name : '通用') + '\n\n---\n\n' + syn + '\n\n---\n\n' + sub + '\n';
+
+  var auditHtml = buildAuditReport(fullMD);
+  var pacingHtml = buildPacingReport(fullMD);
+  persistHistory('newbook', g.name + ' · 新书配套 · ' + title, fullMD, auditHtml, pacingHtml);
+
+  displayResults(results, auditHtml, pacingHtml);
+}
+
+function genTitle(g, hero) {
+  var suffix = {
+    zhuixu: '的隐藏身份', qiandao: '签到万年', moshi: '的末世日记', chuanshu: '穿书之后',
+    tianchong: '追妻日记', niandai: '的致富路', chongsheng: '重来一次', xuanyi: '诡案录'
+  };
+  return hero + (suffix[g && coverKeyByGenre(g.name)] || '的传奇');
+}
+
+function showToast(msg) {
+  var toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function(){ toast.classList.remove('show'); }, 2000);
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('已复制到剪贴板 ✓');
+    }).catch(function() { fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  showToast('已复制到剪贴板 ✓');
+}
+
+function downloadMD(filename, content) {
+  // 尝试真实下载（在系统浏览器中正常落盘到「下载」文件夹）
+  try {
+    var blob = new Blob([content], {type:'text/markdown;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  } catch(e) {}
+  // 兜底：预览沙箱常拦截下载，弹出原文窗口，确保一定能拿到内容
+  showMDViewer(filename, content);
+}
+
+function showMDViewer(filename, content) {
+  var ov = document.getElementById('mdViewerOverlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'mdViewerOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.75);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px;font-family:-apple-system,Segoe UI,Roboto,sans-serif';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if (e.target === ov) ov.style.display = 'none'; });
+  }
+  ov.innerHTML = '';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:14px;max-width:780px;width:100%;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)';
+  var head = document.createElement('div');
+  head.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #eee;gap:12px';
+  var titleWrap = document.createElement('div');
+  titleWrap.innerHTML = '<div style="font-weight:700;font-size:15px;color:#1e293b">📄 ' + esc(filename) + '</div>' +
+    '<div style="font-weight:400;font-size:12px;color:#64748b;margin-top:4px;line-height:1.5">预览面板可能拦截浏览器直接下载。下方为原始 Markdown，可「复制全部」后自行粘贴保存为 .md 文件。</div>';
+  var close = document.createElement('button');
+  close.textContent = '✕';
+  close.style.cssText = 'border:none;background:#f1f5f9;width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer;color:#475569;flex:none';
+  close.onclick = function(){ ov.style.display = 'none'; };
+  head.appendChild(titleWrap); head.appendChild(close);
+  var ta = document.createElement('textarea');
+  ta.readOnly = true;
+  ta.value = content;
+  ta.style.cssText = 'flex:1;border:none;outline:none;resize:none;padding:16px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.6;color:#0f172a;background:#fafafa;white-space:pre';
+  var foot = document.createElement('div');
+  foot.style.cssText = 'padding:12px 18px;border-top:1px solid #eee;display:flex;gap:10px;justify-content:flex-end';
+  var copyBtn = document.createElement('button');
+  copyBtn.textContent = '📋 复制全部';
+  copyBtn.style.cssText = 'border:none;background:#e11d48;color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:14px';
+  copyBtn.onclick = function(){ ta.focus(); ta.select(); copyToClipboard(content); };
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = '关闭';
+  closeBtn.style.cssText = 'border:1px solid #cbd5e1;background:#fff;color:#475569;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:14px';
+  closeBtn.onclick = function(){ ov.style.display = 'none'; };
+  foot.appendChild(closeBtn); foot.appendChild(copyBtn);
+  box.appendChild(head); box.appendChild(ta); box.appendChild(foot);
+  ov.appendChild(box);
+  ov.style.display = 'flex';
+  ta.focus(); ta.select();
+}
+
+// ============ GENERATION: Mode 1 ============
+function generateInspiration() {
+  var genre = selectedGenres.inspiration || 'zhuixu';
+  var qty = parseInt(getRadioValue('qty-inspiration')) || 3;
+  var fmt = getRadioValue('fmt-inspiration') || 'display';
+  var extraEl = document.getElementById('extra-inspiration');
+  var extra = extraEl ? extraEl.value.trim() : '';
+
+  var g = GENRES[genre];
+  var subGenre = selectedSubGenres.inspiration;
+  var variants;
+  if (subGenre && subGenre !== 'random') {
+    variants = [subGenre];
+    var others = g.variants.filter(function(v){ return v !== subGenre; });
+    variants = variants.concat(pickN(others, qty - 1));
+  } else {
+    variants = pickN(g.variants, qty);
+  }
+
+  var results = [];
+  var fullMD = '# ' + g.name + ' - 灵感综合生成\n\n';
+
+  variants.forEach(function(variant, i) {
+    var heroName = randomName(Math.random() > 0.5);
+    var heroineName = randomName(true);
+    var villainName = randomName(false);
+
+    var genreKey = getGenreKey(g);
+    var logline = generateLogline(genreKey, variant, heroName);
+    var premise = generatePremise(g, variant, heroName, heroineName, villainName);
+    var conflicts = generateConflicts(g);
+    var twists = generateTwists(g);
+    var characters = generateCharacters(g, heroName, heroineName, villainName);
+    var worldview = generateWorldview(g);
+
+    var content = '### 📖 方向' + (i+1) + '：' + variant + '\n\n**一句话简介**\n' + logline + '\n\n**故事梗概**\n' + premise + '\n\n**核心冲突**\n' + conflicts + '\n\n**关键转折**\n' + twists + '\n\n---\n\n**主角设定**\n' + characters + '\n\n**世界观核心**\n' + worldview;
+
+    results.push({ tag: variant, content: content });
+    fullMD += '## 方向' + (i+1) + '：' + variant + '\n\n' + content + '\n\n---\n\n';
+  });
+
+  var hotKeys = getHotKeys('inspiration');
+  if (hotKeys.length) {
+    var note = buildHotNote(hotKeys);
+    results.push({ tag: '🔥 热门元素植入', content: note });
+    fullMD += '## 热门元素植入\n\n' + note + '\n\n---\n\n';
+  }
+
+  var platNote = buildPlatformNote();
+  if (platNote) { results.push({ tag: '🎨 平台风格适配', content: platNote }); fullMD += '\n\n' + platNote + '\n'; }
+  var auditHtml = buildAuditReport(fullMD);
+  var pacingHtml = buildPacingReport(fullMD);
+  persistHistory('inspiration', g.name + ' · ' + (variants[0] || ''), fullMD, auditHtml, pacingHtml);
+
+  displayResults(results, auditHtml, pacingHtml);
+  if (fmt === 'md') { fullMD += '\n' + auditToMarkdown(fullMD) + '\n' + pacingToMarkdown(fullMD); downloadMD('灵感方案_' + g.name + '_' + Date.now() + '.md', fullMD); }
+  else if (fmt === 'copy') copyToClipboard(fullMD);
+}
+
+function getGenreKey(g) {
+  var keys = Object.keys(GENRES);
+  for (var i = 0; i < keys.length; i++) {
+    if (GENRES[keys[i]] === g) return keys[i];
+  }
+  return 'zhuixu';
+}
+
+function generateLogline(genreKey, variant, name) {
+  var templates = {
+    zhuixu: name + '入赘三年被全家视为废物，没人知道他真实的身份足以让整座城市的豪门跪下来叫他一声"少主"。',
+    qiandao: name + '在宗门废墟签到第一天获得上古传承，同门还在嘲笑他废柴时，他的实力已经悄悄碾压了宗主。',
+    moshi: name + '带着末世记忆重生回三十天前，当所有人还在嘲笑她疯狂囤货时，灾难提前降临了。',
+    chuanshu: name + '穿进一本小说成了第三章就死的炮灰，系统让她逆袭改命——但原著男主正提着剑站在门外。',
+    tianchong: name + '在男主身边隐忍三年，终于决定离开。三天后男主翻到她留下的字条，才发现自己错过了什么。',
+    niandai: name + '穿越到六零年代家徒四壁，脑子里装着全套现代农业知识，极品亲戚还在等着欺负她。',
+    chongsheng: name + '被未婚夫和白莲花联手害死，重生回到三年前——这次她不会再给任何人伤害她的机会。',
+    xuanyi: name + '接到一起没有伤口的微笑死亡案，调查越深越发现，死者手机里最后一条消息发给了他自己。'
+  };
+  return templates[genreKey] || templates.zhuixu;
+}
+
+function generatePremise(g, variant, hero, heroine, villain) {
+  var nodes = g.nodes;
+  return hero + '的起点是"' + nodes[0] + '"。' + g.maleLead + '，带着' + g.goldenFinger + '的金手指，在' + g.worldRule.split('。')[0] + '的世界中挣扎求生。\n\n当' + g.conflict + '的矛盾爆发时，' + hero + '被迫踏入"' + nodes[1] + '"的阶段。搭档' + heroine + '（' + g.femaleLead + '）的出现让局势更加复杂，而反派' + villain + '（' + g.villain + '）的步步紧逼将他推向绝境。\n\n故事的核心张力在于：' + hero + '必须在"' + nodes[2] + '"和"' + nodes[3] + '"之间做出抉择，而"' + nodes[4] + '"的终极爆发将彻底改变整个世界格局。';
+}
+
+function generateConflicts(g) {
+  return '- **外在冲突**：' + g.villain + ' vs 主角的生存与成长\n- **内在冲突**：' + g.conflict + '\n- **终极抉择**：' + g.nodes[3] + ' → ' + g.nodes[4] + '，主角是否有权做这个决定？';
+}
+
+function generateTwists(g) {
+  var n = g.nodes;
+  return '1. **' + n[0] + '**：主角处于低谷，金手指激活\n2. **' + n[1] + '**：首次出手，小范围打脸\n3. **' + n[2] + '**：关系反转，曾经轻视主角的人态度剧变\n4. **' + n[3] + '**：身份/真相揭露，格局展开\n5. **' + n[4] + '**：终极碾压，引出更大的主线';
+}
+
+function generateCharacters(g, hero, heroine, villain) {
+  return '**' + hero + '** — ' + g.maleLead + '\n- 标签：' + g.maleTag + '\n- 金手指：' + g.goldenFinger + '\n- 核心动机：' + g.conflict + '\n\n**' + heroine + '** — ' + g.femaleLead + '\n- 与主角张力来源：身份差/误会/利益冲突\n\n**' + villain + '** — ' + g.villain + '\n- 前期可打脸，中期暗示更大背景';
+}
+
+function generateWorldview(g) {
+  return '- **世界基调**：' + g.worldRule + '\n- **核心矛盾**：' + g.conflict + '\n- **力量/权力体系**：' + (g.worldRule.split('。')[1] || g.worldRule) + '\n- **金手指融入点**：' + g.goldenFinger;
+}
+
+// ============ GENERATION: Mode 2 ============
+function generateOpening() {
+  var nameEl = document.getElementById('protagonistName');
+  var name = nameEl ? nameEl.value.trim() : '';
+  if (!name) return;
+  var genre = selectedGenres.opening || 'zhuixu';
+  var qty = parseInt(getRadioValue('qty-opening')) || 3;
+  var wc = parseInt(getRadioValue('wc-opening')) || 100;
+  var fmt = getRadioValue('fmt-opening') || 'display';
+
+  var g = GENRES[genre];
+  var mats = OPENING_MATERIALS[genre] || OPENING_MATERIALS.zhuixu;
+  var styles = g.openingStyles;
+
+  var results = [];
+  var fullMD = '# ' + g.name + ' - 爽文开头生成\n主角：' + name + '\n\n';
+  var firstText = '';
+
+  for (var i = 0; i < qty; i++) {
+    var style = styles[i % styles.length];
+    var scene = pick(mats.scenes);
+    var hint = pick(mats.hints);
+    var bomb = pick(mats.bombs);
+    var conflict = pick(mats.conflicts);
+
+    var text = '';
+    if (style === '悬念反转型') {
+      text = name + scene + '。' + hint + '。' + bomb + '。';
+    } else if (style === '高燃冲突型') {
+      text = conflict + '\n' + name + '没有说话。\n' + hint + '。' + bomb + '。';
+    } else if (style === '冷峻叙事型') {
+      text = scene + '。\n' + name + '面无表情。' + hint + '。\n' + bomb + '。';
+    } else if (style === '戏谑吐槽型') {
+      text = name + '觉得自己的运气大概是被狗吃了。\n' + scene + '也就算了，' + hint + '。\n' + bomb + '。';
+    } else if (style === '倒叙震撼型') {
+      text = bomb + '。\n而这一切的开始，要从' + scene + '说起。\n那天' + name + hint + '。';
+    }
+
+    if (wc === 200) {
+      text += '\n\n' + conflict + '\n' + name + '的眼神变了。' + pick(mats.hints) + '。\n' + pick(mats.bombs) + '。';
+    }
+
+    if (i === 0) firstText = text;
+
+    var content = '### ✍️ 开头' + (i+1) + '（' + style + '）\n\n> ' + text + '\n\n**适配爽点**：' + g.template + '\n**风格**：' + style + ' — ' + OPENING_STYLES[style].desc;
+
+    results.push({ tag: '开头' + (i+1) + ' · ' + style, content: content });
+    fullMD += '## 开头' + (i+1) + '（' + style + '）\n\n' + text + '\n\n适配爽点：' + g.template + '\n\n---\n\n';
+  }
+
+  var guidance = '\n💬 回复序号+补充细节，我帮你扩写全文';
+  results.push({ tag: '引导语', content: guidance, isGuidance: true });
+  fullMD += guidance + '\n';
+
+  var hotKeys = getHotKeys('opening');
+  if (hotKeys.length) {
+    var note = buildHotNote(hotKeys);
+    results.push({ tag: '🔥 热门元素植入', content: note });
+    fullMD += '\n## 热门元素植入\n\n' + note + '\n';
+  }
+
+  // 引流文案
+  var trafficTgl = document.getElementById('trafficToggle');
+  if (trafficTgl && trafficTgl.checked) {
+    var traffic = buildTrafficCopy(name, genre, firstText);
+    results.push({ tag: '📣 引流文案', content: traffic, isTraffic: true });
+    fullMD += '\n## 引流文案\n\n' + traffic + '\n';
+  }
+
+  var platNote = buildPlatformNote();
+  if (platNote) { results.push({ tag: '🎨 平台风格适配', content: platNote }); fullMD += '\n\n' + platNote + '\n'; }
+  var auditHtml = buildAuditReport(fullMD);
+  var pacingHtml = buildPacingReport(fullMD);
+  persistHistory('opening', g.name + ' · ' + name + ' · ' + qty + '个开头', fullMD, auditHtml, pacingHtml);
+
+  displayResults(results, auditHtml, pacingHtml);
+  if (fmt === 'md') { fullMD += '\n' + auditToMarkdown(fullMD) + '\n' + pacingToMarkdown(fullMD); downloadMD('爽文开头_' + g.name + '_' + name + '_' + Date.now() + '.md', fullMD); }
+  else if (fmt === 'copy') copyToClipboard(fullMD);
+}
+
+function buildTrafficCopy(name, genre, openingText) {
+  var g = GENRES[genre] || GENRES.zhuixu;
+  var snippet = (openingText && openingText.length > 24) ? openingText.replace(/\n/g,'').slice(0,24) + '…' : ('《' + g.name + '》最新开篇');
+  var nm = name || '主角';
+  var hook = g.template.split('→')[0];
+
+  var xhs = '### 📕 小红书文案\n' +
+    '🔥宝子们！最近挖到一本超上头的' + g.name + '，开篇直接封神！\n\n' +
+    '「' + snippet + '」\n\n' +
+    '主角' + nm + '的人设太带感了，' + hook + '的爽感拉满💯\n' +
+    '📌想看后续全集的姐妹，点我主页戳「小说」合集，每日追更不迷路～\n' +
+    '#' + g.name + ' #网文推荐 #宝藏小说 #追更日常 #甜宠文';
+
+  var dy = '### 🎬 抖音文案\n' +
+    '家人们谁懂啊！这本' + g.name + '开篇直接给我看傻了😱\n\n' +
+    '「' + snippet + '」\n\n' +
+    '主角' + nm + '这波操作，' + hook + '直接爽到天灵盖！\n' +
+    '点个关注，下集更精彩，全集在主页置顶，错过血亏！';
+
+  var ks = '### 📺 快手文案\n' +
+    '老铁们，这本' + g.name + '真香！开篇就上大招🔥\n\n' +
+    '「' + snippet + '」\n\n' +
+    '主角' + nm + '的故事，' + hook + '，双击屏幕看全集，咱们主页见！';
+
+  return xhs + '\n\n---\n\n' + dy + '\n\n---\n\n' + ks;
+}
+
+// ============ GENERATION: Mode 3 ============
+function generateGolden3() {
+  var genre = selectedGenres.golden3;
+  if (!genre) return;
+  var fmt = getRadioValue('fmt-golden3') || 'display';
+  var nameEl = document.getElementById('protagonistName3');
+  var name = nameEl ? nameEl.value.trim() : '';
+  if (!name) name = randomName(Math.random() > 0.5);
+
+  var g = GENRES[genre];
+  var heroineName = randomName(true);
+  var villainName = randomName(false);
+
+  var charProfile = '### 📌 核心人设\n\n**主角档案**\n- 姓名：' + name + '\n- 表面身份：' + g.maleTag.split('→')[0] + '\n- 真实身份/潜力：' + g.maleTag.split('→')[1] + '\n- 性格标签：' + g.maleLead.split('/')[0] + '、' + (g.maleLead.split('/')[1] || '谨慎') + '、护短\n- 金手指：' + g.goldenFinger + '\n- 核心动机：' + g.conflict + '\n- 缺陷/弱点：过度依赖金手指，使用时有代价/冷却\n- 标志性细节：' + pick(['习惯性摩挲手指','紧张时敲击桌面','眼神变冷时反而会笑','遇事不慌但会先算三步']) + '\n\n**搭档/CP档案**\n- 姓名：' + heroineName + '\n- 身份：' + g.femaleLead + '\n- 与主角张力来源：身份差距/初期误会/利益冲突\n- 成长方向：从旁观者→并肩作战的伙伴\n\n**反派体系**\n- 前期反派：' + villainName + ' — ' + g.villain.split('、')[0] + '，嚣张资本是家世/实力，打脸方式：主角金手指首次出手碾压\n- 中期反派暗示：' + (g.villain.split('、')[1] || '幕后势力') + '，与主角有未知关联\n- 终极反派暗示：' + (g.villain.split('、')[2] || '更大的存在') + '，威胁来源待揭晓';
+
+  var worldRules = '### 🌍 世界观核心规则\n\n- **世界基调**：' + g.worldRule + '\n- **力量体系**：' + (g.worldRule.split('。')[1] || '详见赛道设定') + '\n- **核心资源**：' + g.goldenFinger.split('、')[0] + '\n- **势力格局**：' + g.worldRule.split('。')[0] + '\n- **关键禁忌**：' + g.conflict + '\n- **金手指融入点**：' + g.goldenFinger + '，获得方式在第1章交代，有使用代价';
+
+  var ch1Parts = g.g3c.ch1.split(' → ');
+  var ch2Parts = g.g3c.ch2.split(' → ');
+  var ch3Parts = g.g3c.ch3.split(' → ');
+
+  var ch1 = '### 📖 第1章：处境建立+金手指激活\n\n- **场景**：' + ch1Parts[0] + '\n- **冲突点**：' + (ch1Parts[1] || '主角面临困境') + '\n- **金手指激活**：' + g.goldenFinger.split('、')[0] + '\n- **首个爽点**：金手指带来的第一个小优势\n- **结尾钩子**：' + (ch1Parts[2] || '悬念留白') + '\n- **节奏**：低谷处境(200字) → 冲突爆发(300字) → 金手指激活(200字) → 首次小爽(200字) → 钩子结尾(100字)';
+
+  var ch2 = '### 📖 第2章：首次出手+打脸\n\n- **场景**：' + ch2Parts[0] + '\n- **冲突点**：' + (ch2Parts[1] || '对手继续嚣张') + '\n- **金手指运用**：' + g.goldenFinger.split('、')[0] + '化解危机\n- **爽点释放**：' + (ch2Parts[3] || '对手震惊/态度反转') + '\n- **结尾钩子**：' + (ch2Parts[4] || ch2Parts[3] || '更大麻烦出现') + '\n- **节奏**：对手嚣张(200字) → 主角布局(200字) → 金手指出手(200字) → 打脸爽感(300字) → 新危机钩子(100字)';
+
+  var ch3 = '### 📖 第3章：碾压爆发+格局展开\n\n- **场景**：' + ch3Parts[0] + '\n- **冲突点**：' + (ch3Parts[1] || '比前两章更强的对手') + '\n- **金手指爆发**：超出所有人预期的更强运用\n- **碾压爽点**：' + (ch3Parts[3] || '实力差距碾压，全场震撼') + '\n- **结尾钩子**：' + (ch3Parts[4] || ch3Parts[3] || '主线开启') + '\n- **节奏**：大场面铺垫(200字) → 强敌出现(200字) → 主角出手(200字) → 碾压震撼(300字) → 主线开启钩子(100字)';
+
+  var checklist = '### ✅ 质量检查清单\n\n- [x] 第1章有钩子\n- [x] 金手指清晰（第1章交代获得方式和基本功能）\n- [x] 爽点递进（小爽→打脸→碾压）\n- [x] 前期反派足够嚣张\n- [x] 主角有标志性特征\n- [x] 世界观自洽\n- [x] 第3章引主线\n- [x] 节奏明快（每章1000字内有冲突）\n- [ ] CP/搭档暗示（视需求）\n- [x] 金手指留成长空间';
+
+  var fullContent = '## 🏆 ' + g.name + ' — 黄金三章配套框架\n\n主角：' + name + ' | 赛道：' + g.name + '\n爽点结构：' + g.template + '\n\n---\n\n' + charProfile + '\n\n---\n\n' + worldRules + '\n\n---\n\n' + ch1 + '\n\n' + ch2 + '\n\n' + ch3 + '\n\n---\n\n' + checklist;
+
+  var results = [{ tag: g.name + ' · 黄金三章', content: fullContent }];
+  var fullMD = '# ' + g.name + ' - 黄金三章配套框架\n\n主角：' + name + '\n爽点结构：' + g.template + '\n\n---\n\n' + charProfile + '\n\n' + worldRules + '\n\n' + ch1 + '\n\n' + ch2 + '\n\n' + ch3 + '\n\n' + checklist + '\n';
+
+  var hotKeys = getHotKeys('golden3');
+  if (hotKeys.length) {
+    var note = buildHotNote(hotKeys);
+    results.push({ tag: '🔥 热门元素植入', content: note });
+    fullMD += '\n## 热门元素植入\n\n' + note + '\n';
+  }
+
+  var platNote = buildPlatformNote();
+  if (platNote) { results.push({ tag: '🎨 平台风格适配', content: platNote }); fullMD += '\n\n' + platNote + '\n'; }
+  var auditHtml = buildAuditReport(fullMD);
+  var pacingHtml = buildPacingReport(fullMD);
+  persistHistory('golden3', g.name + ' · 黄金三章', fullMD, auditHtml, pacingHtml);
+
+  displayResults(results, auditHtml, pacingHtml);
+  if (fmt === 'md') { fullMD += '\n' + auditToMarkdown(fullMD) + '\n' + pacingToMarkdown(fullMD); downloadMD('黄金三章_' + g.name + '_' + name + '_' + Date.now() + '.md', fullMD); }
+  else if (fmt === 'copy') copyToClipboard(fullMD);
+}
+
+// ============ GENERATION: Mode 4 ============
+function generateBestseller() {
+  var inputEl = document.getElementById('bestsellerInput');
+  var input = inputEl ? inputEl.value.trim() : '';
+  if (!input) return;
+  var genre = selectedGenres.bestseller;
+  var qty = parseInt(getRadioValue('qty-bestseller')) || 3;
+  var fmt = getRadioValue('fmt-bestseller') || 'display';
+
+  var detectedGenre = genre || detectGenre(input);
+  var g = GENRES[detectedGenre] || GENRES.zhuixu;
+  var mats = OPENING_MATERIALS[detectedGenre] || OPENING_MATERIALS.zhuixu;
+
+  var deconReport = '## 🔥 爆款拆解报告\n\n### 一、赛道识别\n- 匹配赛道：' + g.name + '\n- 匹配依据：' + (genre ? '用户指定' : '根据关键词自动识别') + '\n\n### 二、爽点结构拆解\n- 赛道：' + g.name + '\n- 当前阶段：' + g.nodes[0] + '（对应赛道爽点结构的第1节点）\n- 爽点密度：' + (input.length > 200 ? '高' : '中') + '\n- 压抑释放比：7:3（先抑后扬型）\n- 钩子类型：尾钩型（最后一句制造悬念）\n- 核心爽点：' + g.template.split('→')[0] + '\n\n### 三、叙事节奏分析\n- 开场方式：' + (input.charAt(0) === '"' ? '对话开场' : (input.length < 50 ? '场景开场' : '倒叙开场')) + '\n- 视角：第三人称限知\n- 信息释放节奏：前疏后密（末尾信息炸弹）\n- 对话占比：' + (input.indexOf('"') !== -1 ? '高对话型' : '低对话型') + '\n- 情绪曲线：压抑 → 好奇 → 震撼\n- 句式风格：短句密集型\n- 留白程度：高（暗示多，直白少）\n\n### 四、人设框架提取\n- 主角辨识度：' + (input.length > 10 ? '姓名+处境反差' : '待补充') + '\n- 开局处境：' + g.maleTag.split('→')[0] + '\n- 实力暗示：' + g.goldenFinger.split('、')[0] + '\n- 性格信号：' + g.maleLead.split('/')[0] + '\n- 金手指暗示：' + g.goldenFinger + '\n- 关系张力：与反派/搭档的初期对立\n\n### 五、差异化标记\n- **核心创意点**：' + g.template + '\n- **可复用结构**：' + OPENING_STYLES[g.openingStyles[0]].formula + '\n- **需差异化部分**：人物姓名、具体设定、情节细节\n- **避免照搬点**：原作专有元素（姓名、地名、招式名等）\n\n---\n\n## 同风格新内容\n';
+
+  var results = [{ tag: '爆款拆解报告', content: deconReport }];
+  var fullMD = deconReport + '\n';
+
+  var styles = g.openingStyles;
+  for (var i = 0; i < qty; i++) {
+    var style = styles[i % styles.length];
+    var scene = pick(mats.scenes);
+    var hint = pick(mats.hints);
+    var bomb = pick(mats.bombs);
+    var conflict = pick(mats.conflicts);
+    var newName = randomName(Math.random() > 0.5);
+
+    var text = '';
+    if (style === '悬念反转型') {
+      text = newName + scene + '。' + hint + '。' + bomb + '。';
+    } else if (style === '高燃冲突型') {
+      text = conflict + '\n' + newName + '没有说话。\n' + hint + '。' + bomb + '。';
+    } else if (style === '冷峻叙事型') {
+      text = scene + '。\n' + newName + '面无表情。' + hint + '。\n' + bomb + '。';
+    } else if (style === '戏谑吐槽型') {
+      text = newName + '觉得自己的运气大概是被狗吃了。\n' + scene + '也就算了，' + hint + '。\n' + bomb + '。';
+    } else if (style === '倒叙震撼型') {
+      text = bomb + '。\n而这一切的开始，要从' + scene + '说起。\n那天' + newName + hint + '。';
+    }
+
+    var content = '### 方案' + (i+1) + '：' + style + '\n\n> ' + text + '\n\n**差异化标记**：结构对标原作，人物和设定完全原创\n**适配爽点**：' + g.template;
+
+    results.push({ tag: '方案' + (i+1) + ' · ' + style, content: content });
+    fullMD += '### 方案' + (i+1) + '：' + style + '\n\n' + text + '\n\n---\n\n';
+  }
+
+  var hotKeys = getHotKeys('bestseller');
+  if (hotKeys.length) {
+    var note = buildHotNote(hotKeys);
+    results.push({ tag: '🔥 热门元素植入', content: note });
+    fullMD += '\n## 热门元素植入\n\n' + note + '\n';
+  }
+
+  var platNote = buildPlatformNote();
+  if (platNote) { results.push({ tag: '🎨 平台风格适配', content: platNote }); fullMD += '\n\n' + platNote + '\n'; }
+  var auditHtml = buildAuditReport(fullMD);
+  var pacingHtml = buildPacingReport(fullMD);
+  persistHistory('bestseller', g.name + ' · 爆款对标', fullMD, auditHtml, pacingHtml);
+
+  displayResults(results, auditHtml, pacingHtml);
+  if (fmt === 'md') { fullMD += '\n' + auditToMarkdown(fullMD) + '\n' + pacingToMarkdown(fullMD); downloadMD('爆款对标_' + g.name + '_' + Date.now() + '.md', fullMD); }
+  else if (fmt === 'copy') copyToClipboard(fullMD);
+}
+
+function detectGenre(text) {
+  var keywords = {
+    zhuixu: ['赘婿','上门','妻子','丈母娘','隐忍','战神','返乡','龙王','兵王'],
+    qiandao: ['签到','宗门','弟子','长老','大比','无敌','碾压'],
+    moshi: ['末世','丧尸','囤货','变异','异能','避难所'],
+    chuanshu: ['穿书','快穿','系统','原著','炮灰','反派','攻略'],
+    tianchong: ['总裁','追妻','替身','火葬场','离婚','甜宠','追悔'],
+    niandai: ['年代','工分','知青','粮票','生产队','种田','六零','七零'],
+    chongsheng: ['重生','前世','回到','再次','上一世','穿越'],
+    xuanyi: ['案件','推理','魔法','密室','诡秘','悬疑','死者','尸体']
+  };
+  var bestMatch = 'zhuixu';
+  var bestScore = 0;
+  Object.keys(keywords).forEach(function(k) {
+    var score = 0;
+    keywords[k].forEach(function(kw) {
+      if (text.indexOf(kw) !== -1) score++;
+    });
+    if (score > bestScore) { bestScore = score; bestMatch = k; }
+  });
+  return bestMatch;
+}
+
+// ============ GENERATION: Mode 5 章节续写 ============
+function generateContinuation() {
+  var pasteEl = document.getElementById('chapterPaste');
+  var paste = pasteEl ? pasteEl.value.trim() : '';
+  if (!paste) { showToast('请先粘贴章节内容'); return; }
+  var genre = selectedGenres.continue || 'zhuixu';
+  var wc = parseInt(getRadioValue('wc-continue')) || 1000;
+  var fmt = getRadioValue('fmt-continue') || 'display';
+  var keepEl = document.getElementById('keepSetting');
+  var keep = keepEl ? keepEl.checked : false;
+
+  var g = GENRES[genre];
+  var mats = OPENING_MATERIALS[genre] || OPENING_MATERIALS.zhuixu;
+  var hero = randomName(Math.random() > 0.5);
+
+  // 承接上章结尾
+  var lastSentence = paste.replace(/\s+/g,'').slice(-40);
+  var paragraphs = [];
+  var charCount = 0;
+  function push(p) { paragraphs.push(p); charCount += p.length; }
+
+  push('（承接你粘贴的上一章结尾：「……' + lastSentence + '」）');
+  push('风波暂歇，' + hero + '站在窗前，脑海中还回荡着方才那一幕——' + pick(mats.conflicts) + '。但他比谁都清楚，真正的考验才刚刚开始。');
+
+  var beatTpls = [
+    function(){ return '就在这时，' + pick(mats.hints) + '。' + hero + '的瞳孔微微一缩，' + (keep ? '他按捺住心思，没有轻举妄动' : '一个大胆的念头在他心中升起') + '。'; },
+    function(){ return g.nodes[1] + '的节点如期而至。' + pick(mats.bombs) + '——所有人都以为' + hero + '会退缩，却不知他早已在暗处布下棋子。'; },
+    function(){ return '对手的攻势愈发凶狠，' + pick(mats.conflicts) + '。' + hero + '深吸一口气，' + g.goldenFinger.split('、')[0] + '在这一刻悄然运转，周身气息陡然一变。'; },
+    function(){ return '局面在瞬息间逆转。' + pick(mats.bombs) + '。围观的人甚至还没反应过来，胜负已分。'; },
+    function(){ return hero + '没有乘胜追击，而是转身望向远方——那里，' + (g.villain.split('、')[0]) + '的影子正缓缓浮现，像一团化不开的阴云。'; },
+    function(){ return '短暂的喘息里，' + hero + '梳理着方才的得失。' + g.conflict + '的矛盾并未消解，反而被推到了临界点。'; },
+    function(){ return '新的变故从最意想不到的地方降临。' + pick(mats.hints) + '，' + hero + '意识到，这场博弈远比想象中更深。'; }
+  ];
+
+  var i = 0;
+  while (charCount < wc && i < 50) {
+    push(beatTpls[i % beatTpls.length]());
+    i++;
+  }
+
+  // 结尾钩子
+  push('而就在' + hero + '以为危机暂解的瞬间，' + pick(mats.bombs) + '。他嘴角勾起一抹冷笑——下一章，才是真正的开始。');
+
+  var draft = paragraphs.join('\n\n');
+
+  var content = '### 📝 续写草案（' + (keep ? '保持人设/世界观' : '自由发挥') + '·目标约' + wc + '字·实际' + charCount + '字）\n\n' +
+    '> ⚠️ 本续写为**基于赛道结构的模板草案**，纯前端无法真正理解你粘贴的剧情。如需 AI 读懂原文、顺着人设世界观续写，请用对话里的「小说灵感生成器」skill 发送这段内容。\n\n' +
+    draft + '\n\n**本章冲突点**：' + (g.villain.split('、')[0]) + '的压迫升级\n**结尾钩子**：更大的危机/势力浮现，引导读者翻下一章';
+
+  var results = [{ tag: '续写草案 · ' + g.name, content: content }];
+  var fullMD = '# ' + g.name + ' - 章节续写草案\n\n' + content + '\n';
+
+  var platNote = buildPlatformNote();
+  if (platNote) { results.push({ tag: '🎨 平台风格适配', content: platNote }); fullMD += '\n\n' + platNote + '\n'; }
+  var auditHtml = buildAuditReport(fullMD + '\n' + paste);
+  var pacingHtml = buildPacingReport(fullMD + '\n' + paste);
+  persistHistory('continue', g.name + ' · 续写草案', fullMD, auditHtml, pacingHtml);
+
+  displayResults(results, auditHtml, pacingHtml);
+  if (fmt === 'md') { fullMD += '\n（原始章节见粘贴内容）\n' + auditToMarkdown(fullMD + '\n' + paste) + '\n' + pacingToMarkdown(fullMD + '\n' + paste); downloadMD('续写草案_' + g.name + '_' + Date.now() + '.md', fullMD); }
+  else if (fmt === 'copy') copyToClipboard(fullMD);
+}
+
+// ============ 历史 & 模板 & 节奏检查 ============
+var LS_HISTORY = 'ng_history_v1';
+var LS_TEMPLATES = 'ng_templates_v1';
+
+function lsGet(key) {
+  try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e){ return null; }
+}
+function lsSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch(e){ return false; }
+}
+
+function formatTime(d) {
+  function p(n){ return (n < 10 ? '0' : '') + n; }
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ---- 历史 ----
+function persistHistory(mode, title, fullMD, auditHtml, pacingHtml) {
+  var list = lsGet(LS_HISTORY) || [];
+  var rec = {
+    id: Date.now(),
+    time: formatTime(new Date()),
+    mode: mode,
+    modeName: MODE_NAMES[mode] || mode,
+    title: title,
+    fullMD: fullMD,
+    auditHtml: auditHtml || '',
+    pacingHtml: pacingHtml || '',
+    preview: (fullMD || '').replace(/[#*>`\n]/g, ' ').replace(/\s+/g, ' ').slice(0, 80)
+  };
+  list.unshift(rec);
+  if (list.length > 50) list = list.slice(0, 50);
+  lsSet(LS_HISTORY, list);
+}
+
+function getHistoryById(id) {
+  var list = lsGet(LS_HISTORY) || [];
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+  return null;
+}
+function delHistory(id) {
+  var list = lsGet(LS_HISTORY) || [];
+  list = list.filter(function(r){ return r.id !== id; });
+  lsSet(LS_HISTORY, list);
+}
+function renderHistory() {
+  var list = lsGet(LS_HISTORY) || [];
+  var el = document.getElementById('historyList');
+  if (!el) return;
+  if (!list.length) { el.innerHTML = '<div class="ht-empty">还没有生成记录。去其他模式生成一次，这里会自动保存～</div>'; return; }
+  var html = '';
+  list.forEach(function(r) {
+    html += '<div class="ht-item">' +
+      '<div class="ht-head"><span class="ht-title">' + esc(r.title) + '</span><span class="ht-time">' + esc(r.time) + ' · ' + esc(r.modeName) + '</span></div>' +
+      '<div class="ht-preview">' + esc(r.preview) + '…</div>' +
+      '<div class="ht-actions">' +
+        '<button data-hview="' + r.id + '">👁 查看/复用</button>' +
+        '<button data-hcopy="' + r.id + '">📋 复制</button>' +
+        '<button data-hdel="' + r.id + '">🗑 删除</button>' +
+      '</div></div>';
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('[data-hview]').forEach(function(b){
+    b.addEventListener('click', function(){ viewHistory(parseInt(b.getAttribute('data-hview'))); });
+  });
+  el.querySelectorAll('[data-hcopy]').forEach(function(b){
+    b.addEventListener('click', function(){ var r = getHistoryById(parseInt(b.getAttribute('data-hcopy'))); if (r) copyToClipboard(r.fullMD); });
+  });
+  el.querySelectorAll('[data-hdel]').forEach(function(b){
+    b.addEventListener('click', function(){ delHistory(parseInt(b.getAttribute('data-hdel'))); renderHistory(); });
+  });
+}
+function viewHistory(id) {
+  var r = getHistoryById(id);
+  if (!r) return;
+  var area = document.getElementById('resultsArea');
+  if (!area) return;
+  var html = '<div class="result-item"><div class="ri-header"><span class="ri-tag">' + esc(r.title) + '</span><span style="font-size:12px;color:#999">' + esc(r.time) + '</span></div><div class="ri-content">' + highlightViolations(markdownToHtml(r.fullMD)) + '</div></div>' + (r.auditHtml || '') + (r.pacingHtml || '');
+  area.innerHTML = html;
+  showToast('已载入历史记录 ✓');
+}
+
+// ---- 模板 ----
+function collectParams(mode) {
+  function val(id){ var e = document.getElementById(id); return e ? e.value.trim() : ''; }
+  function chk(id){ var e = document.getElementById(id); return e ? e.checked : false; }
+  var p = { mode: mode };
+  p.genre = selectedGenres[mode];
+  p.subgenre = selectedSubGenres[mode];
+  p.qty = getRadioValue('qty-' + mode);
+  p.fmt = getRadioValue('fmt-' + mode);
+  p.wc = getRadioValue('wc-' + mode);
+  p.hotEnabled = hotEnabled[mode] || false;
+  p.hotSel = (hotSel[mode] || []).slice();
+  p.extra = val('extra-' + mode);
+  if (mode === 'opening') p.protagonist = val('protagonistName');
+  if (mode === 'golden3') p.protagonist3 = val('protagonistName3');
+  if (mode === 'bestseller') p.input = val('bestsellerInput');
+  if (mode === 'continue') p.chapter = val('chapterPaste');
+  p.traffic = chk('trafficToggle');
+  p.keep = chk('keepSetting');
+  return p;
+}
+
+function saveTemplate() {
+  var nameEl = document.getElementById('templateName');
+  var name = nameEl ? nameEl.value.trim() : '';
+  if (!name) { showToast('请先给模板起个名字'); if (nameEl) nameEl.focus(); return; }
+  var p = collectParams(currentMode);
+  if (!p.genre && p.mode !== 'bestseller' && p.mode !== 'continue') { showToast('当前模式缺少赛道选择，无法保存'); return; }
+  var list = lsGet(LS_TEMPLATES) || [];
+  list.unshift({ id: Date.now(), name: name, params: p });
+  lsSet(LS_TEMPLATES, list);
+  if (nameEl) nameEl.value = '';
+  renderTemplates();
+  showToast('模板已保存 ✓');
+}
+
+function renderTemplates() {
+  var list = lsGet(LS_TEMPLATES) || [];
+  var el = document.getElementById('templateList');
+  if (!el) return;
+  if (!list.length) { el.innerHTML = '<div class="ht-empty">还没有保存的模板。在上方「保存当前选择为模板」里存一套常用参数吧～</div>'; return; }
+  var html = '';
+  list.forEach(function(t) {
+    var p = t.params;
+    var genreName = p.genre ? (GENRES[p.genre] ? GENRES[p.genre].name : p.genre) : (p.mode === 'bestseller' ? '爆款对标' : (p.mode === 'continue' ? '章节续写' : ''));
+    var desc = (MODE_NAMES[p.mode] || p.mode) + (genreName ? (' · ' + genreName) : '') + (p.qty ? (' · ' + p.qty + '个') : '') + (p.wc ? (' · ' + p.wc + '字') : '') + (p.hotEnabled ? (' · 热门' + p.hotSel.length + '项') : '');
+    html += '<div class="ht-item"><div class="ht-head"><span class="ht-title">' + esc(t.name) + '</span><span class="ht-time">' + esc(desc) + '</span></div>' +
+      '<div class="ht-actions"><button data-tapply="' + t.id + '">✅ 套用</button><button data-tdel="' + t.id + '">🗑 删除</button></div></div>';
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('[data-tapply]').forEach(function(b){
+    b.addEventListener('click', function(){ applyTemplate(parseInt(b.getAttribute('data-tapply'))); });
+  });
+  el.querySelectorAll('[data-tdel]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var list2 = lsGet(LS_TEMPLATES) || [];
+      list2 = list2.filter(function(t){ return t.id !== parseInt(b.getAttribute('data-tdel')); });
+      lsSet(LS_TEMPLATES, list2); renderTemplates();
+    });
+  });
+}
+
+function applyTemplate(id) {
+  var list = lsGet(LS_TEMPLATES) || [];
+  var t = null;
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) t = list[i];
+  if (!t) return;
+  applyParams(t.params);
+}
+
+function setRadio(groupId, val) {
+  if (!val) return;
+  var group = document.getElementById(groupId);
+  if (!group) return;
+  group.querySelectorAll('.radio-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-val') === val); });
+}
+function setVal(id, v) {
+  var e = document.getElementById(id);
+  if (e && v !== undefined && v !== null) e.value = v;
+}
+function setChecked(id, v) {
+  var e = document.getElementById(id);
+  if (e) e.checked = !!v;
+}
+function setHot(mode, keys) {
+  var grid = document.getElementById('hotGrid-' + mode);
+  var tgl = document.getElementById('hotToggle-' + mode);
+  if (!grid) return;
+  hotEnabled[mode] = !!(keys && keys.length > 0);
+  hotSel[mode] = (keys || []).slice();
+  if (tgl) tgl.checked = hotEnabled[mode];
+  grid.style.display = hotEnabled[mode] ? 'flex' : 'none';
+  grid.querySelectorAll('.genre-chip').forEach(function(c){
+    c.classList.toggle('active', keys && keys.indexOf(c.getAttribute('data-hot')) !== -1);
+  });
+}
+function selectSubGenreByVal(mode, val) {
+  var grid = document.getElementById('subgenreGrid-' + mode);
+  if (!grid) return;
+  grid.querySelectorAll('.genre-chip').forEach(function(c){
+    if (c.getAttribute('data-subval') === val) { c.classList.add('active'); selectedSubGenres[mode] = val; }
+    else c.classList.remove('active');
+  });
+}
+function applyParams(p) {
+  switchMode(p.mode);
+  if (p.genre) selectGenre(p.genre, p.mode);
+  if (p.subgenre && p.subgenre !== 'random') selectSubGenreByVal(p.mode, p.subgenre);
+  setRadio('qty-' + p.mode, p.qty);
+  setRadio('fmt-' + p.mode, p.fmt);
+  if (p.mode === 'opening' || p.mode === 'bestseller' || p.mode === 'continue') setRadio('wc-' + p.mode, p.wc);
+  setHot(p.mode, p.hotSel);
+  setVal('extra-' + p.mode, p.extra);
+  if (p.mode === 'opening') setVal('protagonistName', p.protagonist);
+  if (p.mode === 'golden3') setVal('protagonistName3', p.protagonist3);
+  if (p.mode === 'bestseller') setVal('bestsellerInput', p.input);
+  if (p.mode === 'continue') setVal('chapterPaste', p.chapter);
+  setChecked('trafficToggle', p.traffic);
+  setChecked('keepSetting', p.keep);
+  if (p.mode === 'opening') checkOpeningReady();
+  else if (p.mode === 'golden3') checkGolden3Ready();
+  else if (p.mode === 'bestseller') checkBestsellerReady();
+  else if (p.mode === 'continue') checkContinueReady();
+  showToast('模板已套用 ✓');
+}
+
+// ---- 爽点节奏检查 ----
+function analyzePacing(text) {
+  var t = (text || '').replace(/[#>*`]/g, '');
+  var len = t.length;
+  var first300 = t.slice(0, 300);
+  var checks = [];
+  var score = 100;
+
+  var hasEarlyConflict = PACING.conflictWords.some(function(w){ return first300.indexOf(w) !== -1; });
+  if (hasEarlyConflict) {
+    checks.push({ name: '开头300字内出现冲突/张力', pass: true, advice: '' });
+  } else {
+    score -= 25;
+    checks.push({ name: '开头300字内出现冲突/张力', pass: false, advice: '前300字建议安排一个矛盾爆发点或悬念钩子（如被当众羞辱、收到威胁、发现异常），让读者3秒内被抓住。' });
+  }
+
+  var paras = t.split(/\n+/).filter(function(s){ return s.trim().length > 0; });
+  var lastPara = paras.length ? paras[paras.length - 1] : '';
+  var hasHook = PACING.hookWords.some(function(w){ return lastPara.indexOf(w) !== -1; });
+  if (hasHook) {
+    checks.push({ name: '段落/章节结尾有钩子', pass: true, advice: '' });
+  } else {
+    score -= 20;
+    checks.push({ name: '段落/章节结尾有钩子', pass: false, advice: '每个收尾句建议抛出一个未解悬念（疑问句、"然而…"、"更大的危机浮现"等），引导读者翻下一页。' });
+  }
+
+  var coolCount = 0;
+  PACING.coolWords.forEach(function(w){
+    var idx = 0;
+    while ((idx = t.indexOf(w, idx)) !== -1) { coolCount++; idx += w.length; }
+  });
+  var density = len > 0 ? (coolCount / (len / 1000)) : 0;
+  if (density >= 2.5) {
+    checks.push({ name: '爽点密度达标（≥2.5个/千字）', pass: true, advice: '' });
+  } else {
+    score -= 15;
+    checks.push({ name: '爽点密度达标（≥2.5个/千字）', pass: false, advice: '当前爽点密度约 ' + density.toFixed(1) + ' 个/千字。建议增加"打脸/碾压/震惊/反转"等爽感词的出现频次，避免平铺直叙。' });
+  }
+
+  if (len >= 300) {
+    checks.push({ name: '内容体量充足', pass: true, advice: '' });
+  } else {
+    score -= 10;
+    checks.push({ name: '内容体量充足', pass: false, advice: '当前内容偏短，建议至少扩展到300字以上，给爽点和钩子留出展开空间。' });
+  }
+
+  score = Math.max(5, Math.min(100, Math.round(score)));
+  return { score: score, checks: checks };
+}
+
+function buildPacingReport(text) {
+  var r = analyzePacing(text);
+  var color = r.score >= 80 ? '#27ae60' : (r.score >= 60 ? '#f39c12' : '#e74c3c');
+  var verdict = r.score >= 80 ? '节奏达标，可以直接开写' : (r.score >= 60 ? '节奏尚可，局部可优化' : '节奏需重点调整');
+  var html = '<div class="pacing-report"><h3>🎯 爽点节奏检查（新手友好评分）</h3>';
+  html += '<div class="pacing-score" style="color:' + color + '">' + r.score + '<span style="font-size:14px;color:#888"> /100</span></div>';
+  html += '<div style="font-size:13px;color:#555;margin-bottom:8px">综合评级：' + verdict + '</div>';
+  r.checks.forEach(function(c){
+    html += '<div class="pacing-check"><span class="' + (c.pass ? 'pass' : 'fail') + '">' + (c.pass ? '✅ ' : '⚠️ ') + c.name + '</span>' + (c.pass ? '（达标）' : '（待优化）') + (c.advice ? '<div class="pacing-advice">💡 ' + c.advice + '</div>' : '') + '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function pacingToMarkdown(text) {
+  var r = analyzePacing(text);
+  var md = '## 🎯 爽点节奏检查（' + r.score + '/100）\n\n';
+  r.checks.forEach(function(c){
+    md += (c.pass ? '- ✅ ' : '- ⚠️ ') + c.name + (c.advice ? ('：' + c.advice) : '') + '\n';
+  });
+  return md;
+}
+
+// ============ DISPLAY & EXPORT ============
+function displayResults(results, auditHtml, pacingHtml) {
+  var area = document.getElementById('resultsArea');
+  if (!area) return;
+  var html = '';
+  results.forEach(function(r, i) {
+    if (r.isGuidance) {
+      html += '<div class="result-item" style="border-left-color:#e74c3c;text-align:center"><div class="ri-content" style="font-size:15px;font-weight:600">' + r.content + '</div></div>';
+      return;
+    }
+    if (r.isTraffic) {
+      html += '<div class="traffic-card"><div class="ri-header"><span class="ri-tag">📣 引流文案</span>' +
+        '<div class="ri-actions"><button data-copy-idx="' + i + '">📋 复制</button><button data-dl-idx="' + i + '">📄 下载MD</button></div></div>' +
+        '<div class="ri-content">' + markdownToHtml(r.content) + '</div></div>';
+      return;
+    }
+    if (r.isCover) {
+      html += '<div class="result-item" style="border-left-color:#8e44ad"><div class="ri-header"><span class="ri-tag">🖼 小说封面</span>' +
+        '<div class="ri-actions"><button data-coveridx="' + i + '">📋 复制提示词</button></div></div>' +
+        '<div class="ri-content">' + r.content + '</div></div>';
+      return;
+    }
+    if (r.isSubmission) {
+      html += '<div class="submission-card result-item" style="border-left-color:#16a085"><div class="ri-header"><span class="ri-tag">📮 投稿渠道</span>' +
+        '<div class="ri-actions"><button data-copy-idx="' + i + '">📋 复制</button><button data-dl-idx="' + i + '">📄 下载MD</button></div></div>' +
+        '<div class="ri-content">' + markdownToHtml(r.content) + '</div></div>';
+      return;
+    }
+    html += '<div class="result-item">' +
+      '<div class="ri-header">' +
+        '<span class="ri-tag">' + r.tag + '</span>' +
+        '<div class="ri-actions">' +
+          '<button data-copy-idx="' + i + '">📋 复制</button>' +
+          '<button data-dl-idx="' + i + '">📄 下载MD</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ri-content">' + highlightViolations(markdownToHtml(r.content)) + '</div>' +
+    '</div>';
+  });
+  html += auditHtml;
+  if (pacingHtml) html += pacingHtml;
+  area.innerHTML = html;
+
+  currentResults = results;
+
+  area.querySelectorAll('[data-copy-idx]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(btn.getAttribute('data-copy-idx'));
+      if (currentResults[idx]) {
+        copyToClipboard(currentResults[idx].content.replace(/[#*>`]/g, '').replace(/\n{3,}/g, '\n\n'));
+      }
+    });
+  });
+  area.querySelectorAll('[data-dl-idx]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(btn.getAttribute('data-dl-idx'));
+      if (currentResults[idx]) {
+        downloadMD('结果_' + currentResults[idx].tag + '_' + Date.now() + '.md', currentResults[idx].content);
+      }
+    });
+  });
+  area.querySelectorAll('[data-coveridx]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(btn.getAttribute('data-coveridx'));
+      if (currentResults[idx] && currentResults[idx].coverPrompt) {
+        copyToClipboard(currentResults[idx].coverPrompt);
+      }
+    });
+  });
+}
+
+function markdownToHtml(md) {
+  return md
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/- \[x\] (.+?)$/gm, '✅ $1')
+    .replace(/- \[ \] (.+?)$/gm, '☐ $1')
+    .replace(/^- (.+?)$/gm, '• $1')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/\n/g, '<br>');
+}
+
+function auditToMarkdown(text) {
+  var result = auditContent(text);
+  var hasIssue = result.hasIssue;
+  var issues = result.issues;
+  var md = '## 📋 敏感词检查报告\n\n| 检查项 | 状态 | 详情 |\n|--------|------|------|\n';
+  if (!hasIssue) {
+    md += '| 全部检查项 | ✅ 通过 | 未发现违规内容 |\n';
+  } else {
+    issues.forEach(function(i) {
+      md += '| ' + i.type + ' | ⚠️ 注意 | "' + i.word + '"建议替换为"' + i.suggestion + '"（番茄:' + i.fanqie + '/起点:' + i.qidian + '/晋江:' + i.jjwxc + '/七猫:' + i.qimao + '） |\n';
+    });
+  }
+  md += '\n推荐发布平台：起点中文网 / 番茄小说 / 晋江文学城 / 七猫小说（根据内容适配度选择）\n';
+  return md;
+}
+
+})();
+</script>
+</body>
+</html>
