@@ -5,6 +5,7 @@ frontend/dist/
 四模块/dist/
 frontend/_preview/
 .venv/
+.venv*/
 __pycache__/
 *.pyc
 
@@ -22,3 +23,4 @@ backend/资源/日志/
 
 # ===== 本地数据库导出（含样例业务数据，不随开源分发；建库用 表结构.sql） =====
 aicg.sql
+数据库导出_*.sql
