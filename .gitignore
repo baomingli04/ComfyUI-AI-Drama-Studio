@@ -14,8 +14,6 @@ backend/资源/上传/
 backend/资源/产物/
 backend/资源/OpenMontage/
 backend/资源/日志/
-# 嵌套 git 仓库（text-to-image-prompt-optimizer 自带 .git，按 gitlink 处理，内容不入库）
-backend/资源/技能/text-to-image-prompt-optimizer/
 
 # ===== 日志 / 临时 / 本地索引 =====
 *.log
